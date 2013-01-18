@@ -639,7 +639,7 @@ document.getElementById('audioTag').src = streamURL;</pre></div>
 			If conforming user agents cannot determine the media type of the <code>Stream</code>, they <em title="must" class="rfc2119">must</em> return the empty string. 
 			A string is a valid MIME type if it matches the media-type token defined in section 3.7 "Media Types" of RFC 2616 [<cite><a href="#bib-HTTP11" class="bibref">HTTP11</a></cite>].
 		</dd></dl></section><section id="methods"><h3><span class="secno">2.2 </span>Methods</h3><dl class="methods"><dt id="widl-Stream-close-void"><code>close</code></dt><dd>
-			This method should close the Stream and not allow and future reads. 
+			This method should close the Stream and not allow any future reads. 
 This is done by returning on the next and subsequent reads with no data.
  This is an irreversible and non-idempotent operation; once a <code>Stream</code>
  has been closed, it cannot be used again; dereferencing a Stream URI 
