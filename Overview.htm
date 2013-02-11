@@ -4,7 +4,7 @@
 
 <head>
 	<title>Streams API</title>
-	<meta content=text/html;charset=utf-8 http-equiv=Content-Type>
+	<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
 
 <!--	<script class=remove src="http://dev.w3.org/2009/dap/ReSpec.js/js/respec.js"></script> -->
 	
@@ -248,7 +248,7 @@ document.getElementById('audioTag').src = streamURL;
 <!--End section: Introduction-->
 </section>
 
-<section class="section" id="stream interface">
+<section class="section" id="stream-interface">
 <h2>The Stream Interface</h2>
 
 	<p>
@@ -639,7 +639,7 @@ document.getElementById('audioTag').src = streamURL;
 				<a href="http://dev.w3.org/2006/webapi/FileAPI/#fire-a-progress-event">firing events</a> is defined in DOM Level 3 Events [[!DOM-LEVEL-3-EVENTS]], 
 				and the table below is normative for the events in this specification. 
 			</p>
-				<table class="error" id="event-summary-table">
+				<table class="error" id="streamreader-event-summary-table">
 					<thead>
 						<tr>
 							<th>Event name</th>
@@ -682,9 +682,7 @@ document.getElementById('audioTag').src = streamURL;
 					</tbody>
 				</table>
 		</section>
-		
 	</section>
-	
 </section>
 <!-- End section: The StreamReader Interface -->
 
@@ -794,6 +792,7 @@ document.getElementById('audioTag').src = streamURL;
 <h2>Determining an empty Stream</h2>
 	<p>
 		StreamReader will read a Stream until maxSize has been reached or the Stream has no further data to return. If a Stream has been read until the end, then there is no further data to return. Subsequent read calls will return the following:
+	</p>
 		<dl class="switch">
 								<dt>If read is <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#dom-xmlhttprequest-responsetype"><code>readAsBlob</code></a></dt>
 								<dd>Return an empty <code>Blob</code> with size zero</dd>
@@ -808,7 +807,7 @@ document.getElementById('audioTag').src = streamURL;
 								<dd>Return an empty string</dd>
 								
 							</dl>
-	</p>
+	
 </section>
 
 <section class="section" id="errors-and-exceptions">
@@ -971,7 +970,7 @@ document.getElementById('audioTag').src = streamURL;
 				<a href="http://dev.w3.org/2006/webapi/FileAPI/#fire-a-progress-event">firing events</a> is defined in DOM Level 3 Events [[!DOM-LEVEL-3-EVENTS]], 
 				and the table below is normative for the events in this specification. 
 			</p>
-				<table class="error" id="event-summary-table">
+				<table class="error" id="streambuilder-event-summary-table">
 					<thead>
 						<tr>
 							<th>Event name</th>
@@ -1198,7 +1197,7 @@ document.getElementById('audioTag').src = streamURL;
 			</ol>
 	</section>
 
-	<section clas="section" id="send0">
+	<section class="section" id="send0">
 	<h3>send()</h3>
 		<p>
 			<a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#the-send-method">Section 4.6.6 The <code>send()</code> method</a> 
