@@ -441,10 +441,7 @@ table.exceptions table {
 			<li>A <a href="#idl-def-StreamReader" class="idlType"><code>StreamReader</code></a> interface, which provides methods to read the contents of a <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> as a 
 				<code>Blob</code>, <code>DataURL</code>, <code>ArrayBuffer</code>, or as <code>Text</code>.</li>
 			<li>A <a href="#idl-def-StreamBuilder" class="idlType"><code>StreamBuilder</code></a> interface, which allows for creating a new <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> whose contents is read from an internal buffer that was made by appending <code>Text</code>, <code>Blobs</code>, or <code>ArrayBuffers</code>.</li>
-			<li>Extensions to <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#the-xmlhttprequest-interface">XmlHttpRequest</a> [<cite><a class="bibref" href="#bib-XMLHTTPREQUEST2">XMLHTTPREQUEST2</a></cite>] to add support for upload and download of a <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a>.</li>
-			<li>
-				Extensions to <a href="http://dev.w3.org/2006/webapi/FileAPI/#FileErrorInterface">FileError</a> and 
-				<a href="http://dev.w3.org/2006/webapi/FileAPI/#FileException">FileException</a> to encompass <a href="#streamerror-error">Stream Errors</a>.</li>
+			<li>Extensions to <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html#interface-xmlhttprequest">XmlHttpRequest</a> [<cite><a class="bibref" href="#bib-XMLHTTPREQUEST2">XMLHTTPREQUEST2</a></cite>] to add support for upload and download of a <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a>.</li>
 			<li>
 				Extensions to <a href="http://dev.w3.org/2006/webapi/FileAPI/#dfn-createObjectURL">createObjectURL</a> and 
 				<a href="http://dev.w3.org/2006/webapi/FileAPI/#dfn-revokeObjectURL">revokeObjectURL</a> to add support for <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a>.</li>
@@ -455,9 +452,9 @@ table.exceptions table {
 		<p>
 			This API is designed to be used in conjunction with other APIs and elements on the web platform, notably: 
 			<a href="http://dev.w3.org/2006/webapi/FileAPI">File</a> [<cite><a class="bibref" href="#bib-FILE-API">FILE-API</a></cite>], 
-			<a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2">XMLHttpRequest</a> 
-			(e.g. with an overloaded <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#the-send-method"><code>send()</code></a> method 
-			and <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#the-responsetype-attribute"><code>response</code></a> object for <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> objects) [<cite><a class="bibref" href="#bib-XMLHTTPREQUEST2">XMLHTTPREQUEST2</a></cite>], 
+			<a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html">XMLHttpRequest</a> 
+			(e.g. with an overloaded <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html#the-send()-method"><code>send()</code></a> method 
+			and <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html/#the-responsetype-attribute"><code>response</code></a> object for <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> objects) [<cite><a class="bibref" href="#bib-XMLHTTPREQUEST2">XMLHTTPREQUEST2</a></cite>], 
 			<a href="http://dev.w3.org/html5/postmsg/#dom-window-postmessage"><code>postMessage</code></a>, and 
 			Web Workers [<cite><a class="bibref" href="#bib-WEBWORKERS">WEBWORKERS</a></cite>].
 		</p>
@@ -533,7 +530,7 @@ table.exceptions table {
     	</p>
     	<p>
 			The <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> interface represents binary data which can be obtained over time. A <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> can come from APIs 
-			such as <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#the-xmlhttprequest-interface"><code>XMLHttpRequest</code></a>, or can
+			such as <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html#interface-xmlhttprequest"><code>XMLHttpRequest</code></a>, or can
 			be built using <a href="#idl-def-StreamBuilder" class="idlType"><code>StreamBuilder</code></a>. 
 			The <a href="#idl-def-StreamReader" class="idlType"><code>StreamReader</code></a> interface represents a way to read data 
 			from a <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> as a <code>Blob</code>, <code>DataURL</code>, <code>ArrayBuffer</code>, or as <code>Text</code>, 
@@ -1087,16 +1084,16 @@ document.getElementById('audioTag').src = streamURL;</pre></div>
 		StreamReader will read a Stream until maxSize has been reached or the Stream has no further data to return. If a Stream has been read until the end, then there is no further data to return. Subsequent read calls will return the following:
 	</p>
 		<dl class="switch">
-								<dt>If read is <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#dom-xmlhttprequest-responsetype"><code>readAsBlob</code></a></dt>
+								<dt>If read is <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html/#dom-xmlhttprequest-responsetype"><code>readAsBlob</code></a></dt>
 								<dd>Return an empty <code>Blob</code> with size zero</dd>
 								
-								<dt>If read is <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#dom-xmlhttprequest-responsetype"><code>readAsArrayBuffer</code></a></dt>
+								<dt>If read is <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html/#dom-xmlhttprequest-responsetype"><code>readAsArrayBuffer</code></a></dt>
 								<dd>Return an <code>ArrayBuffer</code> with length zero</dd>
 								
-								<dt>If read is <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#dom-xmlhttprequest-responsetype"><code>readAsText</code></a></dt>
+								<dt>If read is <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html/#dom-xmlhttprequest-responsetype"><code>readAsText</code></a></dt>
 								<dd>Return an empty string</dd>
 								
-								<dt>If read is <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#dom-xmlhttprequest-responsetype"><code>readAsDataURL</code></a></dt>
+								<dt>If read is <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html/#dom-xmlhttprequest-responsetype"><code>readAsDataURL</code></a></dt>
 								<dd>Return an empty string</dd>
 								
 							</dl>
@@ -1108,14 +1105,14 @@ document.getElementById('audioTag').src = streamURL;</pre></div>
 	<section class="section" id="streamerror-error">
 	<h3><span class="secno">6.1 </span>StreamError</h3>
 		<p>
-			This interface should mimic the <a href="http://dev.w3.org/2006/webapi/FileAPI/#FileErrorInterface"><code>FileError</code> Interface</a>, and contain the same error codes.
+			This interface should mimic the <a href="http://www.w3.org/TR/2010/WD-FileAPI-20101026/#dfn-fileerror"><code>FileError</code> Interface</a>, and contain the same error codes.
 		</p>
 	</section>
 	
 	<section class="section" id="streamexception-error">
 	<h3><span class="secno">6.2 </span>StreamException</h3>
 		<p>
-			This interface should mimic the <a href="http://dev.w3.org/2006/webapi/FileAPI/#FileException"><code>FileException</code> Interface</a>, , and contain the same error codes.
+			This interface should mimic the <a href="http://www.w3.org/TR/2010/WD-FileAPI-20101026/#dfn-FileException"><code>FileException</code> Interface</a>, , and contain the same error codes.
 		</p>
 	</section>
 </section>
@@ -1340,7 +1337,7 @@ interface <span class="idlInterfaceID">StreamBuilder</span> : <span class="idlSu
 	<p>
 		This specification proposes an extension to <code>XMLHttpRequest</code> [<cite><a class="bibref" href="#bib-XMLHTTPREQUEST2">XMLHTTPREQUEST2</a></cite>] to add support for <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a>. This section is temporary and is meant to provide a recommendation for how <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> should be incorporated into <code>XMLHttpRequest</code>.
 		This will extend <code>XMLHttpRequest</code> to allow for receiving and uploading of a <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a>. 
-		One such scenario is providing access to data during <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#dom-xmlhttprequest-readystate"><code>readyState</code></a> 3 (loading). 
+		One such scenario is providing access to data during <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html/#dom-xmlhttprequest-readystate"><code>readyState</code></a> 3 (loading). 
 		The sections below document in detail what extensions must be done to <code>XMLHttpRequest</code> to support <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a>. 
 	</p>
 	
@@ -1350,7 +1347,7 @@ interface <span class="idlInterfaceID">StreamBuilder</span> : <span class="idlSu
 			A responseType of ‘<code>stream</code>’ should be introduced to <code>XMLHttpRequest</code>.
 		</p>		
 		<p>
-			<a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#the-responsetype-attribute">Section 4.7.7 the <code>responseType</code> attribute</a> 
+			<a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html/#the-responsetype-attribute">Section 4.7.7 the <code>responseType</code> attribute</a> 
 			in XMLHttpRequest Level 2 [<cite><a class="bibref" href="#bib-XMLHTTPREQUEST2">XMLHTTPREQUEST2</a></cite>] should now read:
 		</p>
 		<p>
@@ -1358,41 +1355,41 @@ interface <span class="idlInterfaceID">StreamBuilder</span> : <span class="idlSu
 		</p>
 			<ol>
 				<li>
-					If the state is not <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#dom-xmlhttprequest-opened"><code>OPENED</code></a> or 
-					<a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#dom-xmlhttprequest-headers_received"><code>HEADERS_RECEIVED</code></a> 
-					raise an <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#dom-domexception-invalid_state_err"><code>INVALID_STATE_ERR</code></a> 
+					If the state is not <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html/#dom-xmlhttprequest-opened"><code>OPENED</code></a> or 
+					<a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html/#dom-xmlhttprequest-headers_received"><code>HEADERS_RECEIVED</code></a> 
+					raise an <a href="https://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#invalidstateerror"><code>INVALID_STATE_ERR</code></a> 
 					exception and terminate these steps.
 				</li>
 				<li>
 					If the given value is not the empty string, "<code>arraybuffer</code>", "<code>blob</code>", 
 					"<code>document</code>", "<code>stream</code>", or "<code>text</code>" terminate these steps.</li>
-				<li>Set the <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#dom-xmlhttprequest-responsetype"><code>responseType</code></a> attribute's value to the given value.</li>
+				<li>Set the <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html/#dom-xmlhttprequest-responsetype"><code>responseType</code></a> attribute's value to the given value.</li>
 			</ol>	
 		<p></p>
 		
 		<p>
-			<a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#the-response-attribute">Section 4.7.8 the <code>response</code> attribute</a> 
+			<a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html/#the-response-attribute">Section 4.7.8 the <code>response</code> attribute</a> 
 			in XMLHttpRequest Level 2 [<cite><a class="bibref" href="#bib-XMLHTTPREQUEST2">XMLHTTPREQUEST2</a></cite>] should now read:
 		</p>
 		<p>
 			The <code>response</code> attribute must return the result of running these steps:
 		</p>	
 			<dl class="switch">
-				<dt>If <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#dom-xmlhttprequest-responsetype"><code>responseType</code></a> is the empty string or "text"</dt>
+				<dt>If <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html/#dom-xmlhttprequest-responsetype"><code>responseType</code></a> is the empty string or "text"</dt>
 				<dd>
 					<ol>
 						<li>
 							If the state is not 
-							<a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#dom-xmlhttprequest-loading">LOADING</a>
-							or <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#dom-xmlhttprequest-done">DONE</a> 
+							<a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html/#dom-xmlhttprequest-loading">LOADING</a>
+							or <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html/#dom-xmlhttprequest-done">DONE</a> 
 							return the empty string and terminate these steps.
 						</li>
 						<li>
-							If the <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#error-flag">error flag</a> 
+							If the <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html/#error-flag">error flag</a> 
 							is true return the empty string and terminate these steps.
 						</li>
 						<li>
-							Return the <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#text-response-entity-body">text response entity body</a>.
+							Return the <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html#response-entity-body-0">text response entity body</a>.
 						</li>
 					</ol>
 				</dd>
@@ -1401,8 +1398,8 @@ interface <span class="idlInterfaceID">StreamBuilder</span> : <span class="idlSu
 					<ol>
 						<li>
 							If the state is not 
-							<a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#dom-xmlhttprequest-loading">LOADING</a>
-							or <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#dom-xmlhttprequest-done">DONE</a> 
+							<a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html/#dom-xmlhttprequest-loading">LOADING</a>
+							or <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html/#dom-xmlhttprequest-done">DONE</a> 
 							return null and terminate these steps.</li>
 						<li>
 							If the error flag is true return null and terminate these steps.
@@ -1416,21 +1413,21 @@ interface <span class="idlInterfaceID">StreamBuilder</span> : <span class="idlSu
 				<dd>
 					<ol>
 						<li>
-							If the state is not <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#dom-xmlhttprequest-done">DONE</a> return null and terminate these steps.
+							If the state is not <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html/#dom-xmlhttprequest-done">DONE</a> return null and terminate these steps.
 						</li>
 						<li>
-							If the <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#error-flag">error flag</a> is true return null and terminate these steps.
+							If the <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html/#error-flag">error flag</a> is true return null and terminate these steps.
 						</li>
 						<li>
 							<dl class="switch">
-								<dt>If <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#dom-xmlhttprequest-responsetype"><code>responseType</code></a> is "<code>arraybuffer</code>"</dt>
-								<dd>Return the <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#arraybuffer-response-entity-body">arraybuffer response entity body</a>.</dd>
+								<dt>If <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html/#dom-xmlhttprequest-responsetype"><code>responseType</code></a> is "<code>arraybuffer</code>"</dt>
+								<dd>Return the <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html/#arraybuffer-response-entity-body">arraybuffer response entity body</a>.</dd>
 								
-								<dt>If <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#dom-xmlhttprequest-responsetype"><code>responseType</code></a> is "<code>blob</code>"</dt>
-								<dd>Return the <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#blob-response-entity-body">blob response entity body</a>.</dd>
+								<dt>If <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html/#dom-xmlhttprequest-responsetype"><code>responseType</code></a> is "<code>blob</code>"</dt>
+								<dd>Return the <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html/#blob-response-entity-body">blob response entity body</a>.</dd>
 								
-								<dt>If <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#dom-xmlhttprequest-responsetype"><code>responseType</code></a> is "<code>document</code>"</dt>
-								<dd>Return the <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#document-response-entity-body">document response entity body</a>.</dd>
+								<dt>If <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html/#dom-xmlhttprequest-responsetype"><code>responseType</code></a> is "<code>document</code>"</dt>
+								<dd>Return the <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html/#document-response-entity-body">document response entity body</a>.</dd>
 								
 							</dl>
 						</li>
@@ -1444,24 +1441,24 @@ interface <span class="idlInterfaceID">StreamBuilder</span> : <span class="idlSu
 	<h3><span class="secno">10.2 </span>readyState 3 changes</h3>
 		<p>
 			A <code>stream</code> is binary data obtained sequentially over time. 
-			Given this, a <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> should be accessible in <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#dom-xmlhttprequest-readystate"><code>readyState</code></a> 3 (LOADING).
+			Given this, a <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> should be accessible in <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html/#dom-xmlhttprequest-readystate"><code>readyState</code></a> 3 (LOADING).
 		</p>
 		<p>
-			<a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#response-entity-body0">Section 4.7.5 Response Entity Body</a> 
+			<a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html/#response-entity-body0">Section 4.7.5 Response Entity Body</a> 
 			in XMLHttpRequest Level 2 [<cite><a class="bibref" href="#bib-XMLHTTPREQUEST2">XMLHTTPREQUEST2</a></cite>] should have the following additions:
 		</p>
 		<p>
-			The <dfn id="stream-response-entity">stream response entity body</dfn> is a <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> representing the <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#response-entity-body">response entity body</a>. 
+			The <dfn id="stream-response-entity">stream response entity body</dfn> is a <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> representing the <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html/#response-entity-body">response entity body</a>. 
 			If the <a href="#stream-response-entity">stream response entity body</a> has no value assigned to it let it be the return value of the following algorithm:
 		</p>
 			<ol>
 				<li>
-					If the <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#response-entity-body">response entity body</a> is null, 
+					If the <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html/#response-entity-body">response entity body</a> is null, 
 					return an empty <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> object and terminate these steps.
 				</li>
 				<li>
 					Return a <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> object representing the 
-					<a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#response-entity-body">response entity body</a>.
+					<a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html/#response-entity-body">response entity body</a>.
 				</li>
 			</ol>
 	</section>
@@ -1469,7 +1466,7 @@ interface <span class="idlInterfaceID">StreamBuilder</span> : <span class="idlSu
 	<section class="section" id="send0">
 	<h3><span class="secno">10.3 </span>send()</h3>
 		<p>
-			<a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#the-send-method">Section 4.6.6 The <code>send()</code> method</a> 
+			<a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html#the-send()-method">Section 4.6.6 The <code>send()</code> method</a> 
 			in XMLHttpRequest Level 2 [<cite><a class="bibref" href="#bib-XMLHTTPREQUEST2">XMLHTTPREQUEST2</a></cite>] should have the following additions:
 		</p>
 		<dl class="switch">
@@ -1479,7 +1476,7 @@ interface <span class="idlInterfaceID">StreamBuilder</span> : <span class="idlSu
 					If the object's <code>type</code> attribute is not the empty string let <var>mime type</var> be its value.
 				</p>
 				<p>
-					Let the <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#request-entity-body">request entity body</a> be the raw data represented by <var>data</var>.
+					Let the <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html/#request-entity-body">request entity body</a> be the raw data represented by <var>data</var>.
 				</p>
 			
 			</dd>
