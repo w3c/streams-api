@@ -383,24 +383,20 @@ table.exceptions table {
   </p>
   <h1 class="title" id="title">Streams API</h1>
   
-  <h2 id="w3c-working-draft-11-february-2013"><abbr title="World Wide Web Consortium">W3C</abbr> Working Draft 11 February 2013</h2>
+  <h2 id="w3c-working-draft-11-february-2013"><abbr title="World Wide Web Consortium">W3C</abbr> Working Draft 14 February 2013</h2>
   <dl>
     
       <dt>This version:</dt>
-      <dd><a href="http://www.w3.org/TR/2013/WD-streams-api-20130211/">http://www.w3.org/TR/2013/WD-streams-api-20130211/</a></dd>
+      <dd><a href="http://www.w3.org/TR/2013/WD-streams-api-20130214/">http://www.w3.org/TR/2013/WD-streams-api-20130214/</a></dd>
       <dt>Latest published version:</dt>
       <dd><a href="http://www.w3.org/TR/streams-api/">http://www.w3.org/TR/streams-api/</a></dd>
     
+
+      <dt>Previous version:</dt>
+      <dd>None</dd>
     
       <dt>Latest editor's draft:</dt>
       <dd><a href="https://dvcs.w3.org/hg/streams-api/raw-file/tip/Overview.htm">https://dvcs.w3.org/hg/streams-api/raw-file/tip/Overview.htm</a></dd>
-    
-    
-    
-    
-    
-      <dt>Previous version:</dt>
-      <dd><a href=""></a></dd>
     
     
     <dt>Editor:</dt>
@@ -694,9 +690,9 @@ document.getElementById('audioTag').src = streamURL;</pre></div>
 <span class="idlMethod">    <span class="idlMethType"><a>void</a></span> <span class="idlMethName"><a href="#widl-StreamReader-readAsText-void-Stream-stream-DOMString-encoding-unsigned-long-long-maxSize">readAsText</a></span> (<span class="idlParam"><span class="idlParamType"><a href="#idl-def-Stream" class="idlType"><code>Stream</code></a></span> <span class="idlParamName">stream</span></span>, <span class="idlParam">optional <span class="idlParamType"><a>DOMString</a></span> <span class="idlParamName">encoding</span></span>, <span class="idlParam">optional <span class="idlParamType"><a>unsigned long long</a></span> <span class="idlParamName">maxSize</span></span>);</span>
 <span class="idlMethod">    <span class="idlMethType"><a>void</a></span> <span class="idlMethName"><a href="#widl-StreamReader-readAsDataURL-void-Stream-Stream-unsigned-long-long-maxSize">readAsDataURL</a></span> (<span class="idlParam"><span class="idlParamType"><a href="#idl-def-Stream" class="idlType"><code>Stream</code></a></span> <span class="idlParamName">Stream</span></span>, <span class="idlParam">optional <span class="idlParamType"><a>unsigned long long</a></span> <span class="idlParamName">maxSize</span></span>);</span>
 <span class="idlMethod">    <span class="idlMethType"><a>void</a></span> <span class="idlMethName"><a href="#widl-StreamReader-abort-void">abort</a></span> ();</span>
-<span class="idlConst">    const <span class="idlConstType"><a>unsigned short</a></span> <span class="idlConstName"><a href="#EMPTY">EMPTY</a></span> = <span class="idlConstValue">0</span>;</span>
-<span class="idlConst">    const <span class="idlConstType"><a>unsigned short</a></span> <span class="idlConstName"><a href="#LOADING">LOADING</a></span> = <span class="idlConstValue">1</span>;</span>
-<span class="idlConst">    const <span class="idlConstType"><a>unsigned short</a></span> <span class="idlConstName"><a href="#DONE">DONE</a></span> = <span class="idlConstValue">2</span>;</span>
+<span class="idlConst">    const <span class="idlConstType"><a>unsigned short</a></span> <span class="idlConstName"><a href="#widl-StreamReader-EMPTY">EMPTY</a></span> = <span class="idlConstValue">0</span>;</span>
+<span class="idlConst">    const <span class="idlConstType"><a>unsigned short</a></span> <span class="idlConstName"><a href="#widl-StreamReader-LOADING">LOADING</a></span> = <span class="idlConstValue">1</span>;</span>
+<span class="idlConst">    const <span class="idlConstType"><a>unsigned short</a></span> <span class="idlConstName"><a href="#widl-StreamReader-DONE">DONE</a></span> = <span class="idlConstValue">2</span>;</span>
 <span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a>unsigned short</a></span> <span class="idlAttrName"><a href="#widl-StreamReader-readyState">readyState</a></span>;</span>
 <span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a>any</a></span>            <span class="idlAttrName"><a href="#widl-StreamReader-result">result</a></span>;</span>
 <span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a>StreamError</a></span>    <span class="idlAttrName"><a href="#widl-StreamReader-error">error</a></span>;</span>
@@ -735,7 +731,7 @@ document.getElementById('audioTag').src = streamURL;</pre></div>
         		<ul>
         			<li>
         				On getting, if the 
-        				<a href="#widl-StreamReader-readAsBlob-void-Stream-stream-int-maxSize">readAsBlob</a> read method is used, 
+        				<a href="#widl-StreamReader-readAsBlob-void-Stream-stream-unsigned-long-long-maxSize">readAsBlob</a> read method is used, 
         				this attribute <em class="rfc2119" title="must">must</em> return a <code>Blob</code> of the data read from the <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> 
         				with the type property set as the type of the <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a>. 
         			</li>
@@ -918,8 +914,8 @@ document.getElementById('audioTag').src = streamURL;</pre></div>
 		<table class="error">
 		   <thead>
 				<tr>
-					<th><a href="#event-handler-attributes" title="event handler attributes">event handler attribute</a></th>
-					<th><a href="#event-handler-event-type">event handler event type</a></th>
+					<th><a href="http://dev.w3.org/2006/webapi/FileAPI/#event-handler-attributes" title="event handler attributes">event handler attribute</a></th>
+					<th><a href="http://dev.w3.org/2006/webapi/FileAPI/#event-handler-event-type">event handler event type</a></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -1220,8 +1216,8 @@ interface <span class="idlInterfaceID">StreamBuilder</span> : <span class="idlSu
 		<table class="error">
 		   <thead>
 				<tr>
-					<th><a href="#event-handler-attributes" title="event handler attributes">event handler attribute</a></th>
-					<th><a href="#event-handler-event-type">event handler event type</a></th>
+					<th><a href="http://dev.w3.org/2006/webapi/FileAPI/#event-handler-attributes" title="event handler attributes">event handler attribute</a></th>
+					<th><a href="http://dev.w3.org/2006/webapi/FileAPI/#event-handler-event-type">event handler event type</a></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -1444,7 +1440,7 @@ interface <span class="idlInterfaceID">StreamBuilder</span> : <span class="idlSu
 			Given this, a <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> should be accessible in <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html/#dom-xmlhttprequest-readystate"><code>readyState</code></a> 3 (LOADING).
 		</p>
 		<p>
-			<a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html/#response-entity-body0">Section 4.7.5 Response Entity Body</a> 
+			<a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html/#response-entity-body-0">Section 4.7.5 Response Entity Body</a> 
 			in XMLHttpRequest Level 2 [<cite><a class="bibref" href="#bib-XMLHTTPREQUEST2">XMLHTTPREQUEST2</a></cite>] should have the following additions:
 		</p>
 		<p>
