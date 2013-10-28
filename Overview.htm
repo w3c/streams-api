@@ -1,4 +1,4 @@
-﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 
 <html>
 
@@ -7,72 +7,84 @@
 	<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
 
 <!--	<script class=remove src="http://dev.w3.org/2009/dap/ReSpec.js/js/respec.js"></script> -->
-	
-	<script class="remove" src="https://www.w3.org/Tools/respec/respec-w3c-common"></script>
 
-	
+	<script class="remove" src="https://www.w3.org/Tools/respec/respec-w3c-common"></script>
+	<!--<script class="remove" src="respec-w3c-common.js"></script>-->
+
 	<script class="remove">
 	      var respecConfig = {
 	          // specification status (e.g. WD, LCWD, NOTE, etc.). If in doubt use ED.
 	          specStatus:           "ED",
-	          
+
 	          // the specification's short name, as in http://www.w3.org/TR/short-name/
 	          shortName:            "streams-api",
-	
+
 	          // if your specification has a subtitle that goes below the main
 	          // formal title, define it here
 	          // subtitle   :  "an excellent document",
-	
+
 	          // if you wish the publication date to be other than today, set this
 	          // publishDate:  "yyyy-mm-dd",
-	
+
 	          // if the specification's copyright date is a range of years, specify
 	          // the start date here:
 	          // copyrightStart: "2005"
-	
+
 	          // if there is a previously published draft, uncomment this and set its YYYY-MM-DD date
 	          // and its maturity status
 	          // previousPublishDate:  "yyyy-mm-dd",
 	          // previousMaturity:  "WD",
 
-	
+
 	          // if there a publicly available Editor's Draft, this is the link
 	          edDraftURI:           "http://dvcs.w3.org/hg/streams-api/Overview.html",
-	
+
 	          // if this is a LCWD, uncomment and set the end of its review period
 	          // lcEnd: "2009-08-05",
-	
+
 	          // if you want to have extra CSS, append them to this list
 	          // it is recommended that the respec.css stylesheet be kept
-	          extraCSS:             ["http://dev.w3.org/2009/dap/ReSpec.js/css/respec.css", 
-	          	"http://www.w3.org/StyleSheets/TR/W3C-ED.css", 
-	          	], 
-	
+	          //extraCSS:             ["http://dev.w3.org/2009/dap/ReSpec.js/css/respec.css",
+	          //	"http://www.w3.org/StyleSheets/TR/W3C-ED.css",
+	          //	],
+
 	          // editors, add as many as you like
 	          // only "name" is required
+
+              localBiblio: {
+                "EncodingDetermination": {
+                  title: "Encoding",
+                  href: "http://encoding.spec.whatwg.org/",
+                  authors: ["Anne van Kesteren", "Joshua Bell"],
+                  publisher: "WHATWG"
+                }
+              },
+
           editors:  [
               { name: "Feras Moussa", url: "mailto:feras.moussa@hotmail.com",
                 company: "Invited Expert",  },
+              { name: "Takeshi Yoshino", url: "mailto:tyoshino@google.com",
+                company: "Google, Inc.",  },
           ],
-	
-	          // authors, add as many as you like. 
+
+	          // authors, add as many as you like.
 	          // This is optional, uncomment if you have authors as well as editors.
 	          // only "name" is required. Same format as editors.
-	
+
 	          //authors:  [
 	          //    { name: "Your Name", url: "http://example.org/",
 	          //      company: "Your Company", companyURL: "http://example.com/" },
 	          //],
-	          
+
 	          // name of the WG
 	          wg:           "W3C Web Applications (WebApps)",
-	          
+
 	          // URI of the public WG page
 	          wgURI:        "http://www.w3.org/2008/webapps/",
-	          
+
 	          // name (with the @w3c.org) of the public mailing to which comments are due
 	          wgPublicList: "public-webapps",
-	          
+
 	          // URI of the patent status for this WG, for Rec-track documents
 	          // !!!! IMPORTANT !!!!
 	          // This is important for Rec-track documents, do not copy a patent URI from a random
@@ -82,8 +94,6 @@
 	      };
 	    </script>
 
-	<meta name=GENERATOR content="MSHTML 8.00.7600.16588">
-	
 	<!-- Styles to mimic File API spec -->
 	<style type="text/css">
 		table.error { border-collapse:collapse; border-style:hidden hidden none hidden }
@@ -91,118 +101,129 @@
 		table.error tbody th:first-child { border-left:solid }
 		table.error td, table th { border-left:solid; border-right:solid; border-bottom:solid thin; vertical-align:top; padding:0.2em }
 	</style>
-	
+
 </head>
 
 <body>
-<div class="note">this spec is currently being revised to incorporate many of the changes outlined in <a href='http://htmlpreview.github.io/?https://github.com/tyoshino/stream/blob/master/streams.html'>this reference spec.</a></div>
-<section id=abstract>
+<!--<div class="note">this spec is currently being revised to incorporate many of the changes outlined in <a href='http://htmlpreview.github.io/?https://github.com/tyoshino/stream/blob/master/streams.html'>this reference spec.</a></div>-->
+<section id="abstract">
 		<!-- TODO: are all of the links and objects in the abstract formatted? -->
 		<p>
-			This specification provides an API for representing binary data in web applications as a <a>Stream</a> object, 
+			This specification provides an API for representing binary and string data in web applications as a <a>Stream</a> object,
 			as well as programmatically building and reading its contents. This includes:
 		</p>
 		<ul>
-			<li>A <a>Stream</a> interface, which represents a sequence of data that can be read over time.</li>
-			<li>A <a>StreamReader</a> interface, which provides methods to read the contents of a <a>Stream</a> as a 
-				<code>Blob</code>, <code>DataURL</code>, <code>ArrayBuffer</code>, or as <code>Text</code>.</li>
-			<li>A <a>StreamBuilder</a> interface, which allows for creating a new <a>Stream</a> whose contents is read from an internal buffer that was made by appending <code>Text</code>, <code>Blobs</code>, or <code>ArrayBuffers</code>.</li>
-			<li>Extensions to <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#the-xmlhttprequest-interface">XmlHttpRequest</a> [[!XMLHTTPREQUEST2]] to add support for upload and download of a <a>Stream</a>.</li>
+			<li>A <a>Stream</a> interface, which represents a sequence of data which can be read only once and provides APIs for reading, writing, and piping the data.</li>
+			<li>A <a>StreamConsumeResult</a> interface, which represents a chunk of content read from a stream.</li>
+			<li>A <a>StreamReadType</a> interface, which represents how the <a>Stream</a> is currently being read.</li>
+			<li>A list of notable stream <a href="#producers">producers</a> a and <a href="#consumers">consumers</a> for a <a>Stream</a> object.</li>
+			<li>Extensions to <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#the-xmlhttprequest-interface">XMLHttpRequest</a> [[!XMLHTTPREQUEST2]] to add support for upload and download of a <a>Stream</a>.</li>
 			<li>
-				Extensions to <a href="http://dev.w3.org/2006/webapi/FileAPI/#FileErrorInterface">FileError</a> and 
-				<a href="http://dev.w3.org/2006/webapi/FileAPI/#FileException">FileException</a> to encompass <a href="#streamerror-error">Stream Errors</a>.</li>
-			<li>
-				Extensions to <a href="http://dev.w3.org/2006/webapi/FileAPI/#dfn-createObjectURL">createObjectURL</a> and 
-				<a href="http://dev.w3.org/2006/webapi/FileAPI/#dfn-revokeObjectURL">revokeObjectURL</a> to add support for <a>Stream</a>.</li>
+				Extensions to <a href="http://dev.w3.org/2006/webapi/FileAPI/#dfn-createObjectURL">URL.createObjectURL</a> and
+				<a href="http://dev.w3.org/2006/webapi/FileAPI/#dfn-revokeObjectURL">URL.revokeObjectURL</a> to add support for <a>Stream</a>.</li>
 		</ul>
+
 		<p>
-			Additionally, this specification defines objects to be used within threaded web applications for the synchronous reading of a <a>Stream</a>.
-		</p>
-		<p>
-			This API is designed to be used in conjunction with other APIs and elements on the web platform, notably: 
-			<a href="http://dev.w3.org/2006/webapi/FileAPI">File</a> [[!FILE-API]], 
-			<a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2">XMLHttpRequest</a> 
-			(e.g. with an overloaded <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#the-send-method"><code>send()</code></a> method 
-			and <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#the-responsetype-attribute"><code>response</code></a> object for <a>Stream</a> objects) [[!XMLHTTPREQUEST2]], 
-			<a href="http://dev.w3.org/html5/postmsg/#dom-window-postmessage"><code>postMessage</code></a>, and 
+			This API is designed to be used in conjunction with other APIs and elements on the web platform, notably:
+			<a href="http://dev.w3.org/2006/webapi/FileAPI">File</a> [[!FILE-API]],
+			<a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2">XMLHttpRequest</a>
+			(e.g. with an overloaded <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#the-send-method"><code>send()</code></a> method
+			and <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#the-responsetype-attribute"><code>response</code></a> object for <a>Stream</a> objects) [[!XMLHTTPREQUEST2]],
+			<a href="http://dev.w3.org/html5/postmsg/#dom-window-postmessage"><code>postMessage</code></a>, and
 			Web Workers [[!WEBWORKERS]].
 		</p>
 <!--End section: Abstract-->
 </section>
 
+<section id="sotd">
+  <p>
+    This specification is currently being revised to incorporate <a href="https://github.com/domenic/promises-unwrapping/blob/master/README.md">Promises</a>.
+  </p>
+</section>
+
 <section id="introduction" class="section informative">
     	<h2>Introduction</h2>
-    	
+
     	<p>
-    		Web applications should have the ability to acquire and manipulate data in a wide variety of forms, 
-    		including as a sequence of data made available over time. 
-    		This specification defines the basic representation for <a href="#idl-def-Stream"><code>Streams</code></a>, 
-    		errors raised by <a href="#idl-def-Stream"><code>Streams</code></a>, 
-    		and programmatic ways to read and create <a href="#idl-def-Stream"><code>Streams</code></a>. 
+    		Web applications should have the ability to acquire and manipulate data in a wide variety of forms,
+    		including as a sequence of data made available over time.
+    		This specification defines the basic representation for <a href="#dfn-stream">Streams</a>,
+    		errors raised by <a href="#dfn-stream">Streams</a>,
+    		and programmatic ways to create, read, and write to <a href="#dfn-stream">Streams</a>.
     	</p>
     	<p>
-			The <a>Stream</a> interface represents binary data which can be obtained over time. A <a>Stream</a> can come from APIs 
-			such as <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#the-xmlhttprequest-interface"><code>XMLHttpRequest</code></a>, or can
-			be built using <a>StreamBuilder</a>. 
-			The <a>StreamReader</a> interface represents a way to read data 
-			from a <a>Stream</a> as a <code>Blob</code>, <code>DataURL</code>, <code>ArrayBuffer</code>, or as <code>Text</code>, 
-			and should happen asynchronously on the user agent’s main thread, 
-			with an optional synchronous API used within threaded web applications. 
-			An asynchronous API for reading <a href="#idl-def-Stream"><code>Streams</code></a> prevents blocking and UI “freezing” on a user agent’s main thread. 
-			This specification defines an asynchronous API based on an event model to read and access a <a>Stream</a>, 
-			which is closely based on the FileReader interface defined in the [[!FILE-API]]. 
-			A <a>StreamReader</a> object provides asynchronous read methods to access the <a href="#idl-def-Stream"><code>Stream's</code></a> data as a 
-			<code>Blob</code>, <code>DataURL</code>, <code>ArrayBuffer</code>, or as <code>Text</code> through event handler attributes and the firing of events. 
-			The use of events and event handlers allows separate code blocks the ability to monitor the progress of the read 
-			(which is particularly useful for long <a>Stream</a> reads or high latency network requests) 
-			and error conditions that may arise during reading of a <a>Stream</a>. An example will be illustrative.
+			The <a>Stream</a> interface represents binary data which can be obtained over time and read once. A <a>Stream</a> can come from API <a href="#producers">producers</a> such as <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#the-xmlhttprequest-interface"><code>XMLHttpRequest</code></a>, or can
+			be built using the <a>Stream</a> constructor.
 		</p>
+
+		<p>
+			The <a>Stream</a> interface provides a <code>read</code> method for reading the data
+			from a <a>Stream</a> as a <a>StreamConsumeResult</a>, which provides the data as a <code>Blob</code>, <code>ArrayBuffer</code>, or as <code>DOMString</code>,
+			and should happen asynchronously on the user agent’s main thread. Additionally, the stream can also be used in API <a href="#consumers">consumers</a> such as a media element.
+		</p>
+
+		<p>
+			The <a>Stream</a> interface also provides a <code>write</code> method for writing data
+			to a <a>Stream</a> as a <code>Blob</code>, <code>ArrayBuffer</code>, or as <code>DOMString</code>,
+			and should happen asynchronously on the user agent’s main thread.
+		</p>
+
+		<p>
+			An asynchronous API for reading <a href="#idl-def-Stream"><code>Streams</code></a> prevents blocking and UI “freezing” on a user agent’s main thread.
+			This specification defines an asynchronous API to access a <a>Stream</a>. Error conditions that may arise during reading of a <a>Stream</a> will be handled by a reject callback set to the promise returned by the read() method. An example will be illustrative.
+
+		</p>
+
     	<p>
-    		In the example below, different code blocks handle progress, error, and success conditions. 
-    		The example demonstrates how to read a <a>Stream</a> using <a>StreamReader</a>.
+    		In the example below, different code blocks handle progress, error, and success conditions.
+    		The example demonstrates how to read a chunk of data from a <a>Stream</a> using <code>read</code>. The <a>Stream</a> may of come from a <a href="#producers	">producer</a> such as <code>XMLHttpRequest</code>. Additionally, it demonstrates how to read a stream until an EOF is encountered.
     	</p>
     	<pre class="example">
-function startRead(stream) {
-        
-  var reader = new StreamReader();
-  
-  // Handle progress, success, and errors
-  reader.onprogress = updateProgress;
-  reader.onload = loaded;
-  reader.onerror = errorHandler;
-  
-    // Read the first 1024 bytes of the stream as UTF-8      
-  reader.readAsText(stream, "UTF-8", 1024);
-}
-
-function updateProgress(evt) {
-    var bytesLoaded = (evt.loaded / 1024);
-    // Increase bytes loaded counter
-}
-
-function loaded(evt) {  
-  // Obtain the read stream data    
-  var streamRead = evt.target.result;
-  
-}
-
-function errorHandler(evt) {
-  if(evt.target.error.name == "NOT_READABLE_ERR") {
-    // The stream could not be read
+// Read the first 1024 bytes of the stream as UTF-8
+stream.readEncoding = "UTF-8";
+stream.readType = "arraybuffer";
+Promise readPromise = stream.read(1024);
+readPromise.then(
+  function(result) {
+    console.log("Loaded" + result.size + " bytes");
+    // Handle result.data
+  },
+  function(error) {
+    // Handle error
   }
+);
+
+// Read data from the stream repeatedly
+function readUntilEof() {
+  stream.read(1024).then(
+    function(result) {
+      // Handle read data
+      someProcessFunction(result.data);
+
+      // Print progress
+      someReportFunction(result.size);
+
+      if (!result.eof) {
+        readUntilEof();
+      }
+    },
+    function(error) {
+      // Handle error
+    }
+  );
 }
     	</pre>
-    	
+
     	<p>
-    		In the example below, different code blocks handle progress, error, and success conditions. 
-    		The example below demonstrates how to obtain a <a>Stream</a> from <code>XMLHttpRequest</code> to begin playing a large video in <code>readystate</code> 3.
+    		In the example below, different code blocks handle progress, error, and success conditions.
+    		The example below demonstrates how to obtain a <a>Stream</a> from <code>XMLHttpRequest</code> to begin playing a large video in <code>readystate</code> 3. The example takes the <a>Stream</a> from a <a href="#producers">producer</a>, <code>XMLHttpRequest</code>, and gives to a <a href="#consumers">consumer</a>, the video tag.
     	</p>
     	<pre class="example">
 function handler() {
   if(this.readyState == this.LOADING) {
-	var theStream = this.response;
-	var streamURL = URL.createObjectURL(theStream);
-	document.getElementById("myVideoTag").src = streamURL;
+    var theStream = this.response;
+    var streamURL = URL.createObjectURL(theStream);
+    document.getElementById("myVideoTag").src = streamURL;
   }
 }
 
@@ -214,853 +235,450 @@ client.open("GET", "myvideo.h264");
 client.responseType = "stream";
 client.send();
     	</pre>
-    	
+
 		<p>
-			In addition to reading a Stream, this specification introduces a programatic way to build a Stream with the <a>StreamBuilder</a> interface.
-			The <a>StreamBuilder</a> interface represents a way to provide the data to be read from a Stream by appending the data to an internal buffer.
-			<a>StreamBuilder</a> supports appending <code>Blob</code>, <code>ArrayBuffer</code>, and <code>Text</code> data to the buffer. 
-			<a>StreamBuilder</a> also provides an event to notify when the data available to be read from the buffer has fallen below a given threshold.
+			In addition to reading a Stream, this specification introduces a programatic way to write data to a Stream.
+			The <a>Stream</a> interface provides a <code>write()</code> method which allows applications to build the data to be read by a Stream <a href="#consumers">consumer</a> by appending the data to an internal buffer.
+			<code>write()</code> supports appending data as a <code>Blob</code>, <code>ArrayBuffer</code>, or <code>DOMString</code> to the buffer.
 		</p>
 		<p>
-			The example below demonstrates how to use <a>StreamBuilder</a> to load a stream into the audio tag, whose data is processed and built dynamically at read time. 
-			The <code>thresholdReached</code> event is fired when the buffer falls below 1024 bytes.
+			The example below demonstrates how to use <code>write()</code> to load a Stream into the audio tag, whose data could be processed and built dynamically at read time.
 		</p>
-		
+
 <pre class="example">
-function thresholdReached(){
-  var moreData = //do work to create more data to place into the stream
-  
-  //if we have no more data to process and place in the stream, we close
-  if(moreData == null){
-  	sbuilder.close();
+var theStream = new Stream("audio/mp3");
+
+function writeData(){
+  var moreData;
+  // Do work to create more data to place into the stream
+
+  // If we have no more data to process and place in the stream, we close
+  if (moreData == null){
+    theStream.close();
   } else{
-  	sbuiler.append(moreData);
+    theStream.write(moreData).then(
+      function () {
+        writeData();
+      },
+      function (error) {
+        // Handle error
+      }
+    );
   }
 }
 
-var sbuilder = new StreamBuilder("audio/mp3", 1024);
-var sbuilder.onthresholdreached = thresholdReached;
-  
-var streamURL = URL.createObjectURL(sbuilder.stream);
+var streamURL = URL.createObjectURL(theStream);
 document.getElementById('audioTag').src = streamURL;
 
-		</pre>
+writeData();</pre>
 <!--End section: Introduction-->
 </section>
 
-<section class="section" id="stream-interface">
-<h2>The Stream Interface</h2>
+<section class="section" id="streams">
+	<h2>Streams</h2>
+	<p>
+		This section introduces the <code>Stream</code> interface, as well as accompanying interfaces required as part of the <a>Stream</a> implementation. This includes a constructor to build a <a>Stream</a>, as well as methods to <code>read</code>, <code>write</code>, <code>skip</code>, <code>pipe</code>, and <code>close</code> streams.
 
-	<p>
-		This interface represents a raw sequence of linear data which can be read over time. 
-		It provides an attribute representing the type of data represented by the <a>Stream</a>.
-	</p>
-	<p>A <a>Stream</a> is an object that:</p>
-	<ul>
-		<li>Has a content type;</li>
-		<li>Has unspecified length;</li>
-		<li>Can generally be used in the same places <code>Blob</code> can be used, such as <code>URL.createObjectURL()</code></li>
-	</ul>
-	<dl class="idl" title="interface Stream">
-		<dt>readonly attribute DOMString type</dt>
-		<dd>
-			The ASCII-encoded string in lower case representing the media type of the <code>Stream</code>, 
-			expressed as an RFC2046 MIME type [[!RFC2046]]. 
-			Conforming user agents SHOULD return the MIME type of the <code>Stream</code>, if it is known. 
-			If conforming user agents cannot determine the media type of the <code>Stream</code>, they MUST return the empty string. 
-			A string is a valid MIME type if it matches the media-type token defined in section 3.7 "Media Types" of RFC 2616 [[!HTTP11]].
-		</dd>
-
-		<dt>void close()</dt>
-		<dd>
-			This method should close the Stream and not allow any future reads. This is done by returning on the next and subsequent reads with no data. This is an irreversible and non-idempotent operation; once a <code>Stream</code> has been closed, it cannot be used again; dereferencing a Stream URI bound to a Stream object on which close has been called results in a <a href="http://www.w3.org/TR/FileAPI/#FiveHundredInternalServerError">500 Error</a>.
-		</dd>
-
-	
-	</dl>
-</section>
-<!-- End section: The Stream Interface -->
-
-<section class="section" id="streamreader-interface">
-<h2>The StreamReader Interface</h2>
-	<p>
-		This interface provides methods to read the data of a <code>Stream</code> using progress events and event handler attributes. 
-		It is desirable to read data from <a href="idl-def-Stream">Streams</a> asynchronously in the main thread of user agents. 
-		This interface provides such an asynchronous API, and is specified to be used with the global object 
-		(<a href="http://www.w3.org/TR/2011/WD-html5-20110525/browsers.html#the-window-object">Window</a> [[!HTML5]]).
-		The <a>StreamReader</a> is designed in a way to closely follow the W3C <a href="http://dev.w3.org/2006/webapi/FileAPI/#FileReader-interface">FileReader</a> [[!FILE-API]], 
-		and thus only identifies changes or additions to the way <a href="http://dev.w3.org/2006/webapi/FileAPI/#dfn-filereader">FileReader methods</a> behave.
-	</p>
-	<p>
-		When the <code>StreamReader()</code> constructor is invoked, the user agent MUST return a new <a>StreamReader</a> object.
-	</p>
-	<p>
-		In environments where the global object is represented by a <code>Window</code> or a <code>WorkerGlobalScope</code> object, 
-		the <a>StreamReader</a> constructor MUST be available.
-	</p>
-	<p>
-		For event handler attributes, event handlers for <a>StreamReader</a> should mimic
-		<a href="http://dev.w3.org/2006/webapi/FileAPI/#event-handler-attributes-section">6.4.3 Event Handler Attributes</a> of the File API specification. [[!FILE-API]]
-	</p>
-	<p>
-		For states, event handlers for <a>StreamReader</a> should mimic <a href="http://dev.w3.org/2006/webapi/FileAPI/#blobreader-state">6.4.4 FileReader States</a> 
-		of the File API specification, except as defined below for <a href="#widl-StreamReader-DONE"><code>DONE</code></a> (numeric value of 2). [[!FILE-API]]
-	</p>
-	<p>
-		Multiple reads on <a>StreamReader</a> should mimic 
-		<a href="http://dev.w3.org/2006/webapi/FileAPI/#MultipleReads">6.4.5.1 Multiple Reads</a> of the File API specification. [[!FILE-API]]
 	</p>
 
-	
-	<dl class="idl" title="interface StreamReader : EventTarget">
-		
-		<dt>void readAsBlob(in Stream stream, optional unsigned long long maxSize) raises (StreamException, OperationNotAllowedException)</dt>
-		<dd>
-			<p></p>
-			<p>
-				When this method is called, the user agent MUST run the steps below (unless otherwise indicated).
-			</p>
-			<ol>
-				<li>
-						If <code>maxSize</code> is less than one, through an Invalid Argument exception. Terminate these overall steps.
-					</li>
-				<li>
-					If <code>readyState</code> is <code>LOADING</code>, raise a <code>NOT_ALLOWED_ERR</code> exception and terminate these steps.
-				</li>
-				<li>
-					If an error occurs during reading the <code>stream</code> parameter, 
-					set <a class="idlType" href="#widl-StreamReader-readyState"><code>readyState</code></a> to <code>DONE</code> and set 
-					<a class="idlType" href="#widl-StreamReader-result"><code>result</code></a> to <code>null</code>. 
-					Proceed to the error steps below.
-						<ol>
-							<li>
-								Dispatch a progress event called <code>error</code>. 
-								Set the <a class="idlType" href="#widl-StreamReader-error"><code>error</code></a> attribute; 
-								on getting, the <a class="idlType" href="#widl-StreamReader-error"><code>error</code></a> 
-								attribute MUST be a <a href="#streamerror-error"><code>StreamError</code></a> object with a valid error code 
-								that indicates the kind of file error that has occurred.
-							</li>
-							<li>
-								Dispatch a progress event called <code>loadend</code>.
-							</li>
-							<li>
-								Terminate this overall set of steps.
-							</li>
-						</ol>
-				</li>
-				<li>
-					If no error has occurred, set <a class="idlType" href="#widl-StreamReader-readyState"><code>readyState</code></a> to <code>LOADING</code>.
-				</li>
-				<li>
-					Fire a progress event called <code>loadstart</code>.
-				</li>
-				<li>
-					Make progress notifications.
-				</li>
-				<li>
-					Continue reading on the <a>Stream</a>:
-						<ol>
-							<li>
-								If the optional <code>maxSize</code> parameter has been set, 
-								set the <a class="idlType" href="#widl-StreamReader-readyState"><code>readyState</code></a> to <code>DONE</code> 
-								when the number of bytes read reaches <code>MAX_SIZE</code> 
-								or the stream has been fully read and the number of bytes is less than <code>MAX_SIZE</code>.
-							</li>
-							<li>
-								If the optional parameter has not been set, 
-								set <a class="idlType" href="#widl-StreamReader-readyState"><code>readyState</code></a> 
-								to <code>DONE</code> when the stream has been fully read. 
-							</li>
-						</ol>
-				</li>
-				<li>
-					Set the <a class="idlType" href="#widl-StreamReader-result"><code>result</code></a> attribute to be stream’s data content represented as a <code>Blob</code>; 
-					on getting, the result <a class="idlType" href="#widl-StreamReader-result"><code>result</code></a> returns the (complete) data of stream as a <code>Blob</code>.
-				</li>
-				<li>
-					Terminate this overall set of steps.
-				</li>
-			</ol>
-			<p></p>
-			<dl class="parameters">
-				<dt>Stream stream</dt>
-				<dd>The Stream to be read</dd>
-				
-				<dt>unsigned long long maxSize</dt>
-				<dd>The maximum number of bytes to be read before completion</dd>
-			</dl>
-		</dd>
-
-		<dt>void readAsArrayBuffer(in Stream stream, optional unsigned long long maxSize) raises (OperationNotAllowedException)</dt>
-		<dd>
-			<p></p>
-			<p>
-				This method should mimic <a href="http://dev.w3.org/2006/webapi/FileAPI/#readAsArrayBuffer"><code>FileReader.readAsArrayBuffer()</code></a>. [[!FILE-API]]
-				The only addition is the addition of a <code>maxSize</code> parameter, which has the following adjustment:
-			</p>
-				<ul>
-					<li>
-						If <code>maxSize</code> is less than one, throw an Invalid Argument exception. Terminate these overall steps.
-					</li>
-					<li>
-						When the stream has been fully read, 
-						or the number of bytes specified by <code>maxSize</code> has been reached, 
-						set <a class="idlType" href="#widl-StreamReader-readyState"><code>readyState</code></a> to <code>DONE</code>.
-					</li>
-				</ul>
-			<p></p>
-			<dl class="parameters">
-				<dt>Stream stream</dt>
-				<dd>The Stream to be read</dd>
-				<dt>optional unsigned long long maxSize</dt>
-				<dd>The maximum number of bytes to be read before completion</dd>
-			</dl>
-			<dl class="exception" title="StreamException">
-				<dt></dt>
-				<dd></dd>
-			</dl>
-			<dl class="exception" title="OperationNotAllowedException">
-				<dt></dt>
-				<dd></dd>
-			</dl>
-
-		</dd>
-	
-		<dt>void readAsText(in Stream stream, optional DOMString encoding, in optional unsigned long long maxSize) raises (OperationNotAllowedException)</dt>
-		<dd>	
-		<p></p>
-			<p>
-				This method should mimic <a href="http://dev.w3.org/2006/webapi/FileAPI/#readAsDataText"><code>FileReader.readAsText()</code></a>. [[!FILE-API]]
-				The only addition is the addition of a <code>maxSize</code> parameter, which has the following adjustment:
-			</p>
-			<ol>
-				<li>
-						If <code>maxSize</code> is less than one, through an Invalid Argument exception. Terminate these overall steps.
-					</li>
-				<li>
-					If no encoding is specified, use the <a href="http://dev.w3.org/2006/webapi/FileAPI/#encoding-determination">encoding determination</a> algorithm specified in the [[!FILE-API]]. 
-				</li>
-				<li>
-					If no <code>maxSize</code> is specified, continue reading until the stream has been completed.
-				</li>
-				<li>
-					When the stream has been fully read, or 
-					<strong>the number of bytes specified by <code>maxSize</code> has been reached</strong>, 
-					set <a class="idlType" href="#widl-StreamReader-readyState"><code>readyState</code></a> to <code>DONE</code>.
-				</li>
-			</ol>
-		<p></p>
-			<dl class="parameters">
-				<dt>Stream stream</dt>
-				<dd>The Stream to be read</dd>
-				<dt>optional DOMString encoding</dt>
-				<dd>The encoding format</dd>
-				<dt>optional unsigned long long maxSize</dt>
-				<dd>The maximum number of bytes to be read before completion</dd>
-			</dl>
-			<dl class="exception" title="StreamException">
-				<dt></dt>
-				<dd></dd>
-			</dl>
-			<dl class="exception" title="OperationNotAllowedException">
-				<dt></dt>
-				<dd></dd>
-			</dl>
-		</dd>
-		
-		<dt>void readAsDataURL(in Stream stream, optional unsigned long long maxSize)</dt>
-		<dd>
-		<p></p>
-			<p>
-				This method should mimic <a href="http://dev.w3.org/2006/webapi/FileAPI/#readAsDataURL"><code>FileReader.readAsDataURL()</code></a>. [[!FILE-API]] 
-				The only addition is the addition of a <code>maxSize</code> parameter, which has the following adjustment.
-			</p>
-				<ul>
-					<li>
-						If <code>maxSize</code> is less than one, through an Invalid Argument exception. Terminate these overall steps.
-					</li>
-					<li>
-						Queue a task to update the <a class="idlType" href="#widl-StreamReader-result"><code>result</code></a> attribute 
-						with the <a>Stream</a> as a DataURL [[!RFC2397]] after the stream has been fully read, 
-						or the number of bytes specified by <code>maxSize</code> has been reached; 
-						on getting, the <a class="idlType" href="#widl-StreamReader-result"><code>result</code></a> attribute 
-						returns the (complete) data of stream as a DataURL [[!RFC2397]].
-					</li>
-				</ul>
-
-			<dl class="parameters">
-				<dt>Stream Stream</dt>
-				<dd>The Stream to be read</dd>
-				<dt>optional unsigned long long maxSize</dt>
-				<dd>The maximum number of bytes to be read before completionk</dd>
-			</dl>
-			<dl class="exception" title="StreamException">
-				<dt></dt>
-				<dd></dd>
-			</dl>
-			<dl class="exception" title="OperationNotAllowedException">
-				<dt></dt>
-				<dd></dd>
-			</dl>
-			
-		</dd>
-		
-		<dt>void abort()</dt>
-		<dd>This method should mimic <a href="http://dev.w3.org/2006/webapi/FileAPI/#abort"><code>FileReader.abort()</code></a>. [[!FILE-API]]</dd>
-		
-		<dt> const unsigned short EMPTY = 0</dt>
-		<dd>
-			This state should mimic the 
-			<code>EMPTY</code> state of the 
-			<a href="http://dev.w3.org/2006/webapi/FileAPI/#blobreader-state">FileReader States</a>
-		</dd>
-
-        <dt>const unsigned short LOADING = 1</dt>
-        <dd>
-			This state should mimic the 
-			<code>LOADING</code> state of the 
-			<a href="http://dev.w3.org/2006/webapi/FileAPI/#blobreader-state">FileReader States</a>
-        </dd>
-        
-        <dt>const unsigned short DONE = 2</dt>
-        <dd>
-        	The current read request has been completed, or an error occurred during read, 
-        	or the read was aborted using <a href="#widl-StreamReader-abort-void"><code>abort()</code></a>. The <a>StreamReader</a> is no longer reading a <a>Stream</a>.
-        </dd>
-        
-        <dt>readonly attribute unsigned short readyState</dt>
-        <dd></dd>
-        
-        <dt>readonly attribute any result</dt>
-        <dd>
-        	This attribute should mimic the <a href="http://dev.w3.org/2006/webapi/FileAPI/#dfn-result">FileReader.result</a> attribute, with the following addition:
-        		<ul>
-        			<li>
-        				On getting, if the 
-        				<a href="#widl-StreamReader-readAsBlob-void-Stream-stream-int-maxSize">readAsBlob</a> read method is used, 
-        				this attribute MUST return a <code>Blob</code> of the data read from the <a>Stream</a> 
-        				with the type property set as the type of the <a>Stream</a>. 
-        			</li>
-        		</ul>
-        </dd>
-		
-        <dt>readonly attribute StreamError error</dt>
-        <dd></dd>
-
-        <dt>attribute Function onloadstart</dt>
-        <dd>
-			This event handler should mimic the 
-        	<a href="http://dev.w3.org/2006/webapi/FileAPI/#dfn-onloadstart"><code>FileReader.onloadstart</code></a> 
-        	event handler.
-		</dd>
-
-        <dt>attribute Function onprogress</dt>
-        <dd>
-			This event handler should mimic the 
-        	<a href="http://dev.w3.org/2006/webapi/FileAPI/#dfn-onprogress"><code>FileReader.onprogress</code></a> 
-        	event handler.
-		</dd>
-
-        <dt>attribute Function onload</dt>
-        <dd>
-			This event handler should mimic the 
-        	<a href="http://dev.w3.org/2006/webapi/FileAPI/#dfn-onload"><code>FileReader.onload</code></a> 
-        	event handler.
-		</dd>
-
-        <dt>attribute Function onabort</dt>
-        <dd>
-			This event handler should mimic the 
-        	<a href="http://dev.w3.org/2006/webapi/FileAPI/#dfn-onabort"><code>FileReader.onabort</code></a> 
-        	event handler.
-		</dd>
-
-        <dt>attribute Function onerror</dt>
-        <dd>
-			This event handler should mimic the 
-        	<a href="http://dev.w3.org/2006/webapi/FileAPI/#dfn-onerror"><code>FileReader.onerror</code></a> 
-        	event handler.
-		</dd>
-
-        <dt>attribute Function onloadend</dt>
-        <dd>
-			This event handler should mimic the 
-        	<a href="http://dev.w3.org/2006/webapi/FileAPI/#dfn-onloadend"><code>FileReader.onloadend</code></a> 
-        	event handler.
-		</dd>
-
-	</dl>
- <div class="idl" title="StreamReader implements EventTarget"></div>
-	
-	<section class="section" id="streamreader-event-handler-types">
-	<h3>Event Handler Attributes</h3>
+	<section class="section" id="stream-interface">
+	<h2>The Stream Interface</h2>
 		<p>
-			The following are the event handler attributes (and their corresponding event handler event types) that user agents MUST support on StreamReader as DOM attributes:
+			This interface represents a raw sequence of linear data which can be read only once over time.
+			It provides a <a href="#widl-Stream-type">type</a> attribute which represents the type of data in the Stream.
+			It also provides the ability to read and write the contents of the Stream.
 		</p>
-		<table class="error">
-		   <thead>
-				<tr>
-					<th><a href="#event-handler-attributes" title="event handler attributes">event handler attribute</a></th>
-					<th><a href="#event-handler-event-type">event handler event type</a></th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr>
-					<td><dfn id="dfn-onloadstart"><code>onloadstart</code></dfn></td>
-					<td><code><a href="#dfn-loadstart-event">loadstart</a></code></td>
-				</tr>
-				<tr>
-					<td><dfn id="dfn-onprogress"><code>onprogress</code></dfn></td>
-					<td><code><a href="#dfn-progress-event">progress</a></code></td>
-				</tr>
-				<tr>
-					<td><dfn id="dfn-onload"><code>onload</code></dfn></td>
-					<td><code><a href="#dfn-load-event">load</a></code></td>
-				</tr>
-				<tr>
-					<td><dfn id="dfn-onabort"><code>onabort</code></dfn></td>
-					<td><code title="abort-event"><a href="#dfn-abort-event">abort</a></code></td>
-				</tr>
-				<tr>
-					<td><dfn id="dfn-onerror"><code>onerror</code></dfn></td>
-					<td><code><a href="#dfn-error-event">error</a></code></td>
-				</tr>
-				<tr>
-					<td><dfn id="dfn-onloadend"><code>onloadend</code></dfn></td>
-					<td><code><a href="#dfn-loadend-event">loadend</a></code></td>
-				</tr>
-			</tbody>
-		</table>
-		
-		<section class="section" id="streamreader-event-summary">
-		<h4>Event Summary</h4>
-			<p>
-				The following are the events that are fired at <code><a>StreamReader</a></code> objects; 
-				<a href="http://dev.w3.org/2006/webapi/FileAPI/#fire-a-progress-event">firing events</a> is defined in DOM Level 3 Events [[!DOM-LEVEL-3-EVENTS]], 
-				and the table below is normative for the events in this specification. 
-			</p>
-				<table class="error" id="streamreader-event-summary-table">
-					<thead>
-						<tr>
-							<th>Event name</th>
-							<th>Interface</th>
-							<th>Fired when…</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr>
-							<td><dfn id="dfn-loadstart-event"><code>loadstart</code></dfn></td>
-							<td><code>ProgressEvent</code></td>
-							<td>When the read starts.</td>
-						</tr>
-						<tr>
-							<td><dfn id="dfn-progress-event"><code>progress</code></dfn></td>
-							<td><code>ProgressEvent</code></td>
-							<td>While reading (and decoding) a <code>stream</code>, and reporting progress.
-							</td>
-						</tr>
-						<tr>
-							<td><dfn id="dfn-abort-event" title="abort-event"><code>abort</code></dfn></td>
-							<td><code>ProgressEvent</code></td>
-							<td>When the read has been aborted. For instance, by invoking the <code><a href="#widl-StreamReader-abort-void">abort()</a></code> method.</td>
-						</tr>
-						<tr>
-							<td><dfn id="dfn-error-event"><code>error</code></dfn></td>
-							<td><code>ProgressEvent</code></td>
-							<td>When the read has failed (see <a href="http://dev.w3.org/2006/webapi/FileAPI/#file-error-read">errors</a>).</td>
-						</tr>
-						<tr>
-							<td><dfn id="dfn-load-event"><code>load</code></dfn></td>
-							<td><code>ProgressEvent</code></td>
-							<td>When the read has successfully completed.</td>
-						</tr>
-						<tr>
-							<td><dfn id="dfn-loadend-event"><code>loadend</code></dfn></td>
-							<td><code>ProgressEvent</code></td>
-							<td>When the request has completed (either in success or failure).</td>
-						</tr>
-					</tbody>
-				</table>
-		</section>
-	</section>
-</section>
-<!-- End section: The StreamReader Interface -->
+		<p>A Stream is an object that:</p>
+		<ul>
+			<li>Has a content type;</li>
+			<li>Has unspecified length;</li>
+			<li>Data is read first in, first out;</li>
+			<li>Once data is read from it, the data is removed and can no longer be re-read;</li>
+		</ul>
 
-<section class="section" id="streamreadersync-interface">
-<h2>The StreamReaderSync Interface</h2>
-	<p>
-		This interface provides methods to read the data of a <a>Stream</a>.
-	</p>
-	<p>
-		When the <code>StreamReaderSync()</code> constructor is invoked, the user agent MUST return a new <code>StreamReaderSync</code> object.
-	</p>
-	<p>
-		In environments where the global object is represented by a <a href="http://dev.w3.org/html5/workers/#workerglobalscope"><code>WorkerGlobalScope</code></a> object, 
-		the <code>StreamReaderSync</code> constructor MUST be available.
-	</p>
-	<dl class="idl" title="interface StreamReaderSync">
-		<dt>Blob readAsBlob(in Stream stream, optional unsigned long long maxSize) raises (Exception) raises (StreamException)</dt>
-		<dd>
-			<p></p>
-			<p>
-				When this method is called, the following steps MUST be followed:
-			</p>
+        <p>
+          A Stream object has an associated <dfn>write closed flag</dfn>.
+          It is set when the <a href="#widl-Stream-close-void">close()</a> method is called.
+          This flag is internal, so scripts cannot access it directly.
+        </p>
+
+        <p>
+          A Stream object has an associated <dfn>write pending flag</dfn>. It is set when the <a href="#widl-Stream-write-Promise-DOMString-ArrayBufferView-Blob-data">write()</a> method is called and unset when it's completed.
+          This flag is internal, so scripts cannot access it directly.
+        </p>
+
+        <p>
+          A Stream object has an associated <dfn>read pending flag</dfn>. It is set when <a href="#widl-Stream-read-Promise--Clamp--unsigned-long-long-size">read()</a>, <a href="#widl-Stream-skip-Promise--Clamp--unsigned-long-long-size">skip()</a> or <a href="#widl-Stream-pipe-Promise-Stream-Stream---destinations--Clamp--unsigned-long-long-size">pipe()</a> method is called and unset when it's completed.
+          This flag is internal, so scripts cannot access it directly.
+        </p>
+
+        <p>
+          A Stream holds a sequence of bytes possibly terminated by a terminator.
+          <dfn id="write-to-stream">Writing bytes to a Stream</dfn> means appending the bytes to the sequence.
+          <dfn id="terminate-stream">Terminating a Stream</dfn> means appending a terminator to the sequence.
+          <dfn id="read-from-stream">Reading bytes from a Stream</dfn> pops bytes from the head of the sequence.
+          If a terminator is encountered while reading bytes from a Stream, it is said <dfn id="eof-reached">the EOF is reached</dfn>.
+          This sequence is internal, so scripts cannot access it directly.
+        </p>
+
+		<dl class="idl" title="interface Stream">
+                  <dt>Constructor(optional DOMString type)</dt>
+                  <dd>Constructs a <a>Stream</a> and sets the <a href="#widl-Stream-type">type</a> to the specified value.
+                    <dl class="parameters">
+                      <dt>in optional DOMString type</dt>
+                      <dd>
+                        Specifies the MIME type [[!RFC2046]] of the <a>Stream</a>.
+                      </dd>
+                    </dl>
+                  </dd>
+
+			<dt>readonly attribute DOMString type</dt>
+			<dd>
+				Returns the ASCII-encoded string in lower case representing the media type of the <code>Stream</code>,
+				expressed as an RFC2046 MIME type [[!RFC2046]].
+				Conforming user agents SHOULD return the MIME type of the <code>Stream</code>, if it is known.
+				If conforming user agents cannot determine the media type of the <code>Stream</code>, they MUST return the empty string.
+				A string is a valid MIME type if it matches the media-type token defined in section 3.7 "Media Types" of RFC 2616 [[!HTTP11]].
+			</dd>
+
+			<dt>attribute <a>StreamReadType</a> readType</dt>
+			<dd>
+				<p>
+					Returns the type of the last read operation taken on the <a>Stream</a>. On getting, conforming user agents must return the type of the last read operation. If no read operation has taken place and the <code>readType</code> was not set, then return the empty string. This can be set to the empty string (default), "arraybuffer", "blob" and "text" to change the type of the read operation.
+				</p>
+			</dd>
+
+			<dt>attribute DOMString readEncoding</dt>
+			<dd>
+				<p>
+					A <code>DOMString</code> that represents the label of an encoding [[!EncodingDetermination]]. If set, it will be used as part of the encoding determination used when processing a <code>read</code> call. If not set, it will return the empty string.
+				</p>
+			</dd>
+
+			<dt>Promise write((DOMString or ArrayBufferView or Blob) data)</dt>
+			<dd>
+				<p>
+                                  This method writes data to the <a>Stream</a>.
+                                  Another write() or close() call must not be made until the returned Promise is resolved or rejected.
+                                  Resolution of the returned Promise doesn't necessarily mean that the data written has been successfully read.
+                                  The user agent must run the steps below (unless otherwise indicated):
+                                </p>
+
 				<ol>
-					<li>
-						If an error occurs during reading the <code>stream</code> parameter, 
-						throw a <code>StreamException</code> with the appropriate error code. 
-						Terminate these overall steps.
-					</li>
-					<li>
-						If no error has occurred, read <code>stream</code> until the end is reached, 
-						or the number of bytes specified by <code>maxSize</code> have been read. 
-						Return the data contents of <code>stream</code> as a blob 
-						with the <code>type</code> property set as the type of the <a>Stream</a>.
-					</li>
+				 <li>If the <a>Stream</a> has been neutered, throw an "<code><a href="http://dev.w3.org/2006/webapi/DOM4Core/#invalidstateerror">InvalidStateError</a></code>" [[!DOM4]] exception and terminate these steps.</li>
+				 <li>If the <a>write closed flag</a> is set, throw an "<code><a href="http://dev.w3.org/2006/webapi/DOM4Core/#invalidstateerror">InvalidStateError</a></code>" [[!DOM4]] exception and terminate these steps.</li>
+				 <li>If the <a>write pending flag</a> is set, throw an "<code><a href="http://dev.w3.org/2006/webapi/DOM4Core/#invalidstateerror">InvalidStateError</a></code>" [[!DOM4]] exception and terminate these steps.</li>
+				 <li>Set the <a>write pending flag</a>.</li>
+				 <li>Let <code>writePromise</code> be a new promise.</li>
+				 <li>Return <code>writePromise</code>, but continue to process the steps in this algorithm.</li>
+				 <li>Execute the rules below, depending on the type of <code>data</code>:
+				  <dl class="switch">
+				   <dt><code>ArrayBufferView</code></dt>
+				   	  <dd>Let <code>rawData</code> be the raw data represented by the <code>Blob</code> object.</dd>
+				   <dt><code>Blob</code></dt>
+				   	  <dd>Let <code>rawData</code> be the data stored in the section of the buffer described by the <code>ArrayBuffer</code> object that the <code>ArrayBufferView</code> object references.</dd>
+				   <dt><code>DOMString</code></dt>
+				   	  <dd>Let <code>rawData</code> be the result of <a href="http://encoding.spec.whatwg.org/#encode">encoding</a> <code>data</code> to binary data using the encoding determined by the [[!EncodingDetermination]] </dd>
+				  </dl>
+				  </li>
+				 <li><a href="#write-to-stream">Write <code>rawData</code> to the Stream</a>.
+				 <li>If an error has occurred during the write, neuter the <a>Stream</a>, let <code>exception</code> be an "<code><a href="http://dev.w3.org/2006/webapi/DOM4Core/#invalidstateerror">InvalidStateError</a></code>" [[!DOM4]] exception and run <code>Reject(<code>writePromise</code>, <code>exception</code>)</code> as specified in the promises spec and terminate this algorithm.
+				 <li>Unset the <a>write pending flag</a> and run <code>Resolve(<code>writePromise</code>, <code>undefined</code>)</code> as specified in the promises spec. Implementations may delay this step if appropriate.
 				</ol>
-			<p></p>
-			<dl class="parameters">
-				<dt>Stream stream</dt>
-				<dd>The Stream to be read</dd>
-				
-				<dt>optional unsigned long long maxSize</dt>
-				<dd>The maximum number of bytes to be read before completion</dd>
-			</dl>
-			<dl class="exception" title="StreamException">
-				<dt></dt>
-				<dd></dd>
-			</dl>
-		</dd>
-		<dt>ArrayBuffer readAsArrayBuffer(in Stream stream, optional unsigned long long maxSize) raises (StreamException)</dt>
-		<dd>
-			<p>
-				This method should mimic <a href="http://dev.w3.org/2006/webapi/FileAPI/#readAsArrayBufferSyncSection"><code>FileReader.readAsArrayBuffer()</code></a>. [[!FILE-API]]
-				The only addition is the addition of a <code>maxSize</code> parameter that affects the amount of bytes to read from the <a>Stream</a>.
-			</p>
-			<dl class="parameters">
-				<dt>Stream stream</dt>
-				<dd>The Stream to be read</dd>
-				<dt>optional unsigned long long maxSize</dt>
-				<dd>The maximum number of bytes to be read before completion</dd>
-			</dl>
-			<dl class="exception" title="StreamException">
-				<dt></dt>
-				<dd></dd>
-			</dl>
-		</dd>
-		<dt>DOMString readAsText(in Stream stream, optional in DOMString encoding, optional unsigned long long maxSize) raises (StreamException)</dt>
-		<dd>
-			<p>
-				This method should mimic <a href="http://dev.w3.org/2006/webapi/FileAPI/#readAsTextSync"><code>FileReader.readAsText()</code></a>. [[!FILE-API]]
-				The only addition is the addition of a <code>maxSize</code> parameter that affects the amount of the amount of bytes to read from the <a>Stream</a>.
-			</p>
-			<dl class="parameters">
-				<dt>Stream stream</dt>
-				<dd>The Stream to be read</dd>
-				<dt>optional DOMString encoding</dt>
-				<dd>The encoding format</dd>
-				<dt>optional unsigned long long maxSize</dt>
-				<dd>The maximum number of bytes to be read before completion</dd>
-			</dl>
-			<dl class="exception" title="StreamException">
-				<dt></dt>
-				<dd></dd>
-			</dl>
-		</dd>
-		
-		<dt>DOMString readAsDataURL(in Stream stream, optional unsigned long long maxSize) raises (StreamException)</dt>
-		<dd>
-			<p>
-				This method should mimic <a href="http://dev.w3.org/2006/webapi/FileAPI/#readAsDataURLSync-section"><code>FileReader.readAsDataURL()</code></a>. [[!FILE-API]]
-				The only addition is the addition of a <code>maxSize</code> parameter that affects the amount of the amount of bytes to read from the <a>Stream</a>.
-			</p>
-			<dl class="parameters">
-				<dt>Stream stream</dt>
-				<dd>The Stream to be read</dd>
-				<dt>optional unsigned long long maxSize</dt>
-				<dd>The maximum number of bytes to be read before completion</dd>
-			</dl>
-			<dl class="exception" title="StreamException">
-				<dt></dt>
-				<dd></dd>
-			</dl>
-		</dd>
-	</dl>
-</section>
+                                <dl class="parameters">
+                                  <dt>(DOMString or ArrayBufferView or Blob) data</dt>
+                                  <dd>Data to write.</dd>
+                                </dl>
+			</dd>
 
-<section class="section" id="reading-empty-stream">
-<h2>Determining an empty Stream</h2>
-	<p>
-		StreamReader will read a Stream until maxSize has been reached or the Stream has no further data to return. If a Stream has been read until the end, then there is no further data to return. Subsequent read calls will return the following:
-	</p>
-		<dl class="switch">
-								<dt>If read is <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#dom-xmlhttprequest-responsetype"><code>readAsBlob</code></a></dt>
-								<dd>Return an empty <code>Blob</code> with size zero</dd>
-								
-								<dt>If read is <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#dom-xmlhttprequest-responsetype"><code>readAsArrayBuffer</code></a></dt>
-								<dd>Return an <code>ArrayBuffer</code> with length zero</dd>
-								
-								<dt>If read is <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#dom-xmlhttprequest-responsetype"><code>readAsText</code></a></dt>
-								<dd>Return an empty string</dd>
-								
-								<dt>If read is <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#dom-xmlhttprequest-responsetype"><code>readAsDataURL</code></a></dt>
-								<dd>Return an empty string</dd>
-								
-							</dl>
-	
-</section>
+			<dt>void close()</dt>
+			<dd>
+				<p>
+                                  This method closes the <a>Stream</a> and does not allow any future writes. This is an irreversible operation; once a <a>Stream</a> has been closed, it cannot be written to again.
+                                  When all data has been read from the <a>Stream</a> on which close() has been called, i.e. <a href="#eof-reached">EOF is reached</a>, it resolves the Promise returned by read() with a <a>StreamConsumeResult</a> with the <a href="#widl-StreamConsumeResult-eof">eof</a> attribute set to true.
+                                  The user agent must run the steps below:
+                                </p>
 
-<section class="section" id="errors-and-exceptions">
-<h2>Errors and Exceptions</h2>
-	<section class="section" id="streamerror-error">
-	<h3>StreamError</h3>
-		<p>
-			This interface should mimic the <a href="http://dev.w3.org/2006/webapi/FileAPI/#FileErrorInterface"><code>FileError</code> Interface</a>, and contain the same error codes.
-		</p>
-	</section>
-	
-	<section class="section" id="streamexception-error">
-	<h3>StreamException</h3>
-		<p>
-			This interface should mimic the <a href="http://dev.w3.org/2006/webapi/FileAPI/#FileException"><code>FileException</code> Interface</a>, , and contain the same error codes.
-		</p>
-	</section>
-</section>
-
-<section class="section" id="streambuilder-interface">
-<h2>The StreamBuilder Interface</h2>
-	<p>
-		The <a>StreamBuilder</a> interface provides a way for developers to create a <a>Stream</a> by appending data. During a read on the <code>stream</code> from a <a>StreamBuilder</a>, the data is read 'First in, First out', 
-		in the order it was appended. <a>StreamBuilder</a> provides methods for appending different data, as well as a <a href="#dfn-thresholdreached-event"><code>thresholdreached</code></a> event to be notified when the amount of data available for read has fallen below a specified threshold.
-	</p>
-	<p>
-		When the <code>StreamBuilder(in contentType)</code> constructor is invoked, the user agent MUST return a new <a><code>StreamBuilder</code></a> object. 
-		If the <code>StreamBuilder(in contentType)</code> constructor is invoked with the optional <code>thresholdLimit</code> overload, 
-		then this limit will be used to fire the <a href="#dfn-thresholdreached-event"><code>thresholdreached</code></a> event.
-	</p>
-	<p>
-		In environments where the global object is represented by a <a href="http://dev.w3.org/html5/workers/#workerglobalscope"><code>WorkerGlobalScope</code></a> object, 
-		the <code>StreamBuilder()</code> constructor MUST be available.
-	</p>
-	<dl class="idl" title="[Constructor, Constructor(DOMString contentType, optional int thresholdLimit)] interface StreamBuilder : EventTarget">
-		<dt>void append(in DomString text)</dt>
-		<dd>
-			<p></p>
-			<p>
-				Appends the supplied text to the data available for the <a><code>Stream</code></a>, writing it as UTF-8.
-			</p>
-			<p></p>
-			<dl class="parameters">
-				<dt>String data</dt>
-				<dd>The data to append</dd>	
-			</dl>
-			<dl class="exception" title="OperationNotAllowedException">
-				<dt></dt>
-				<dd>Thrown if append is called on a closed StreamBuilder</dd>
-			</dl>
-		</dd>
-		
-		<dt>void append(in Blob data)</dt>
-		<dd>
-			<p></p>
-			<p>
-				Appends the supplied <code>Blob</code> to the data available for the <a><code>Stream</code></a>.
-			</p>
-			<p></p>
-			<dl class="parameters">
-				<dt>Blob data</dt>
-				<dd>The data to append</dd>	
-			</dl>
-			<dl class="exception" title="OperationNotAllowedException">
-				<dt></dt>
-				<dd>Thrown if append is called on a closed StreamBuilder</dd>
-			</dl>
-		</dd>
-		
-		<dt>void append(in ArrayBuffer arraybuffer)</dt>
-		<dd>
-			<p></p>
-			<p>
-				Appends the supplied <code>ArrayBuffer</code> to the data available for the <a><code>Stream</code></a>.
-			</p>
-			<p></p>
-			<dl class="parameters">
-				<dt>ArrayBuffer data</dt>
-				<dd>The data to append</dd>
-			</dl>
-			<dl class="exception" title="OperationNotAllowedException">
-				<dt></dt>
-				<dd>Thrown if append is called on a closed StreamBuilder</dd>
-			</dl>
-		</dd>
-		
-		<dt>void close()</dt>
-		<dd>This method should close the <a><code>Stream</code></a>. This is done by returning on the next and subsequent reads with no data.</dd>
-		
-		<dt>readonly attribute Stream stream</dt>
-        <dd>Returns the underlying <a>Stream</a> represented by the <a><code>StreamBuilder</code></a>.</dd>
-		
-		<dt>readonly attribute unsigned long long availableDataSize</dt>
-        <dd>The number of bytes of data available for read from the <a>stream</a></dd>
-		
-		<dt>attribute Function onthresholdreached</dt>
-        <dd>
-			Handler for <a href="#dfn-thresholdreached-event"><code>thresholdreached</code></a> events.
-		</dd>
-	</dl>
-	
-	<section class="section" id="reads-on-a-stream-from-streambuilder">
-			<h2>Reads on a Stream from StreamBuilder</h2>
-			<p>
-				When a read on a stream from <a>StreamBuilder</a> is made, the following steps MUST be followed:
-			</p>
 				<ol>
-					<li>
-						If there is enough data available to satisfy the amount requested in the read, return the amount specified.	The data should be returned in the order the data was appended.
-						<ul>
-							<li>
-								Update the value of <a href="#widl-StreamBuilder-availableDataSize"><code>availableDataSize</code></a>. 
-							</li>
-						</ul>
-					</li>
-					<li>
-						If there is not enough data available to satisfy the amount requested in the read:
-						<ul>
-							<li>
-								If the <a>Stream</a> has been closed, return all the data available, 
-								and set <a href="#widl-StreamBuilder-availableDataSize"><code>availableDataSize</code></a> to zero.</li>
-							<li>
-								Else, keep the request pending and do not return until there is enough data available to satisfy the requset. 
-								
-							</li>
-						</ul>
-					</li>
-					<li>
-						If during the read request the value of <a href="#widl-StreamBuilder-availableDataSize"><code>availableDataSize</code></a>
-						fell below the <code>thresholdLimit</code> value specified in the constructor, 
-						fire an event called <a href="#dfn-thresholdreached-event"><code>thresholdreached</code></a>.
-					</li>
+				 <li>If the <a>Stream</a> has been neutered, throw an "<code><a href="http://dev.w3.org/2006/webapi/DOM4Core/#invalidstateerror">InvalidStateError</a></code>" [[!DOM4]] exception and terminate these steps.</li>
+				 <li>If the <a>write closed flag</a> is set, throw an "<code><a href="http://dev.w3.org/2006/webapi/DOM4Core/#invalidstateerror">InvalidStateError</a></code>" [[!DOM4]] exception and terminate these steps.</li>
+				 <li>If the <a>write pending flag</a> is set, throw an "<code><a href="http://dev.w3.org/2006/webapi/DOM4Core/#invalidstateerror">InvalidStateError</a></code>" [[!DOM4]] exception and terminate these steps.</li>
+				 <li>Set the <a>write closed flag</a>.</li>
+				 <li><a href="#terminate-stream">Terminate the Stream</a>.</li>
+				 <li>If an error has occurred during writing a stream termination, neuter the <a>Stream</a> and terminate these steps.</li>
 				</ol>
-		</section>
-		
-	<section class="section" id="streambuilder-event-handler-types">
-	<h3>Event Handler Attributes</h3>
-		<p>
-			The following are the event handler attributes (and their corresponding event handler event types) that user agents MUST support on <a>StreamBuilder</a> as DOM attributes:
-		</p>
-		<table class="error">
-		   <thead>
-				<tr>
-					<th><a href="#event-handler-attributes" title="event handler attributes">event handler attribute</a></th>
-					<th><a href="#event-handler-event-type">event handler event type</a></th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr>
-					<td><dfn id="dfn-onthresholdreached"><code>onthresholdreached</code></dfn></td>
-					<td><code><a href="#dfn-thresholdreached-event">thresholdreached</a></code></td>
-				</tr>
-			</tbody>
-		</table>
-		
-		<section class="section" id="streambuilder-event-summary">
-		<h4>Event Summary</h4>
-			<p>
-				The following are the events that are fired at <code><a>StreamBuilder</a></code> objects; 
-				<a href="http://dev.w3.org/2006/webapi/FileAPI/#fire-a-progress-event">firing events</a> is defined in DOM Level 3 Events [[!DOM-LEVEL-3-EVENTS]], 
-				and the table below is normative for the events in this specification. 
-			</p>
-				<table class="error" id="streambuilder-event-summary-table">
-					<thead>
-						<tr>
-							<th>Event name</th>
-							<th>Interface</th>
-							<th>Fired when…</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr>
-							<td><dfn id="dfn-thresholdreached-event"><code>thresholdreached</code></dfn></td>
-							<td><code>StreamBuilder</code></td>
-							<td>The <a href="#widl-StreamBuilder-availableDataSize"><code>availableDataSize</code></a> has fallen below the <code>thresholdLimit</code> value specified in the constructor</td>
-						</tr>
-					</tbody>
-				</table>
-		</section>
-		
+			</dd>
+
+			<dt>Promise read(optional [Clamp] unsigned long long size)</dt>
+			<dd>
+				<p>
+                                  This method reads data from the <a>Stream</a>.
+                                  This method takes an optional <code>size</code> which represents the number of bytes to be read.
+                                  Another read(), skip() or pipe() call must not be made until the returned Promise is resolved or rejected.
+                                  The user agent must run the steps below (unless otherwise indicated):
+                                </p>
+
+				<ol>
+				 <li>If the <a>Stream</a> has been neutered, throw an "<code><a href="http://dev.w3.org/2006/webapi/DOM4Core/#invalidstateerror">InvalidStateError</a></code>" [[!DOM4]] exception and terminate these steps.</li>
+				 <li>If the <a>read pending flag</a> is set, throw an "<code><a href="http://dev.w3.org/2006/webapi/DOM4Core/#invalidstateerror">InvalidStateError</a></code>" [[!DOM4]] exception and terminate these steps.</li>
+				 <li>If <code>size</code> is specified but is 0, throw a "<code><a href="http://dev.w3.org/2006/webapi/DOM4Core/#syntaxerror">SyntaxError</a></code>" [[!DOM4]] exception and terminate these steps.</li>
+				 <li>Set the <a>read pending flag</a>.</li>
+				 <li>Let <code>readPromise</code> be a new promise.
+				 <li>Return <code>readPromise</code>, but continue to process the steps in this algorithm.</li>
+				 <li>If <code>size</code> is specified, <a href="#read-from-stream">read data from the Stream</a> until <code>size</code> bytes are read.</li>
+				 <li>Otherwise, <a href="#read-from-stream">read data from the Stream</a> until any non-zero bytes are read.</li>
+				 <li>If an error has occurred during reading, neuter the <a>Stream</a>, let <code>exception</code> be an "<code><a href="http://dev.w3.org/2006/webapi/DOM4Core/#invalidstateerror">InvalidStateError</a></code>" [[!DOM4]] exception and run <code>Reject(<code>readPromise</code>, <code>exception</code>)</code> as specified in the promises spec and terminate these steps.</li>
+				 <li>Let <code>result</code> be a newly created <a>StreamConsumeResult</a>.</li>
+				 <li>If EOF is reached, set the <a href="#widl-StreamConsumeResult-eof">eof</a> attribute of <code>result</code> to true.</li>
+				 <li>Otherwise, set the <a href="#widl-StreamConsumeResult-eof">eof</a> attribute of <code>result</code> to false.</li>
+				 <li>Set the <a href="#widl-StreamConsumeResult-eof">data</a> attribute of <code>result</code> to the result of executing the steps below.
+					 <dl class="switch">
+					  <dt>If <a href="#widl-Stream-readType">readType</a> is the empty string or "<code title>text</code>"
+					  <dd>
+					   <ol>
+					    <li>If readEncoding is not null, let <var>charset</var> be <code>readEncoding</code>.
+					    <li>Otherwise, let <var>charset</var> be utf-8.
+					    <li>Let <code>result</code> be result of <a href="http://encoding.spec.whatwg.org/#decode">decoding</a> the data read using fallback encoding <var>charset</var>.
+					   </ol>
+					  <dt>If <a href="#widl-Stream-readType">readType</a> is the empty string or "<code title>blob</code>"
+					  <dd>Let <code>result</code> be a blob created from the read data
+					  <dt>If <a href="#widl-Stream-readType">readType</a> is the empty string or "<code title>arraybuffer</code>"
+					  <dd>Let <code>result</code> be an array buffer created from the read data
+					 </dl>
+				 </li>
+				 <li>Unset the <a>read pending flag</a> and run <code>Resolve(<code>readPromise</code>, <code>result</code>)</code> as specified in the promises spec.
+				</ol>
+                                <dl class="parameters">
+                                  <dt>optional [Clamp] unsigned long long size</dt>
+                                  <dd>Number of bytes to read.</dd>
+                                </dl>
+			</dd>
+
+			<dt>Promise skip(![Clamp] unsigned long long size)</dt>
+			<dd>
+				<p>
+                                  This method reads data from the <a>Stream</a> and ignore them.
+                                  This method takes optionally a <code>size</code> which represents the number of bytes to be read and ignored.
+                                  Another read(), skip() or pipe() call must not be made until the returned Promise is resolved or rejected.
+                                  The user agent must run the steps below:
+                                </p>
+
+				<ol>
+				 <li>If the <a>Stream</a> has been neutered, throw an "<code><a href="http://dev.w3.org/2006/webapi/DOM4Core/#invalidstateerror">InvalidStateError</a></code>" [[!DOM4]] exception and terminate these steps.</li>
+				 <li>If the <span>read pending flag</span> is set, throw an "<code><a href="http://dev.w3.org/2006/webapi/DOM4Core/#invalidstateerror">InvalidStateError</a></code>" [[!DOM4]] exception and terminate these steps.</li>
+				 <li>If <code>size</code> is specified but is 0, throw a "<code><a href="http://dev.w3.org/2006/webapi/DOM4Core/#syntaxerror">SyntaxError</a></code>" [[!DOM4]] exception and terminate these steps.</li>
+				 <li>Set <span>read pending flag</span>.</li>
+				 <li>Let <code>readPromise</code> be a new promise.</li>
+				 <li>Return the <code>skip()</code> method with <code>readPromise</code>, but continue to process the steps in this algorithm.</li>
+				 <li>If <code>size</code> is specified, <a href="#read-from-stream">read data from the Stream</a> until <code>size</code> bytes are read.</li>
+				 <li>Otherwise, <a href="#read-from-stream">read data from the Stream</a> until any non-zero bytes are read.</li>
+				 <li>If any error has occurred during reading, neuter the <a>Stream</a>, let <code>exception</code> be an "<code><a href="http://dev.w3.org/2006/webapi/DOM4Core/#invalidstateerror">InvalidStateError</a></code>" [[!DOM4]] exception and run <code>Reject(<code>readPromise</code>, <code>exception</code>)</code> as specified in the promises spec and terminate these steps.</li>
+				 <li>Let <code>result</code> be a newly created <a>StreamConsumeResult</a> object.</li>
+				 <li>If EOF is reached, set the <a href="#widl-StreamConsumeResult-eof">eof</a> attribute of <code>result</code> to true.</li>
+				 <li>Otherwise, set the <a href="#widl-StreamConsumeResult-eof">eof</a> attribute of <code>result</code> set to false.</li>
+				 <li>Set the <a href="#widl-StreamConsumeResult-eof">size</a> attribute of <code>result</code> to the size of the read data in bytes.</li>
+				 <li>Unset the <a>read pending flag</a> and run <code>Resolve(readPromise, result)</code> as specified in the promises spec.</li>
+				</ol>
+                                <dl class="parameters">
+                                  <dt>![Clamp] unsigned long long size</dt>
+                                  <dd>Number of bytes to read and ignore.</dd>
+                                </dl>
+			</dd>
+
+			<dt>Promise pipe((Stream or Stream[]) destinations, optional [Clamp] unsigned long long size)</dt>
+			<dd>
+				<p>
+                                  This method transfers data from the <a>Stream</a> to another Stream.
+                                  This method takes a <code>destinations</code> and optionally a <code>size</code>.
+                                  Another read(), skip() or pipe() call must not be made until the returned Promise is resolved or rejected.
+                                  Resolution of the returned Promise doesn't necessarily mean that the data transferred to the destination Stream has been successfully read from the Stream.
+                                  The user agent must run the steps below:
+
+				<ol>
+				 <li>If the <a>Stream</a> has been neutered, throw an "<code><a href="http://dev.w3.org/2006/webapi/DOM4Core/#invalidstateerror">InvalidStateError</a></code>" [[!DOM4]] exception and terminate these steps.</li>
+				 <li>If the <a>read pending flag</a> is set, throw an "<code><a href="http://dev.w3.org/2006/webapi/DOM4Core/#invalidstateerror">InvalidStateError</a></code>" [[!DOM4]] exception and terminate these steps.</li>
+				 <li>If <code>size</code> is specified but is 0, throw a "<code><a href="http://dev.w3.org/2006/webapi/DOM4Core/#syntaxerror">SyntaxError</a></code>" [[!DOM4]] exception and terminate these steps.</li>
+				 <li>If <code>destinations</code> is a <a>Stream</a>, let <code>destinations</code> instead be an array consisting of just that <a>Stream</a>.</li>
+				 <li>Set the <a>read pending flag</a>.</li>
+				 <li>Let <code>readPromise</code> be a new promise.</li>
+				 <li>Return the pipe() method with <code>readPromise</code>, but continue to process the steps in this algorithm.</li>
+				 <li>If <code>size</code> is specified, <a href="#read-from-stream">read data from the stream</a> until <code>size</code> bytes are read.</li>
+				 <li>Otherwise, <a href="#read-from-stream">read data from the Stream</a> until <a href="#eof-reached">EOF is reached</a>.</li>
+				 <li>As read data becomes available, <a href="#write-to-stream">write newly read data to <code>destinations</code></a>.</li>
+				 <li>If any error has occurred during reading or writing to <code>destinations</code>, neuter the <a>Stream</a>, let <code>exception</code> be an "<code><a href="http://dev.w3.org/2006/webapi/DOM4Core/#invalidstateerror">InvalidStateError</a></code>" exception and run <code>Reject(<code>readPromise</code>, <code>exception</code>)</code> as specified in the promises spec and terminate these steps.</li>
+				 <li>Once read and write are both completed for all destination streams, run the following algorithm:</li>
+				 <ol>
+				   <li>Let <code>result</code> be a newly created <a>StreamConsumeResult</a> object.</li>
+				   <li>If <a href="#eof-reached">EOF is reached</a>, set <a href="#widl-StreamConsumeResult-eof">eof</a> attribute of <code>result</code> to true.</li>
+				   <li>Otherwise, set <a href="#widl-StreamConsumeResult-eof">eof</a> attribute of <code>result</code> set to false.</li>
+				   <li>Set <a href="#widl-StreamConsumeResult-size">size</a> attribute of <code>result</code> to the total size of the read data.</li>
+				   <li>Unset the <a>read pending flag</a> and run <code>Resolve(<code>readPromise</code>, <code>result</code>)</code> as specified in the promises spec.</li>
+				 </ol>
+				</ol>
+                                <dl class="parameters">
+                                  <dt>!(Stream or Stream[]) destination</dt>
+                                  <dd>Destination <a>Stream</a>.</dd>
+                                  <dt>optional [Clamp] unsigned long long size</dt>
+                                  <dd>Number of bytes to transfer.</dd>
+                                </dl>
+			</dd>
+		</dl>
+
+
+	</section>
+	<!-- End section: The Stream Interface -->
+
+	<section class="section" id="streamConsumeResult-interface">
+		<h2>StreamConsumeResult Interface</h2>
+		<dl class="idl" title="interface StreamConsumeResult">
+		  	<dt>readonly attribute boolean eof</dt>
+			<dd>specifies if the given read resulted in an EOF for the <a>Stream</a></dd>
+			<dt>readonly attribute any data</dt>
+			<dd>The contents of the read request</dd>
+			<dt>readonly attribute unsigned long long size</dt>
+			<dd>The size, in bytes, of the data read</dd>
+		</dl>
 	</section>
 
-		
-</section>
-<!-- End section: The StreamBuilder Interface -->
+	<section class="section" id="streamReadType-interface">
+		<h2>StreamReadType Interface</h2>
+		<dl class="idl" title="enum StreamReadType">
+		  	<dt>blob</dt>
+			<dd>Read operations should return data as a Blob</dd>
+			<dt>arraybuffer</dt>
+			<dd>Read operations should return data as an ArrayBuffer</dd>
+			<dt>text</dt>
+			<dd>Read operations should return data as a DOMString</dd>
+		</dl>
+	</section>
 
-	
-<section class="section" id="error-uris_for_streams">
-<h3>URIs for Stream</h3>
-	<p>
-		To reference a <a>Stream</a>, <a href="http://dev.w3.org/2006/webapi/FileAPI/#url">the same URI used</a> for <code>Blobs</code> and <code>Files</code> in 
-		<a href="http://dev.w3.org/2006/webapi/FileAPI/#url">6.7. A URI for Blob and File reference</a> of 
-		the File API spec should be used. [[!FILE-API]]
-		The definitions of <strong>Origin</strong>, <strong>Lifetime</strong>, <strong>Referencing</strong>, and <strong>Dereferencing</strong> of a <code>Blob</code> should be applied to a <a>Stream</a>.
-	</p>
-		<section class="section" id="creating-revoking-streamuri">
-		<h4>Creating and Revoking a Stream URI</h4>
-			<p>
-				A <dfn id="stream-uri">Stream URI</dfn> is a <code>Blob URI</code> that is referencing a <a>Stream</a>. 
-				These URIs are created and revoked using methods exposed on the URL object, 
-				as defined in <a href="http://dev.w3.org/2006/webapi/FileAPI/#creating-revoking">6.7.5. Creating and Revoking a Blob URI</a> 
-				of the File API spec. [[!FILE-API]]
-			</p>
-			<p>
-				<a href="http://dev.w3.org/2006/webapi/FileAPI/#dfn-createObjectURL">URL.createObjectURL</a> 
-				and <a href="http://dev.w3.org/2006/webapi/FileAPI/#dfn-revokeObjectURL">URL.revokeObjectURL</a> 
-				should both be extended as follows:
-			</p>
-			<dl class="idl" title="interface URL">
-				<dt>static DOMString createObjectURL(in any object)</dt>
-				<dd>
-					<p></p>
-					<p>The extension onto <code>createObjectURL</code> should have the following steps added.</p>
+	<section class="section" id="error-uris_for_streams">
+	<h3>URIs for Stream</h3>
+		<p>
+			To reference a <a>Stream</a>, <a href="http://dev.w3.org/2006/webapi/FileAPI/#url">the same URI used</a> for <code>Blobs</code> and <code>Files</code> in
+			<a href="http://dev.w3.org/2006/webapi/FileAPI/#url">6.7. A URI for Blob and File reference</a> of
+			the File API specification should be used. [[!FILE-API]]
+			The definitions of <strong>Origin</strong>, <strong>Lifetime</strong>, <strong>Referencing</strong>, and <strong>Dereferencing</strong> of a <code>Blob</code> should be applied to a <a>Stream</a>.
+		</p>
+			<section class="section" id="creating-revoking-streamuri">
+			<h4>Creating and Revoking a Stream URI</h4>
+				<p>
+					A <dfn id="stream-uri">Stream URI</dfn> is a <code>Blob URI</code> that is referencing a <a>Stream</a>.
+					These URIs are created and revoked using methods exposed on the URL object,
+					as defined in <a href="http://dev.w3.org/2006/webapi/FileAPI/#creating-revoking">6.7.5. Creating and Revoking a Blob URI</a>
+					of the File API specification. [[!FILE-API]]
+				</p>
+				<p>
+					<a href="http://dev.w3.org/2006/webapi/FileAPI/#dfn-createObjectURL">URL.createObjectURL</a>
+					and <a href="http://dev.w3.org/2006/webapi/FileAPI/#dfn-revokeObjectURL">URL.revokeObjectURL</a>
+					should both be extended as follows:
+				</p>
+				<dl class="idl" title="interface URL">
+					<dt>static DOMString? createObjectURL(in (Blob or Stream) object)</dt>
+					<dd>
+						<p>The extension onto <code>createObjectURL</code> should have the following steps added.</p>
+                                                <p>Returns a unique Blob URL each time it is called on a valid <code>object</code> argument, which is a non-null <a>Stream</a> in scope of the global object's URL property from which this static method is called. This method must act as follows:
+							<ol>
+								<li>
+									If called with a <code>Stream</code> argument that is NOT valid, then user agents must return null.</li>
+								<li>
+									If called with a valid <code>Stream</code> argument,
+									user agents must run the following sub-steps:
+                                                                        <ol>
+                                                                          <li>If the <a>read pending flag</a> of the <a>Stream</a> is set, return null.</li>
+                                                                          <li>Set the <a>read pending flag</a> of the <a>Stream</a>.</li>
+                                                                          <li>Return a unique <code>Blob URI</code> that can be used to dereference the <code>stream</code> argument.</li>
+                                                                          <li>Add an entry to the Blob URL Store for this Blob URL.</li>
+                                                                        </ol>
+								</li>
+							</ol>
+					</dd>
+
+					<dt>static DOMString? createFor(in (Blob or Stream) object)</dt>
+                        <dd>
+                        	<p>The extension onto <code>createFor</code> should have the following steps added.</p>
+                                                <p>Returns a unique Blob URL each time it is called on a valid <code>object</code> argument, which is a non-null <a>Stream</a> in scope of the global object's URL property from which this static method is called. Blob URLs created with this method are said to be auto-revoking since user-agents are responsible for the revocation of Blob URLs created with this method, subject to the lifetime stipulation for Blob URLs. This method must act as follows:
+							<ol>
+								<li>
+									If called with a <code>Stream</code> argument that is NOT valid, then user agents must return null.</li>
+								<li>
+									If called with a valid <code>Stream</code> argument,
+									user agents must run the following sub-steps:
+                                                                        <ol>
+                                                                          <li>If the <a>read pending flag</a> of the <a>Stream</a> is set, return null.</li>
+                                                                          <li>Set the <a>read pending flag</a> of the <a>Stream</a>.</li>
+                                                                          <li>Return a unique <code>Blob URI</code> that can be used to dereference the <code>stream</code> argument.</li>
+                                                                          <li>Add an entry to the Blob URL Store for this Blob URL.</li>
+                                                                          <li>Add an entry in the Revocation List for this Blob URL.</li>
+                                                                        </ol>
+								</li>
+							</ol>
+                        </dd>
+
+					<dt>static void revokeObjectURL(in DOMString url)</dt>
+					<dd>
+						<p></p>
+						<p>
+							The extension onto <code>revokeObjectURL</code> should have the following steps added.
+						</p>
 						<ol>
 							<li>
-								If this method is called with a <code>Blob</code> or <code>Stream</code> argument 
-								that is <strong>not</strong> valid, then the user agent MUST return null.</li>
+								If the URL refers to a <code>Blob</code> or <code>Stream</code> that is both
+								valid and in the same origin of the global object’s <code>URL</code> property on which this static method was called,
+								user agents MUST return a 404 response code when the URL is dereferenced.</li>
 							<li>
-								If this method is called with a valid <code>Blob</code> or <code>Stream</code> argument, 
-								user agents MUST return a unique <code>Blob URI</code> that can be used to dereference the <code>blob</code> or <code>stream</code> argument.	
+								If the URL refers to a <code>Blob</code> or <code>Stream</code> that is <strong>not</strong> valid
+								or if the value provided for the URL argument is not a <code>Blob URI</code>
+								or if the URL argument refers to a <code>Blob</code> or <code>Stream</code> that is <strong>not</strong> in the same origin
+								as the global object’s <code>URL</code> property, this method call does nothing.
+								User agents MAY display a message on their error console.
 							</li>
 						</ol>
-				</dd>
-				
-				<dt>static void revokeObjectURL(in DOMString url)</dt>
-				<dd>
-					<p></p>
-					<p>
-						The extension onto <code>revokeObjectURL</code> should have the following steps added.
-					</p>
-					<ol>
-						<li>
-							If the URL refers to a <code>Blob</code> or <code>Stream</code> that is both 
-							valid and in the same origin of the global object’s <code>URL</code> property on which this static method was called, 
-							user agents MUST return a 404 response code when the URL is dereferenced.</li>
-						<li>
-							If the URL refers to a <code>Blob</code> or <code>Stream</code> that is <strong>not</strong> valid 
-							or if the value provided for the URL argument is not a <code>Blob URI</code> 
-							or if the URL argument refers to a <code>Blob</code> or <code>Stream</code> that is <strong>not</strong> in the same origin 
-							as the global object’s <code>URL</code> property, this method call does nothing. 
-							User agents MAY display a message on their error console.
-						</li>
-					</ol>
-				</dd>
-			</dl>
-		</section>
+					</dd>
+				</dl>
+			</section>
+	</section>
+</section>
+
+<section class="section" id="producers-consumers">
+	<h2>Stream Consumers and Producers</h2>
+	<p>
+		Streams can be both produced and consumed by various APIs. APIs which create streams are identified as producers, and ones which read and act on a stream are known as consumers. This section identifies some of the APIs where Streams may be produced and consumed.
+		<section class="note">The list of producers and consumers below is not an exhaustive list. It is placed here as informative for the time being.</section>
+	</p>
+	<section class="section" id="consumers">
+		<h2>Stream Consumers</h2>
+		<p>This section outlines APIs which can consume a Stream object</p>
+		<ul>
+			<li>WebAudio</li>
+			<li>MediaSourceExtensions</li>
+			<li>WebCrypt</li>
+			<li>TextEncoder</li>
+			<li>TextDecoder</li>
+		</ul>
+	</section>
+
+	<section class="section" id="producers">
+		<h2>Stream Producers</h2>
+		<p>This section outlines APIs which can produce a Stream object</p>
+		<ul>
+			<li>XMLHttpRequest</li>
+			<li>FileReader</li>
+			<li>Media Capture</li>
+			<li>Media Recording API</li>
+			<li>IndexedDB</li>
+			<li>WebCrypt</li>
+			<li>TextEncoder</li>
+			<li>TextDecoder</li>
+		</ul>
+	</section>
 </section>
 
 <section class="section" id="security">
 <h2>Security Considerations</h2>
 	<p>
-		A <a>Stream</a> should have the same security considerations as a <code>Blob</code>. 
-		This is outlined in <a href="http://dev.w3.org/2006/webapi/FileAPI/#security-discussion">6.8. Security Considerations</a> 
+		A <a>Stream</a> should have the same security considerations as a <code>Blob</code>.
+		This is outlined in <a href="http://dev.w3.org/2006/webapi/FileAPI/#security-discussion">6.8. Security Considerations</a>
 		of the File API specification. [[!FILE-API]]
 		Because a <a>Stream</a> uses a <code>Blob URI</code>, cross origin requests on a <a>Stream</a> will not be supported.
 	</p>
@@ -1070,151 +688,111 @@ document.getElementById('audioTag').src = streamURL;
 <h2>Extension of XMLHttpRequest</h2>
 	<p>
 		This specification proposes an extension to <code>XMLHttpRequest</code> [[!XMLHTTPREQUEST2]] to add support for <a>Stream</a>. This section is temporary and is meant to provide a recommendation for how <a>Stream</a> should be incorporated into <code>XMLHttpRequest</code>.
-		This will extend <code>XMLHttpRequest</code> to allow for receiving and uploading of a <a>Stream</a>. 
-		One such scenario is providing access to data during <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#dom-xmlhttprequest-readystate"><code>readyState</code></a> 3 (loading). 
-		The sections below document in detail what extensions must be done to <code>XMLHttpRequest</code> to support <a>Stream</a>. 
+		This will extend <code>XMLHttpRequest</code> to allow for receiving and uploading of a <a>Stream</a>.
+		One such scenario is providing access to data during <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#dom-xmlhttprequest-readystate"><code>readyState</code></a> 3 (LOADING).
+		The sections below document in detail what extensions must be done to <code>XMLHttpRequest</code> to support <a>Stream</a>.
 	</p>
-	
-	<section class="section" title="addition-of-stream">
-	<h3>Addition of stream responseType</h3>
+
+        <section class="section" title="addition-of-stream-response-entity">
+          <h3>Addition of stream response entity body</h3>
 		<p>
-			A responseType of ‘<code>stream</code>’ should be introduced to <code>XMLHttpRequest</code>.
-		</p>		
-		<p>
-			<a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#the-responsetype-attribute">Section 4.7.7 the <code>responseType</code> attribute</a> 
-			in XMLHttpRequest Level 2 [[!XMLHTTPREQUEST2]] should now read:
+			<a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html#response-entity-body-0">The section named "Response Entity Body"</a>
+			in XMLHttpRequest specification [[!XMLHTTPREQUEST2]] should have the following additions:
 		</p>
 		<p>
-			On setting the <code>responseType</code> attribute these steps must be run:
+                  The <dfn id="stream-response-entity">stream response entity body</dfn> is either a <a>Stream</a> representing the <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html#response-entity-body">response entity body</a> or null.
+                  If the <a href="#stream-response-entity">stream response entity body</a> is null, let it be the return value of the following algorithm:
 		</p>
-			<ol>
-				<li>
-					If the state is not <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#dom-xmlhttprequest-opened"><code>OPENED</code></a> or 
-					<a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#dom-xmlhttprequest-headers_received"><code>HEADERS_RECEIVED</code></a> 
-					raise an <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#dom-domexception-invalid_state_err"><code>INVALID_STATE_ERR</code></a> 
-					exception and terminate these steps.
+                <ol>
+                  <li>
+					If the <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html#response-entity-body">response entity body</a> is null,
+					return an empty <a>Stream</a> object.
 				</li>
 				<li>
-					If the given value is not the empty string, "<code>arraybuffer</code>", "<code>blob</code>", 
-					"<code>document</code>", "<code>stream</code>", or "<code>text</code>" terminate these steps.</li>
-				<li>Set the <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#dom-xmlhttprequest-responsetype"><code>responseType</code></a> attribute's value to the given value.</li>
-			</ol>	
-		<p></p>
-		
+					Return a <a>Stream</a> object representing the <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html#response-entity-body">response entity body</a>.
+				</li>
+		</ol>
+              </section>
+
+	<section class="section" title="addition-of-stream">
+	<h3>Addition of "<code>stream</code>" responseType</h3>
 		<p>
-			<a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#the-response-attribute">Section 4.7.8 the <code>response</code> attribute</a> 
-			in XMLHttpRequest Level 2 [[!XMLHTTPREQUEST2]] should now read:
+		  A new value for the <code>responseType</code> attribute "<code>stream</code>" should be introduced.
+		</p>
+                <p>
+                  In the IDL list in <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html#interface-xmlhttprequest">the section named "Interface XMLHttpRequest"</a> in XMLHttpRequest specification [[!XMLHTTPREQUEST2]], the definition of <code>XMLHttpRequestResponseType</code> enum should now read:
+                  <pre>
+enum XMLHttpRequestResponseType {
+  "",
+  "arraybuffer",
+  "blob",
+  "stream",
+  "document",
+  "json",
+  "text"
+}</pre>
+                </p>
+     </section>
+
+     <section class="section" title="modification-on-response-algorithm">
+       <h3>Modification on the <code>response</code> attribute</h3>
+		<p>
+                  The algorithm of the <code>response</code> attribute should be modified to handle the new <code>responseType</code> value "<code>stream</code>".
+			A Stream is binary data obtained sequentially over time.
+			Given this, a <a>Stream</a> should be accessible in <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html#dom-xmlhttprequest-readystate"><code>readyState</code></a> 3 (LOADING).
+                <p>
+                </p>
+			<a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#the-response-attribute">The section named "The response attribute"</a> in XMLHttpRequest specification [[!XMLHTTPREQUEST2]] should now read:
 		</p>
 		<p>
 			The <code>response</code> attribute must return the result of running these steps:
-		</p>	
+		</p>
 			<dl class="switch">
-				<dt>If <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#dom-xmlhttprequest-responsetype"><code>responseType</code></a> is the empty string or "text"</dt>
+				<dt>If <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#dom-xmlhttprequest-responsetype"><code>responseType</code></a> is the empty string or "<code>text</code>"</dt>
 				<dd>
-					<ol>
-						<li>
-							If the state is not 
-							<a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#dom-xmlhttprequest-loading">LOADING</a>
-							or <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#dom-xmlhttprequest-done">DONE</a> 
-							return the empty string and terminate these steps.
-						</li>
-						<li>
-							If the <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#error-flag">error flag</a> 
-							is true return the empty string and terminate these steps.
-						</li>
-						<li>
-							Return the <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#text-response-entity-body">text response entity body</a>.
-						</li>
-					</ol>
+                                  The same as the original XMLHttpRequest specification.
 				</dd>
-				<dt>If <code>responseType</code> is “<code>stream</code>”</dt>
-				<dd>
-					<ol>
-						<li>
-							If the state is not 
-							<a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#dom-xmlhttprequest-loading">LOADING</a>
-							or <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#dom-xmlhttprequest-done">DONE</a> 
-							return null and terminate these steps.</li>
-						<li>
-							If the error flag is true return null and terminate these steps.
-						</li>
-						<li>
-							Return the <a href="#stream-response-entity">stream response entity body</a>.
-						</li>
-					</ol>
-				</dd>
+                                <dt>If <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html#dom-xmlhttprequest-responsetype"><code>responseType</code></a> is "<code>stream</code>"</dt>
+                                <dd>
+                                  <ol>
+                                    <li>
+                                      If the state is not <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html#dom-xmlhttprequest-loading">LOADING</a> or
+                                      <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html#dom-xmlhttprequest-done">DONE</a>, return null.
+                                    </li>
+                                    <li>If the <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html#error-flag">error flag</a> is set, return null.</li>
+                                    <li>Return the <a href="#stream-response-entity">stream response entity body</a>.</li>
+                                  </ol>
+                                </dd>
 				<dt>Otherwise</dt>
 				<dd>
-					<ol>
-						<li>
-							If the state is not <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#dom-xmlhttprequest-done">DONE</a> return null and terminate these steps.
-						</li>
-						<li>
-							If the <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#error-flag">error flag</a> is true return null and terminate these steps.
-						</li>
-						<li>
-							<dl class="switch">
-								<dt>If <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#dom-xmlhttprequest-responsetype"><code>responseType</code></a> is "<code>arraybuffer</code>"</dt>
-								<dd>Return the <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#arraybuffer-response-entity-body">arraybuffer response entity body</a>.</dd>
-								
-								<dt>If <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#dom-xmlhttprequest-responsetype"><code>responseType</code></a> is "<code>blob</code>"</dt>
-								<dd>Return the <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#blob-response-entity-body">blob response entity body</a>.</dd>
-								
-								<dt>If <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#dom-xmlhttprequest-responsetype"><code>responseType</code></a> is "<code>document</code>"</dt>
-								<dd>Return the <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#document-response-entity-body">document response entity body</a>.</dd>
-								
-							</dl>
-						</li>
-					</ol>
+                                  The same as the original XMLHttpRequest specification.
 				</dd>
-			</dl>	
-	
-	</section>
-	
-	<section class="section" id="readystate3-changes">
-	<h3>readyState 3 changes</h3>
-		<p>
-			A <code>stream</code> is binary data obtained sequentially over time. 
-			Given this, a <a>Stream</a> should be accessible in <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#dom-xmlhttprequest-readystate"><code>readyState</code></a> 3 (LOADING).
-		</p>
-		<p>
-			<a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#response-entity-body0">Section 4.7.5 Response Entity Body</a> 
-			in XMLHttpRequest Level 2 [[!XMLHTTPREQUEST2]] should have the following additions:
-		</p>
-		<p>
-			The <dfn id="stream-response-entity">stream response entity body</dfn> is a <a>Stream</a> representing the <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#response-entity-body">response entity body</a>. 
-			If the <a href="#stream-response-entity">stream response entity body</a> has no value assigned to it let it be the return value of the following algorithm:
-		</p>
-			<ol>
-				<li>
-					If the <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#response-entity-body">response entity body</a> is null, 
-					return an empty <a>Stream</a> object and terminate these steps.
-				</li>
-				<li>
-					Return a <a>Stream</a> object representing the 
-					<a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#response-entity-body">response entity body</a>.
-				</li>
-			</ol>
+			</dl>
 	</section>
 
-	<section class="section" id="send0">
+	<section class="section" id="modification-on-send-algorithm">
 	<h3>send()</h3>
 		<p>
-			<a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#the-send-method">Section 4.6.6 The <code>send()</code> method</a> 
-			in XMLHttpRequest Level 2 [[!XMLHTTPREQUEST2]] should have the following additions:
+                  The switch in otherwise case of step 4 of
+			<a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html#the-send()-method">The section named "The <code>send()</code> method"</a>
+			in XMLHttpRequest specification [[!XMLHTTPREQUEST2]] should have the following additions:
 		</p>
 		<dl class="switch">
-			<dt>If data is a <a>Stream</a></dt>
+			<dt><a>Stream</a></dt>
 			<dd>
 				<p>
-					If the object's <code>type</code> attribute is not the empty string let <var>mime type</var> be its value.
+					If the object's <a href="#widl-Stream-type">type</a> attribute is not the empty string let <var>mime type</var> be its value.
 				</p>
 				<p>
-					Let the <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#request-entity-body">request entity body</a> be the raw data represented by <var>data</var>.
+					Set the <a>read pending flag</a> for the stream.
 				</p>
-			
+				<p>
+					Let the <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html#request-entity-body">request entity body</a> be the raw data represented by <var>data</var>.
+				</p>
+				<p>Once the read is completed for the request, call <a href="#widl-Stream-close-void">close()</a> on the stream</p>
+
 			</dd>
-		</dl>	
+		</dl>
 	</section>
 
 </section>
@@ -1222,49 +800,60 @@ document.getElementById('audioTag').src = streamURL;
 <section class="section" id="requirements">
 <h2>Requirements and Use Cases</h2>
 	<p>
-		The <a>Stream</a> type allows for completion of several end-to-end experiences. This section covers what the requirements are for this API, and 
+		The <a>Stream</a> type allows for completion of several end-to-end experiences. This section covers what the requirements are for this API, and
 		illustrates some use cases.
 	</p>
 		<ul>
 			<li>
-				Begin loading a video through <code>XMLHttpRequest</code> in <code>readyState</code> 3
+				Begin loading a video through <code>XMLHttpRequest</code> in <code>readyState</code> LOADING
 				<p>
-					Videos can typically be large files that may take a long time to download, and require authentication or certain headers to access. 
+					Videos can typically be large files that may take a long time to download, and require authentication or certain headers to access.
 					For certain video formats, an application can begin playing the video once the first chunks of data are available, and would not need to wait for the entire video to download.
-				
+
 				</p>
 			</li>
 			<li>
-				Begin processing data with <a>StreamReader</a> as it is being read via <code>XMLHttpRequest</code>
+				Begin processing the data of a <a>Stream</a> as it is being read via <code>XMLHttpRequest</code>
 				<p>
-					If a file format is understood, then an application can make sense of the data as it being made available. For example, a given 
+					If a file format is understood, then an application can make sense of the data as it being made available. For example, a given
 					file may be very large and the application wants to begin processing the data immediately, rather than having to wait for full download of the file.
 				</p>
 			</li>
 			<li>
-				Upload of dynamic runtime data using <a>StreamBuilder</a> and <code>XMLHttpRequest</code>
+				Upload of dynamic runtime data using <a>Stream</a> and <code>XMLHttpRequest</code>
 				<p>
 					There are situations where an application may have data to upload once the application is processing. This could involve processing
 					of data an application wants to upload as it is being created. One such case is the upload of GPS coordinates within an application. The
 					coordiantes may constantly change, and the application wants to upload the data as it being collected.
-				
+
 				</p>
 			</li>
 			<li>
 				Media streaming scenarios using <a>Stream</a> and <code>XMLHttpRequest</code>
 				<p>
-					Media streaming scenarios require the ability to quickly receive data over the network and connect it to a media element. An application can successfully accomplish this by receiving a Stream in <code>readyState</code> 3 and assign it to a media element. This helps avoid the application from having to buffer the data prior to assigning it to a media element.
+					Media streaming scenarios require the ability to quickly receive data over the network and connect it to a media element. An application can successfully accomplish this by receiving a Stream in <code>readyState</code> LOADING and assign it to a media element. This helps avoid the application from having to buffer the data prior to assigning it to a media element.
 				</p>
 			</li>
 		</ul>
 </section>
 
 <section class=appendix>
-<h2>Acknowledgements</h2>
-<p>
-	Thanks to Eliot Graff for editorial assistance. 
-	Special thanks to the W3C.
-</p>
+  <h2>Acknowledgements</h2>
+  <p>
+    Thanks to Eliot Graff for editorial assistance.
+    Special thanks to the W3C.
+    The editor would like to thank
+    Anne van Kesteren,
+    Austin William Wright,
+    Aymeric Vitte,
+    Domenic Denicola,
+    Isaac Schlueter,
+    Jonas Sicking,
+    Kenneth Russell,
+    Yusuke Suzuki,
+    Adrian Bateman
+    for their contributions to this specification.
+  </p>
 </section>
 
 </body>
