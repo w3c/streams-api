@@ -825,6 +825,7 @@ interface <span class="idlInterfaceID">Stream</span> {
 				 <li>As read data becomes available, <a href="#write-to-stream">write newly read data to <code>destinations</code></a>.</li>
 				 <li>If any error has occurred during reading or writing to <code>destinations</code>, neuter the <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a>, let <code>exception</code> be an "<code><a href="http://dev.w3.org/2006/webapi/DOM4Core/#invalidstateerror">InvalidStateError</a></code>" exception and run <code>Reject(<code>readPromise</code>, <code>exception</code>)</code> as specified in the promises spec and terminate these steps.</li>
 				 <li>Once read and write are both completed for all destination streams, run the following algorithm:</li>
+<li>
 				 <ol>
 				   <li>Let <code>result</code> be a newly created <a href="#idl-def-StreamConsumeResult" class="idlType"><code>StreamConsumeResult</code></a> object.</li>
 				   <li>If <a href="#eof-reached">EOF is reached</a>, set <a href="#widl-StreamConsumeResult-eof">eof</a> attribute of <code>result</code> to true.</li>
@@ -832,6 +833,7 @@ interface <span class="idlInterfaceID">Stream</span> {
 				   <li>Set <a href="#widl-StreamConsumeResult-size">size</a> attribute of <code>result</code> to the total size of the read data.</li>
 				   <li>Unset the <a href="#dfn-read-pending-flag" class="internalDFN">read pending flag</a> and run <code>Resolve(<code>readPromise</code>, <code>result</code>)</code> as specified in the promises spec.</li>
 				 </ol>
+</li>
 				</ol>
                                 
 			<table class="parameters"><tbody><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">destination</td><td class="prmType"><code></code></td><td class="prmNullFalse"><span role="img" aria-label="False">✘</span></td><td class="prmOptFalse"><span role="img" aria-label="False">✘</span></td><td class="prmDesc">Destination <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a>.</td></tr><tr><td class="prmName">size</td><td class="prmType"><code></code></td><td class="prmNullFalse"><span role="img" aria-label="False">✘</span></td><td class="prmOptTrue"><span role="img" aria-label="True">✔</span></td><td class="prmDesc">Number of bytes to transfer.</td></tr></tbody></table><div><em>Return type: </em><code></code></div></dd><dt id="widl-Stream-read-Promise--Clamp--unsigned-long-long-size"><code>read</code></dt><dd>
