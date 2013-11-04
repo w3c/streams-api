@@ -1,0 +1,1265 @@
+<!DOCTYPE html PUBLIC '-//W3C//DTD HTML 4.0 Transitional//EN' ''>
+<html lang="en" dir="ltr" typeof="bibo:Document w3p:WD" about="" property="dcterms:language" content="en">
+<head>
+	<title>Streams API</title>
+	<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+
+<!--	<script class=remove src="http://dev.w3.org/2009/dap/ReSpec.js/js/respec.js"></script> -->
+
+	
+	<!--<script class="remove" src="respec-w3c-common.js"></script>-->
+
+	
+
+	<!-- Styles to mimic File API spec -->
+	<style type="text/css">
+		table.error { border-collapse:collapse; border-style:hidden hidden none hidden }
+		table.error thead { border-bottom:solid }
+		table.error tbody th:first-child { border-left:solid }
+		table.error td, table th { border-left:solid; border-right:solid; border-bottom:solid thin; vertical-align:top; padding:0.2em }
+	</style>
+
+<style>/*****************************************************************
+ * ReSpec 3 CSS
+ * Robin Berjon - http://berjon.com/
+ *****************************************************************/
+
+/* --- INLINES --- */
+em.rfc2119 { 
+    text-transform:     lowercase;
+    font-variant:       small-caps;
+    font-style:         normal;
+    color:              #900;
+}
+
+h1 acronym, h2 acronym, h3 acronym, h4 acronym, h5 acronym, h6 acronym, a acronym,
+h1 abbr, h2 abbr, h3 abbr, h4 abbr, h5 abbr, h6 abbr, a abbr {
+    border: none;
+}
+
+dfn {
+    font-weight:    bold;
+}
+
+a.internalDFN {
+    color:  inherit;
+    border-bottom:  1px solid #99c;
+    text-decoration:    none;
+}
+
+a.externalDFN {
+    color:  inherit;
+    border-bottom:  1px dotted #ccc;
+    text-decoration:    none;
+}
+
+a.bibref {
+    text-decoration:    none;
+}
+
+cite .bibref {
+    font-style: normal;
+}
+
+code {
+    color:  #ff4500;
+}
+
+/* --- TOC --- */
+.toc a, .tof a {
+    text-decoration:    none;
+}
+
+a .secno, a .figno {
+    color:  #000;
+}
+
+ul.tof, ol.tof {
+    list-style: none outside none;
+}
+
+.caption {
+    margin-top: 0.5em;
+    font-style:   italic;
+}
+
+/* --- TABLE --- */
+table.simple {
+    border-spacing: 0;
+    border-collapse:    collapse;
+    border-bottom:  3px solid #005a9c;
+}
+
+.simple th {
+    background: #005a9c;
+    color:  #fff;
+    padding:    3px 5px;
+    text-align: left;
+}
+
+.simple th[scope="row"] {
+    background: inherit;
+    color:  inherit;
+    border-top: 1px solid #ddd;
+}
+
+.simple td {
+    padding:    3px 10px;
+    border-top: 1px solid #ddd;
+}
+
+.simple tr:nth-child(even) {
+    background: #f0f6ff;
+}
+
+/* --- DL --- */
+.section dd > p:first-child {
+    margin-top: 0;
+}
+
+.section dd > p:last-child {
+    margin-bottom: 0;
+}
+
+.section dd {
+    margin-bottom:  1em;
+}
+
+.section dl.attrs dd, .section dl.eldef dd {
+    margin-bottom:  0;
+}
+</style><style>/* --- EXAMPLES --- */
+div.example-title {
+    min-width: 7.5em;
+    color: #b9ab2d;
+}
+div.example-title span {
+    text-transform: uppercase;   
+}
+aside.example, div.example, div.illegal-example {
+    padding: 0.5em;
+    margin: 1em 0;
+    position: relative;
+    clear: both;
+}
+div.illegal-example { color: red }
+div.illegal-example p { color: black }
+aside.example, div.example {
+    padding: .5em;
+    border-left-width: .5em;
+    border-left-style: solid;
+    border-color: #e0cb52;
+    background: #fcfaee;    
+}
+
+aside.example div.example {
+    border-left-width: .1em;
+    border-color: #999;
+    background: #fff;
+}
+aside.example div.example div.example-title {
+    color: #999;
+}
+</style><style>/* --- ISSUES/NOTES --- */
+div.issue-title, div.note-title {
+    padding-right:  1em;
+    min-width: 7.5em;
+    color: #b9ab2d;
+}
+div.issue-title { color: #e05252; }
+div.note-title { color: #2b2; }
+div.issue-title span, div.note-title span {
+    text-transform: uppercase;
+}
+div.note, div.issue {
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+.note > p:first-child, .issue > p:first-child { margin-top: 0 }
+.issue, .note {
+    padding: .5em;
+    border-left-width: .5em;
+    border-left-style: solid;
+}
+div.issue, div.note {
+    padding: 1em 1.2em 0.5em;
+    margin: 1em 0;
+    position: relative;
+    clear: both;
+}
+span.note, span.issue { padding: .1em .5em .15em; }
+
+.issue {
+    border-color: #e05252;
+    background: #fbe9e9;
+}
+.note {
+    border-color: #52e052;
+    background: #e9fbe9;
+}
+
+
+</style><style>/* --- WEB IDL --- */
+pre.idl {
+    border-top: 1px solid #90b8de;
+    border-bottom: 1px solid #90b8de;
+    padding:    1em;
+    line-height:    120%;
+}
+
+pre.idl::before {
+    content:    "WebIDL";
+    display:    block;
+    width:      150px;
+    background: #90b8de;
+    color:  #fff;
+    font-family:    initial;
+    padding:    3px;
+    font-weight:    bold;
+    margin: -1em 0 1em -1em;
+}
+
+.idlType {
+    color:  #ff4500;
+    font-weight:    bold;
+    text-decoration:    none;
+}
+
+/*.idlModule*/
+/*.idlModuleID*/
+/*.idlInterface*/
+.idlInterfaceID, .idlDictionaryID, .idlCallbackID, .idlEnumID {
+    font-weight:    bold;
+    color:  #005a9c;
+}
+a.idlEnumItem {
+    color:  #000;
+    border-bottom:  1px dotted #ccc;
+    text-decoration: none;
+}
+
+.idlSuperclass {
+    font-style: italic;
+    color:  #005a9c;
+}
+
+/*.idlAttribute*/
+.idlAttrType, .idlFieldType, .idlMemberType {
+    color:  #005a9c;
+}
+.idlAttrName, .idlFieldName, .idlMemberName {
+    color:  #ff4500;
+}
+.idlAttrName a, .idlFieldName a, .idlMemberName a {
+    color:  #ff4500;
+    border-bottom:  1px dotted #ff4500;
+    text-decoration: none;
+}
+
+/*.idlMethod*/
+.idlMethType, .idlCallbackType {
+    color:  #005a9c;
+}
+.idlMethName {
+    color:  #ff4500;
+}
+.idlMethName a {
+    color:  #ff4500;
+    border-bottom:  1px dotted #ff4500;
+    text-decoration: none;
+}
+
+/*.idlCtor*/
+.idlCtorName {
+    color:  #ff4500;
+}
+.idlCtorName a {
+    color:  #ff4500;
+    border-bottom:  1px dotted #ff4500;
+    text-decoration: none;
+}
+
+/*.idlParam*/
+.idlParamType {
+    color:  #005a9c;
+}
+.idlParamName, .idlDefaultValue {
+    font-style: italic;
+}
+
+.extAttr {
+    color:  #666;
+}
+
+/*.idlSectionComment*/
+.idlSectionComment {
+    color: gray;
+}
+
+/*.idlConst*/
+.idlConstType {
+    color:  #005a9c;
+}
+.idlConstName {
+    color:  #ff4500;
+}
+.idlConstName a {
+    color:  #ff4500;
+    border-bottom:  1px dotted #ff4500;
+    text-decoration: none;
+}
+
+/*.idlException*/
+.idlExceptionID {
+    font-weight:    bold;
+    color:  #c00;
+}
+
+.idlTypedefID, .idlTypedefType {
+    color:  #005a9c;
+}
+
+.idlRaises, .idlRaises a.idlType, .idlRaises a.idlType code, .excName a, .excName a code {
+    color:  #c00;
+    font-weight:    normal;
+}
+
+.excName a {
+    font-family:    monospace;
+}
+
+.idlRaises a.idlType, .excName a.idlType {
+    border-bottom:  1px dotted #c00;
+}
+
+.excGetSetTrue, .excGetSetFalse, .prmNullTrue, .prmNullFalse, .prmOptTrue, .prmOptFalse {
+    width:  45px;
+    text-align: center;
+}
+.excGetSetTrue, .prmNullTrue, .prmOptTrue { color:  #0c0; }
+.excGetSetFalse, .prmNullFalse, .prmOptFalse { color:  #c00; }
+
+.idlImplements a {
+    font-weight:    bold;
+}
+
+dl.attributes, dl.methods, dl.constants, dl.constructors, dl.fields, dl.dictionary-members {
+    margin-left:    2em;
+}
+
+.attributes dt, .methods dt, .constants dt, .constructors dt, .fields dt, .dictionary-members dt {
+    font-weight:    normal;
+}
+
+.attributes dt code, .methods dt code, .constants dt code, .constructors dt code, .fields dt code, .dictionary-members dt code {
+    font-weight:    bold;
+    color:  #000;
+    font-family:    monospace;
+}
+
+.attributes dt code, .fields dt code, .dictionary-members dt code {
+    background:  #ffffd2;
+}
+
+.attributes dt .idlAttrType code, .fields dt .idlFieldType code, .dictionary-members dt .idlMemberType code {
+    color:  #005a9c;
+    background:  transparent;
+    font-family:    inherit;
+    font-weight:    normal;
+    font-style: italic;
+}
+
+.methods dt code {
+    background:  #d9e6f8;
+}
+
+.constants dt code {
+    background:  #ddffd2;
+}
+
+.constructors dt code {
+    background:  #cfc;
+}
+
+.attributes dd, .methods dd, .constants dd, .constructors dd, .fields dd, .dictionary-members dd {
+    margin-bottom:  1em;
+}
+
+table.parameters, table.exceptions {
+    border-spacing: 0;
+    border-collapse:    collapse;
+    margin: 0.5em 0;
+    width:  100%;
+}
+table.parameters { border-bottom:  1px solid #90b8de; }
+table.exceptions { border-bottom:  1px solid #deb890; }
+
+.parameters th, .exceptions th {
+    color:  #fff;
+    padding:    3px 5px;
+    text-align: left;
+    font-family:    initial;
+    font-weight:    normal;
+    text-shadow:    #666 1px 1px 0;
+}
+.parameters th { background: #90b8de; }
+.exceptions th { background: #deb890; }
+
+.parameters td, .exceptions td {
+    padding:    3px 10px;
+    border-top: 1px solid #ddd;
+    vertical-align: top;
+}
+
+.parameters tr:first-child td, .exceptions tr:first-child td {
+    border-top: none;
+}
+
+.parameters td.prmName, .exceptions td.excName, .exceptions td.excCodeName {
+    width:  100px;
+}
+
+.parameters td.prmType {
+    width:  120px;
+}
+
+table.exceptions table {
+    border-spacing: 0;
+    border-collapse:    collapse;
+    width:  100%;
+}
+</style><link rel="stylesheet" href="https://www.w3.org/StyleSheets/TR/W3C-WD"><!--[if lt IE 9]><script src='https://www.w3.org/2008/site/js/html5shiv.js'></script><![endif]--><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="ui/save-html" src="https://raw.github.com/darobin/respec/gh-pages/js/ui/save-html.js"></script></head>
+
+<body class="h-entry" style="" role="document" id="respecDocument"><div class="head" role="contentinfo" id="respecHeader">
+  <p>
+    
+      <a href="http://www.w3.org/"><img width="72" height="48" src="https://www.w3.org/Icons/w3c_home" alt="W3C"></a>
+    
+  </p>
+  <h1 class="title p-name" id="title" property="dcterms:title">Streams API</h1>
+  
+  <h2 property="dcterms:issued" datatype="xsd:dateTime" content="2013-11-05T05:00:00.000Z" id="w3c-working-draft-05-november-2013"><abbr title="World Wide Web Consortium">W3C</abbr> Working Draft <time class="dt-published" datetime="2013-11-05">05 November 2013</time></h2>
+  <dl>
+    
+      <dt>This version:</dt>
+      <dd><a class="u-url" href="http://www.w3.org/TR/2013/WD-streams-api-20131105/">http://www.w3.org/TR/2013/WD-streams-api-20131105/</a></dd>
+      <dt>Latest published version:</dt>
+      <dd><a href="http://www.w3.org/TR/streams-api/">http://www.w3.org/TR/streams-api/</a></dd>
+    
+    
+      <dt>Latest editor's draft:</dt>
+      <dd><a href="http://dvcs.w3.org/hg/streams-api/raw-file/tip/Overview.htm">http://dvcs.w3.org/hg/streams-api/raw-file/tip/Overview.htm</a></dd>
+    
+    
+    
+    
+    
+      <dt>Previous version:</dt>
+      <dd><a rel="dcterms:replaces" href="http://www.w3.org/TR/2013/WD-streams-api-20130214/">http://www.w3.org/TR/2013/WD-streams-api-20130214/</a></dd>
+    
+    
+    <dt>Editors:</dt>
+    <dd class="p-author h-card vcard" rel="bibo:editor" inlist=""><span typeof="foaf:Person"><a class="u-url url p-name fn" rel="foaf:homepage" property="foaf:name" content="Feras Moussa" href="mailto:feras.moussa@hotmail.com">Feras Moussa</a>, Invited Expert</span>
+</dd>
+<dd class="p-author h-card vcard" rel="bibo:editor" inlist=""><span typeof="foaf:Person"><a class="u-url url p-name fn" rel="foaf:homepage" property="foaf:name" content="Takeshi Yoshino" href="mailto:tyoshino@google.com">Takeshi Yoshino</a>, Google, Inc.</span>
+</dd>
+
+    
+    
+  </dl>
+  
+  
+  
+  
+    
+      <p class="copyright">
+        <a href="http://www.w3.org/Consortium/Legal/ipr-notice#Copyright">Copyright</a> ©
+        2013
+        
+        <a href="http://www.w3.org/"><abbr title="World Wide Web Consortium">W3C</abbr></a><sup>®</sup>
+        (<a href="http://www.csail.mit.edu/"><abbr title="Massachusetts Institute of Technology">MIT</abbr></a>,
+        <a href="http://www.ercim.eu/"><abbr title="European Research Consortium for Informatics and Mathematics">ERCIM</abbr></a>,
+        <a href="http://www.keio.ac.jp/">Keio</a>, <a href="http://ev.buaa.edu.cn/">Beihang</a>), 
+        
+        All Rights Reserved.
+        
+        <abbr title="World Wide Web Consortium">W3C</abbr> <a href="http://www.w3.org/Consortium/Legal/ipr-notice#Legal_Disclaimer">liability</a>,
+        <a href="http://www.w3.org/Consortium/Legal/ipr-notice#W3C_Trademarks">trademark</a> and
+        
+          <a href="http://www.w3.org/Consortium/Legal/copyright-documents">document use</a>
+        
+        rules apply.
+      </p>
+    
+  
+  <hr>
+</div>
+<!--<div class="note">this spec is currently being revised to incorporate many of the changes outlined in <a href='http://htmlpreview.github.io/?https://github.com/tyoshino/stream/blob/master/streams.html'>this reference spec.</a></div>-->
+<section id="abstract" class="introductory" property="dcterms:abstract" datatype="" typeof="bibo:Chapter" resource="#ref" rel="bibo:Chapter"><h2 aria-level="1" role="heading" id="h2_abstract">Abstract</h2>
+		<!-- TODO: are all of the links and objects in the abstract formatted? -->
+		<p>
+			This specification provides an API for representing binary and string data in web applications as a <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> object,
+			as well as programmatically building and reading its contents. This includes:
+		</p>
+		<ul>
+			<li>A <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> interface, which represents a sequence of data which can be read only once and provides APIs for reading, writing, and piping the data.</li>
+			<li>A <a href="#idl-def-StreamConsumeResult" class="idlType"><code>StreamConsumeResult</code></a> interface, which represents a chunk of content read from a stream.</li>
+			<li>A <a href="#idl-def-StreamReadType" class="idlType"><code>StreamReadType</code></a> interface, which represents how the <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> is currently being read.</li>
+			<li>A list of notable stream <a href="#producers">producers</a> a and <a href="#consumers">consumers</a> for a <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> object.</li>
+			<li>Extensions to <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#the-xmlhttprequest-interface">XMLHttpRequest</a> [<cite><a class="bibref" href="#bib-XMLHTTPREQUEST2">XMLHTTPREQUEST2</a></cite>] to add support for upload and download of a <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a>.</li>
+			<li>
+				Extensions to <a href="http://dev.w3.org/2006/webapi/FileAPI/#dfn-createObjectURL">URL.createObjectURL</a> and
+				<a href="http://dev.w3.org/2006/webapi/FileAPI/#dfn-revokeObjectURL">URL.revokeObjectURL</a> to add support for <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a>.</li>
+		</ul>
+
+		<p>
+			This API is designed to be used in conjunction with other APIs and elements on the web platform, notably:
+			<a href="http://dev.w3.org/2006/webapi/FileAPI">File</a> [<cite><a class="bibref" href="#bib-FILE-API">FILE-API</a></cite>],
+			<a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2">XMLHttpRequest</a>
+			(e.g. with an overloaded <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#the-send-method"><code>send()</code></a> method
+			and <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#the-responsetype-attribute"><code>response</code></a> object for <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> objects) [<cite><a class="bibref" href="#bib-XMLHTTPREQUEST2">XMLHTTPREQUEST2</a></cite>],
+			<a href="http://dev.w3.org/html5/postmsg/#dom-window-postmessage"><code>postMessage</code></a>, and
+			Web Workers [<cite><a class="bibref" href="#bib-WEBWORKERS">WEBWORKERS</a></cite>].
+		</p>
+<!--End section: Abstract-->
+</section><section id="sotd" class="introductory" typeof="bibo:Chapter" resource="#ref" rel="bibo:Chapter"><h2 aria-level="1" role="heading" id="h2_sotd">Status of This Document</h2>
+  
+    
+      
+        <p>
+          <em>This section describes the status of this document at the time of its publication. Other
+          documents may supersede this document. A list of current <abbr title="World Wide Web Consortium">W3C</abbr> publications and the latest revision
+          of this technical report can be found in the <a href="http://www.w3.org/TR/"><abbr title="World Wide Web Consortium">W3C</abbr> technical reports
+          index</a> at http://www.w3.org/TR/.</em>
+        </p>
+        
+        <p>
+          This document was published by the <a href="http://www.w3.org/2008/webapps/"><abbr title="World Wide Web Consortium">W3C</abbr> Web Applications (WebApps)</a> as a Working Draft.
+          
+            This document is intended to become a <abbr title="World Wide Web Consortium">W3C</abbr> Recommendation.
+          
+          
+          If you wish to make comments regarding this document, please send them to 
+          <a href="mailto:public-webapps@w3.org">public-webapps@w3.org</a> 
+          (<a href="mailto:public-webapps-request@w3.org?subject=subscribe">subscribe</a>,
+          <a href="http://lists.w3.org/Archives/Public/public-webapps/">archive</a>)
+	  with a Subject prefix of <code>[streams-api]</code>.
+
+	  If you wish to submit a bug, please use 
+	  <a href="https://www.w3.org/Bugs/Public/buglist.cgi?component=Streams%20API&list_id=29531&product=WebAppsWG&resolution=---">Bugzilla</a>.
+          
+        All comments and bug reports are welcome.
+          
+            All comments are welcome.</p>
+          
+        
+          <p>
+            Publication as a Working Draft does not imply endorsement by the <abbr title="World Wide Web Consortium">W3C</abbr> Membership.
+            This is a draft document and may be updated, replaced or obsoleted by other documents at 
+            any time. It is inappropriate to cite this document as other than work in progress.
+          </p>
+        
+        
+        <p>
+          
+            This document was produced by a group operating under the 
+             
+                <a id="sotd_patent" about="" rel="w3p:patentRules" href="http://www.w3.org/Consortium/Patent-Policy-20040205/">5 February 2004 <abbr title="World Wide Web Consortium">W3C</abbr> Patent Policy</a>.
+            
+          
+          
+          
+            
+              <abbr title="World Wide Web Consortium">W3C</abbr> maintains a <a href="" rel="disclosure">public list of any patent disclosures</a> 
+            
+            made in connection with the deliverables of the group; that page also includes instructions for 
+            disclosing a patent. An individual who has actual knowledge of a patent which the individual believes contains
+            <a href="http://www.w3.org/Consortium/Patent-Policy-20040205/#def-essential">Essential Claim(s)</a> must disclose the
+            information in accordance with <a href="http://www.w3.org/Consortium/Patent-Policy-20040205/#sec-Disclosure">section
+            6 of the <abbr title="World Wide Web Consortium">W3C</abbr> Patent Policy</a>.
+          
+          
+        </p>
+        
+      
+    
+  
+</section><section id="toc"><h2 class="introductory" aria-level="1" role="heading" id="h2_toc">Table of Contents</h2><ul class="toc" role="directory" id="respecContents"><li class="tocline"><a href="#introduction" class="tocxref"><span class="secno">1. </span>Introduction</a></li><li class="tocline"><a href="#streams" class="tocxref"><span class="secno">2. </span>Streams</a><ul class="toc"><li class="tocline"><a href="#stream-interface" class="tocxref"><span class="secno">2.1 </span>The Stream Interface</a><ul class="toc"><li class="tocline"><a href="#constructors" class="tocxref"><span class="secno">2.1.1 </span>Constructors</a></li><li class="tocline"><a href="#attributes" class="tocxref"><span class="secno">2.1.2 </span>Attributes</a></li><li class="tocline"><a href="#methods" class="tocxref"><span class="secno">2.1.3 </span>Methods</a></li></ul></li><li class="tocline"><a href="#streamConsumeResult-interface" class="tocxref"><span class="secno">2.2 </span>StreamConsumeResult Interface</a><ul class="toc"><li class="tocline"><a href="#attributes-1" class="tocxref"><span class="secno">2.2.1 </span>Attributes</a></li></ul></li><li class="tocline"><a href="#streamReadType-interface" class="tocxref"><span class="secno">2.3 </span>StreamReadType Interface</a></li><li class="tocline"><a href="#error-uris_for_streams" class="tocxref"><span class="secno">2.4 </span>URIs for Stream</a><ul class="toc"><li class="tocline"><a href="#creating-revoking-streamuri" class="tocxref"><span class="secno">2.4.1 </span>Creating and Revoking a Stream URI</a><ul class="toc"><li class="tocline"><a href="#methods-1" class="tocxref"><span class="secno">2.4.1.1 </span>Methods</a></li></ul></li></ul></li></ul></li><li class="tocline"><a href="#producers-consumers" class="tocxref"><span class="secno">3. </span>Stream Consumers and Producers</a><ul class="toc"><li class="tocline"><a href="#consumers" class="tocxref"><span class="secno">3.1 </span>Stream Consumers</a></li><li class="tocline"><a href="#producers" class="tocxref"><span class="secno">3.2 </span>Stream Producers</a></li></ul></li><li class="tocline"><a href="#security" class="tocxref"><span class="secno">4. </span>Security Considerations</a></li><li class="tocline"><a href="#XMLHttpRequest" class="tocxref"><span class="secno">5. </span>Extension of XMLHttpRequest</a><ul class="toc"><li class="tocline"><a href="#addition-of-stream-response-entity-body" class="tocxref"><span class="secno">5.1 </span>Addition of stream response entity body</a></li><li class="tocline"><a href="#addition-of-stream-responsetype" class="tocxref"><span class="secno">5.2 </span>Addition of "<code>stream</code>" responseType</a></li><li class="tocline"><a href="#modification-on-the-response-attribute" class="tocxref"><span class="secno">5.3 </span>Modification on the <code>response</code> attribute</a></li><li class="tocline"><a href="#modification-on-send-algorithm" class="tocxref"><span class="secno">5.4 </span>send()</a></li></ul></li><li class="tocline"><a href="#requirements" class="tocxref"><span class="secno">6. </span>Requirements and Use Cases</a></li><li class="tocline"><a href="#acknowledgements" class="tocxref"><span class="secno">A. </span>Acknowledgements</a></li><li class="tocline"><a href="#references" class="tocxref"><span class="secno">B. </span>References</a><ul class="toc"><li class="tocline"><a href="#normative-references" class="tocxref"><span class="secno">B.1 </span>Normative references</a></li></ul></li></ul></section>
+
+<section id="introduction" class="section informative" typeof="bibo:Chapter" resource="#ref" rel="bibo:Chapter">
+    	<!--OddPage--><h2 aria-level="1" role="heading" id="h2_introduction"><span class="secno">1. </span>Introduction</h2><p><em>This section is non-normative.</em></p>
+
+    	<p>
+    		Web applications should have the ability to acquire and manipulate data in a wide variety of forms,
+    		including as a sequence of data made available over time.
+    		This specification defines the basic representation for <a href="#dfn-stream">Streams</a>,
+    		errors raised by <a href="#dfn-stream">Streams</a>,
+    		and programmatic ways to create, read, and write to <a href="#dfn-stream">Streams</a>.
+    	</p>
+    	<p>
+			The <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> interface represents binary data which can be obtained over time and read once. A <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> can come from API <a href="#producers">producers</a> such as <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#the-xmlhttprequest-interface"><code>XMLHttpRequest</code></a>, or can
+			be built using the <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> constructor.
+		</p>
+
+		<p>
+			The <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> interface provides a <code>read</code> method for reading the data
+			from a <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> as a <a href="#idl-def-StreamConsumeResult" class="idlType"><code>StreamConsumeResult</code></a>, which provides the data as a <code>Blob</code>, <code>ArrayBuffer</code>, or as <code>DOMString</code>,
+			and should happen asynchronously on the user agent’s main thread. Additionally, the stream can also be used in API <a href="#consumers">consumers</a> such as a media element.
+		</p>
+
+		<p>
+			The <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> interface also provides a <code>write</code> method for writing data
+			to a <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> as a <code>Blob</code>, <code>ArrayBuffer</code>, or as <code>DOMString</code>,
+			and should happen asynchronously on the user agent’s main thread.
+		</p>
+
+		<p>
+			An asynchronous API for reading <a href="#idl-def-Stream"><code>Streams</code></a> prevents blocking and UI “freezing” on a user agent’s main thread.
+			This specification defines an asynchronous API to access a <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a>. Error conditions that may arise during reading of a <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> will be handled by a reject callback set to the promise returned by the read() method. An example will be illustrative.
+
+		</p>
+
+    	<p>
+    		In the example below, different code blocks handle progress, error, and success conditions.
+    		The example demonstrates how to read a chunk of data from a <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> using <code>read</code>. The <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> may of come from a <a href="#producers	">producer</a> such as <code>XMLHttpRequest</code>. Additionally, it demonstrates how to read a stream until an EOF is encountered.
+    	</p>
+    	<div class="example"><div class="example-title"><span>Example 1</span></div><pre class="example">// Read the first 1024 bytes of the stream as UTF-8
+stream.readEncoding = "UTF-8";
+stream.readType = "arraybuffer";
+Promise readPromise = stream.read(1024);
+readPromise.then(
+  function(result) {
+    console.log("Loaded" + result.size + " bytes");
+    // Handle result.data
+  },
+  function(error) {
+    // Handle error
+  }
+);
+
+// Read data from the stream repeatedly
+function readUntilEof() {
+  stream.read(1024).then(
+    function(result) {
+      // Handle read data
+      someProcessFunction(result.data);
+
+      // Print progress
+      someReportFunction(result.size);
+
+      if (!result.eof) {
+        readUntilEof();
+      }
+    },
+    function(error) {
+      // Handle error
+    }
+  );
+}</pre></div>
+
+    	<p>
+    		In the example below, different code blocks handle progress, error, and success conditions.
+    		The example below demonstrates how to obtain a <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> from <code>XMLHttpRequest</code> to begin playing a large video in <code>readystate</code> 3. The example takes the <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> from a <a href="#producers">producer</a>, <code>XMLHttpRequest</code>, and gives to a <a href="#consumers">consumer</a>, the video tag.
+    	</p>
+    	<div class="example"><div class="example-title"><span>Example 2</span></div><pre class="example">function handler() {
+  if(this.readyState == this.LOADING) {
+    var theStream = this.response;
+    var streamURL = URL.createObjectURL(theStream);
+    document.getElementById("myVideoTag").src = streamURL;
+  }
+}
+
+var client = new XMLHttpRequest();
+client.onreadystatechange = handler;
+client.setRequestHeader('customHeader', 'value');
+client.setRequestHeader('customHeader2', 'value2');
+client.open("GET", "myvideo.h264");
+client.responseType = "stream";
+client.send();</pre></div>
+
+		<p>
+			In addition to reading a Stream, this specification introduces a programatic way to write data to a Stream.
+			The <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> interface provides a <code>write()</code> method which allows applications to build the data to be read by a Stream <a href="#consumers">consumer</a> by appending the data to an internal buffer.
+			<code>write()</code> supports appending data as a <code>Blob</code>, <code>ArrayBuffer</code>, or <code>DOMString</code> to the buffer.
+		</p>
+		<p>
+			The example below demonstrates how to use <code>write()</code> to load a Stream into the audio tag, whose data could be processed and built dynamically at read time.
+		</p>
+
+<div class="example"><div class="example-title"><span>Example 3</span></div><pre class="example">var theStream = new Stream("audio/mp3");
+
+function writeData(){
+  var moreData;
+  // Do work to create more data to place into the stream
+
+  // If we have no more data to process and place in the stream, we close
+  if (moreData == null){
+    theStream.close();
+  } else{
+    theStream.write(moreData).then(
+      function () {
+        writeData();
+      },
+      function (error) {
+        // Handle error
+      }
+    );
+  }
+}
+
+var streamURL = URL.createObjectURL(theStream);
+document.getElementById('audioTag').src = streamURL;
+
+writeData();</pre></div>
+<!--End section: Introduction-->
+</section>
+
+<section class="section" id="streams" typeof="bibo:Chapter" resource="#ref" rel="bibo:Chapter">
+	<!--OddPage--><h2 aria-level="1" role="heading" id="h2_streams"><span class="secno">2. </span>Streams</h2>
+	<p>
+		This section introduces the <code>Stream</code> interface, as well as accompanying interfaces required as part of the <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> implementation. This includes a constructor to build a <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a>, as well as methods to <code>read</code>, <code>write</code>, <code>skip</code>, <code>pipe</code>, and <code>close</code> streams.
+
+	</p>
+
+	<section class="section" id="stream-interface" typeof="bibo:Chapter" resource="#ref" rel="bibo:Chapter">
+	<h3 aria-level="2" role="heading" id="h3_stream-interface"><span class="secno">2.1 </span>The Stream Interface</h3>
+		<p>
+			This interface represents a raw sequence of linear data which can be read only once over time.
+			It provides a <a href="#widl-Stream-type">type</a> attribute which represents the type of data in the Stream.
+			It also provides the ability to read and write the contents of the Stream.
+		</p>
+		<p>A Stream is an object that:</p>
+		<ul>
+			<li>Has a content type;</li>
+			<li>Has unspecified length;</li>
+			<li>Data is read first in, first out;</li>
+			<li>Once data is read from it, the data is removed and can no longer be re-read;</li>
+		</ul>
+
+        <p>
+          A Stream object has an associated <dfn id="dfn-write-closed-flag">write closed flag</dfn>.
+          It is set when the <a href="#widl-Stream-close-void">close()</a> method is called.
+          This flag is internal, so scripts cannot access it directly.
+        </p>
+
+        <p>
+          A Stream object has an associated <dfn id="dfn-write-pending-flag">write pending flag</dfn>. It is set when the <a href="#widl-Stream-write-Promise-DOMString-ArrayBufferView-Blob-data">write()</a> method is called and unset when it's completed.
+          This flag is internal, so scripts cannot access it directly.
+        </p>
+
+        <p>
+          A Stream object has an associated <dfn id="dfn-read-pending-flag">read pending flag</dfn>. It is set when <a href="#widl-Stream-read-Promise--Clamp--unsigned-long-long-size">read()</a>, <a href="#widl-Stream-skip-Promise--Clamp--unsigned-long-long-size">skip()</a> or <a href="#widl-Stream-pipe-Promise-Stream-Stream---destinations--Clamp--unsigned-long-long-size">pipe()</a> method is called and unset when it's completed.
+          This flag is internal, so scripts cannot access it directly.
+        </p>
+
+        <p>
+          A Stream holds a sequence of bytes possibly terminated by a terminator.
+          <dfn id="write-to-stream">Writing bytes to a Stream</dfn> means appending the bytes to the sequence.
+          <dfn id="terminate-stream">Terminating a Stream</dfn> means appending a terminator to the sequence.
+          <dfn id="read-from-stream">Reading bytes from a Stream</dfn> pops bytes from the head of the sequence.
+          If a terminator is encountered while reading bytes from a Stream, it is said <dfn id="eof-reached">the EOF is reached</dfn>.
+          This sequence is internal, so scripts cannot access it directly.
+        </p>
+
+		<pre class="idl"><span class="idlInterface" id="idl-def-Stream">[<span class="idlCtor"> <span class="idlCtorKeyword"></span><span class="idlCtorName"><a href="#widl-ctor-Stream--DOMString-type">Constructor</a></span> (<span class="idlParam">optional <span class="idlParamType">DOMString</span> <span class="idlParamName">type</span></span>)</span>]
+interface <span class="idlInterfaceID">Stream</span> {
+<span class="idlAttribute">    readonly    attribute <span class="idlAttrType">DOMString</span>      <span class="idlAttrName"><a href="#widl-Stream-type">type</a></span>;</span>
+<span class="idlAttribute">                attribute <span class="idlAttrType"><a href="#idl-def-StreamReadType" class="idlType"><code>StreamReadType</code></a></span> <span class="idlAttrName"><a href="#widl-Stream-readType">readType</a></span>;</span>
+<span class="idlAttribute">                attribute <span class="idlAttrType">DOMString</span>      <span class="idlAttrName"><a href="#widl-Stream-readEncoding">readEncoding</a></span>;</span>
+<span class="idlMethod">    <span class="idlMethType">Promise</span> <span class="idlMethName"><a href="#widl-Stream-write-Promise-DOMString-ArrayBufferView-Blob-data">write</a></span> (<span class="idlParam"><span class="idlParamType">(DOMString or ArrayBufferView or Blob)</span> <span class="idlParamName">data</span></span>);</span>
+<span class="idlMethod">    <span class="idlMethType">void</span>    <span class="idlMethName"><a href="#widl-Stream-close-void">close</a></span> ();</span>
+<span class="idlMethod">    <span class="idlMethType">Promise</span> <span class="idlMethName"><a href="#widl-Stream-read-Promise--Clamp--unsigned-long-long-size">read</a></span> (<span class="idlParam">optional <span class="idlParamType">[Clamp] unsigned long long</span> <span class="idlParamName">size</span></span>);</span>
+<span class="idlMethod">    <span class="idlMethType">Promise</span> <span class="idlMethName"><a href="#widl-Stream-skip-Promise---Clamp--unsigned-long-long-size">skip</a></span> (<span class="idlParam"><span class="idlParamType">![Clamp] unsigned long long</span> <span class="idlParamName">size</span></span>);</span>
+<span class="idlMethod">    <span class="idlMethType">Promise</span> <span class="idlMethName"><a href="#widl-Stream-pipe-Promise---Stream-or-Stream----destination--Clamp--unsigned-long-long-size">pipe</a></span> (<span class="idlParam"><span class="idlParamType">!(Stream or Stream[])</span> <span class="idlParamName">destination</span></span>, <span class="idlParam">optional <span class="idlParamType">[Clamp] unsigned long long</span> <span class="idlParamName">size</span></span>);</span>
+};</span></pre><section id="constructors"><h4 aria-level="3" role="heading" id="h4_constructors"><span class="secno">2.1.1 </span>Constructors</h4><dl class="constructors"><dt id="widl-ctor-Stream--DOMString-type"><code>Stream</code></dt><dd>Constructs a <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> and sets the <a href="#widl-Stream-type">type</a> to the specified value.
+                    
+                  <table class="parameters"><tbody><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">type</td><td class="prmType"><code></code></td><td class="prmNullFalse"><span role="img" aria-label="False">✘</span></td><td class="prmOptTrue"><span role="img" aria-label="True">✔</span></td><td class="prmDesc">
+                        Specifies the MIME type [<cite><a class="bibref" href="#bib-RFC2046">RFC2046</a></cite>] of the <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a>.
+                      </td></tr></tbody></table></dd></dl></section><section id="attributes"><h4 aria-level="3" role="heading" id="h4_attributes"><span class="secno">2.1.2 </span>Attributes</h4><dl class="attributes"><dt id="widl-Stream-readEncoding"><code>readEncoding</code> of type <span class="idlAttrType">DOMString</span>,            </dt><dd>
+				<p>
+					A <code>DOMString</code> that represents the label of an encoding [<cite><a class="bibref" href="#bib-EncodingDetermination">EncodingDetermination</a></cite>]. If set, it will be used as part of the encoding determination used when processing a <code>read</code> call. If not set, it will return the empty string.
+				</p>
+			</dd><dt id="widl-Stream-readType"><code>readType</code> of type <span class="idlAttrType"><a href="#idl-def-StreamReadType" class="idlType"><code>StreamReadType</code></a></span>,            </dt><dd>
+				<p>
+					Returns the type of the last read operation taken on the <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a>. On getting, conforming user agents must return the type of the last read operation. If no read operation has taken place and the <code>readType</code> was not set, then return the empty string. This can be set to the empty string (default), "arraybuffer", "blob" and "text" to change the type of the read operation.
+				</p>
+			</dd><dt id="widl-Stream-type"><code>type</code> of type <span class="idlAttrType">DOMString</span>, readonly   </dt><dd>
+				Returns the ASCII-encoded string in lower case representing the media type of the <code>Stream</code>,
+				expressed as an RFC2046 MIME type [<cite><a class="bibref" href="#bib-RFC2046">RFC2046</a></cite>].
+				Conforming user agents <em class="rfc2119" title="SHOULD">SHOULD</em> return the MIME type of the <code>Stream</code>, if it is known.
+				If conforming user agents cannot determine the media type of the <code>Stream</code>, they <em class="rfc2119" title="MUST">MUST</em> return the empty string.
+				A string is a valid MIME type if it matches the media-type token defined in section 3.7 "Media Types" of RFC 2616 [<cite><a class="bibref" href="#bib-HTTP11">HTTP11</a></cite>].
+			</dd></dl></section><section id="methods"><h4 aria-level="3" role="heading" id="h4_methods"><span class="secno">2.1.3 </span>Methods</h4><dl class="methods"><dt id="widl-Stream-close-void"><code>close</code></dt><dd>
+				<p>
+                                  This method closes the <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> and does not allow any future writes. This is an irreversible operation; once a <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> has been closed, it cannot be written to again.
+                                  When all data has been read from the <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> on which close() has been called, i.e. <a href="#eof-reached">EOF is reached</a>, it resolves the Promise returned by read() with a <a href="#idl-def-StreamConsumeResult" class="idlType"><code>StreamConsumeResult</code></a> with the <a href="#widl-StreamConsumeResult-eof">eof</a> attribute set to true.
+                                  The user agent must run the steps below:
+                                </p>
+
+				<ol>
+				 <li>If the <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> has been neutered, throw an "<code><a href="http://dev.w3.org/2006/webapi/DOM4Core/#invalidstateerror">InvalidStateError</a></code>" [<cite><a class="bibref" href="#bib-DOM4">DOM4</a></cite>] exception and terminate these steps.</li>
+				 <li>If the <a href="#dfn-write-closed-flag" class="internalDFN">write closed flag</a> is set, throw an "<code><a href="http://dev.w3.org/2006/webapi/DOM4Core/#invalidstateerror">InvalidStateError</a></code>" [<cite><a class="bibref" href="#bib-DOM4">DOM4</a></cite>] exception and terminate these steps.</li>
+				 <li>If the <a href="#dfn-write-pending-flag" class="internalDFN">write pending flag</a> is set, throw an "<code><a href="http://dev.w3.org/2006/webapi/DOM4Core/#invalidstateerror">InvalidStateError</a></code>" [<cite><a class="bibref" href="#bib-DOM4">DOM4</a></cite>] exception and terminate these steps.</li>
+				 <li>Set the <a href="#dfn-write-closed-flag" class="internalDFN">write closed flag</a>.</li>
+				 <li><a href="#terminate-stream">Terminate the Stream</a>.</li>
+				 <li>If an error has occurred during writing a stream termination, neuter the <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> and terminate these steps.</li>
+				</ol>
+			<div><em>No parameters.</em></div><div><em>Return type: </em><code></code></div></dd><dt id="widl-Stream-pipe-Promise---Stream-or-Stream----destination--Clamp--unsigned-long-long-size"><code>pipe</code></dt><dd>
+				<p>
+                                  This method transfers data from the <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> to another Stream.
+                                  This method takes a <code>destinations</code> and optionally a <code>size</code>.
+                                  Another read(), skip() or pipe() call must not be made until the returned Promise is resolved or rejected.
+                                  Resolution of the returned Promise doesn't necessarily mean that the data transferred to the destination Stream has been successfully read from the Stream.
+                                  The user agent must run the steps below:
+
+				</p><ol>
+				 <li>If the <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> has been neutered, throw an "<code><a href="http://dev.w3.org/2006/webapi/DOM4Core/#invalidstateerror">InvalidStateError</a></code>" [<cite><a class="bibref" href="#bib-DOM4">DOM4</a></cite>] exception and terminate these steps.</li>
+				 <li>If the <a href="#dfn-read-pending-flag" class="internalDFN">read pending flag</a> is set, throw an "<code><a href="http://dev.w3.org/2006/webapi/DOM4Core/#invalidstateerror">InvalidStateError</a></code>" [<cite><a class="bibref" href="#bib-DOM4">DOM4</a></cite>] exception and terminate these steps.</li>
+				 <li>If <code>size</code> is specified but is 0, throw a "<code><a href="http://dev.w3.org/2006/webapi/DOM4Core/#syntaxerror">SyntaxError</a></code>" [<cite><a class="bibref" href="#bib-DOM4">DOM4</a></cite>] exception and terminate these steps.</li>
+				 <li>If <code>destinations</code> is a <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a>, let <code>destinations</code> instead be an array consisting of just that <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a>.</li>
+				 <li>Set the <a href="#dfn-read-pending-flag" class="internalDFN">read pending flag</a>.</li>
+				 <li>Let <code>readPromise</code> be a new promise.</li>
+				 <li>Return the pipe() method with <code>readPromise</code>, but continue to process the steps in this algorithm.</li>
+				 <li>If <code>size</code> is specified, <a href="#read-from-stream">read data from the stream</a> until <code>size</code> bytes are read.</li>
+				 <li>Otherwise, <a href="#read-from-stream">read data from the Stream</a> until <a href="#eof-reached">EOF is reached</a>.</li>
+				 <li>As read data becomes available, <a href="#write-to-stream">write newly read data to <code>destinations</code></a>.</li>
+				 <li>If any error has occurred during reading or writing to <code>destinations</code>, neuter the <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a>, let <code>exception</code> be an "<code><a href="http://dev.w3.org/2006/webapi/DOM4Core/#invalidstateerror">InvalidStateError</a></code>" exception and run <code>Reject(<code>readPromise</code>, <code>exception</code>)</code> as specified in the promises spec and terminate these steps.</li>
+				 <li>Once read and write are both completed for all destination streams, run the following algorithm:</li>
+				 <ol>
+				   <li>Let <code>result</code> be a newly created <a href="#idl-def-StreamConsumeResult" class="idlType"><code>StreamConsumeResult</code></a> object.</li>
+				   <li>If <a href="#eof-reached">EOF is reached</a>, set <a href="#widl-StreamConsumeResult-eof">eof</a> attribute of <code>result</code> to true.</li>
+				   <li>Otherwise, set <a href="#widl-StreamConsumeResult-eof">eof</a> attribute of <code>result</code> set to false.</li>
+				   <li>Set <a href="#widl-StreamConsumeResult-size">size</a> attribute of <code>result</code> to the total size of the read data.</li>
+				   <li>Unset the <a href="#dfn-read-pending-flag" class="internalDFN">read pending flag</a> and run <code>Resolve(<code>readPromise</code>, <code>result</code>)</code> as specified in the promises spec.</li>
+				 </ol>
+				</ol>
+                                
+			<table class="parameters"><tbody><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">destination</td><td class="prmType"><code></code></td><td class="prmNullFalse"><span role="img" aria-label="False">✘</span></td><td class="prmOptFalse"><span role="img" aria-label="False">✘</span></td><td class="prmDesc">Destination <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a>.</td></tr><tr><td class="prmName">size</td><td class="prmType"><code></code></td><td class="prmNullFalse"><span role="img" aria-label="False">✘</span></td><td class="prmOptTrue"><span role="img" aria-label="True">✔</span></td><td class="prmDesc">Number of bytes to transfer.</td></tr></tbody></table><div><em>Return type: </em><code></code></div></dd><dt id="widl-Stream-read-Promise--Clamp--unsigned-long-long-size"><code>read</code></dt><dd>
+				<p>
+                                  This method reads data from the <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a>.
+                                  This method takes an optional <code>size</code> which represents the number of bytes to be read.
+                                  Another read(), skip() or pipe() call must not be made until the returned Promise is resolved or rejected.
+                                  The user agent must run the steps below (unless otherwise indicated):
+                                </p>
+
+				<ol>
+				 <li>If the <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> has been neutered, throw an "<code><a href="http://dev.w3.org/2006/webapi/DOM4Core/#invalidstateerror">InvalidStateError</a></code>" [<cite><a class="bibref" href="#bib-DOM4">DOM4</a></cite>] exception and terminate these steps.</li>
+				 <li>If the <a href="#dfn-read-pending-flag" class="internalDFN">read pending flag</a> is set, throw an "<code><a href="http://dev.w3.org/2006/webapi/DOM4Core/#invalidstateerror">InvalidStateError</a></code>" [<cite><a class="bibref" href="#bib-DOM4">DOM4</a></cite>] exception and terminate these steps.</li>
+				 <li>If <code>size</code> is specified but is 0, throw a "<code><a href="http://dev.w3.org/2006/webapi/DOM4Core/#syntaxerror">SyntaxError</a></code>" [<cite><a class="bibref" href="#bib-DOM4">DOM4</a></cite>] exception and terminate these steps.</li>
+				 <li>Set the <a href="#dfn-read-pending-flag" class="internalDFN">read pending flag</a>.</li>
+				 <li>Let <code>readPromise</code> be a new promise.
+				 </li><li>Return <code>readPromise</code>, but continue to process the steps in this algorithm.</li>
+				 <li>If <code>size</code> is specified, <a href="#read-from-stream">read data from the Stream</a> until <code>size</code> bytes are read.</li>
+				 <li>Otherwise, <a href="#read-from-stream">read data from the Stream</a> until any non-zero bytes are read.</li>
+				 <li>If an error has occurred during reading, neuter the <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a>, let <code>exception</code> be an "<code><a href="http://dev.w3.org/2006/webapi/DOM4Core/#invalidstateerror">InvalidStateError</a></code>" [<cite><a class="bibref" href="#bib-DOM4">DOM4</a></cite>] exception and run <code>Reject(<code>readPromise</code>, <code>exception</code>)</code> as specified in the promises spec and terminate these steps.</li>
+				 <li>Let <code>result</code> be a newly created <a href="#idl-def-StreamConsumeResult" class="idlType"><code>StreamConsumeResult</code></a>.</li>
+				 <li>If EOF is reached, set the <a href="#widl-StreamConsumeResult-eof">eof</a> attribute of <code>result</code> to true.</li>
+				 <li>Otherwise, set the <a href="#widl-StreamConsumeResult-eof">eof</a> attribute of <code>result</code> to false.</li>
+				 <li>Set the <a href="#widl-StreamConsumeResult-eof">data</a> attribute of <code>result</code> to the result of executing the steps below.
+					 <dl class="switch">
+					  <dt>If <a href="#widl-Stream-readType">readType</a> is the empty string or "<code title="">text</code>"
+					  </dt><dd>
+					   <ol>
+					    <li>If readEncoding is not null, let <var>charset</var> be <code>readEncoding</code>.
+					    </li><li>Otherwise, let <var>charset</var> be utf-8.
+					    </li><li>Let <code>result</code> be result of <a href="http://encoding.spec.whatwg.org/#decode">decoding</a> the data read using fallback encoding <var>charset</var>.
+					   </li></ol>
+					  </dd><dt>If <a href="#widl-Stream-readType">readType</a> is the empty string or "<code title="">blob</code>"
+					  </dt><dd>Let <code>result</code> be a blob created from the read data
+					  </dd><dt>If <a href="#widl-Stream-readType">readType</a> is the empty string or "<code title="">arraybuffer</code>"
+					  </dt><dd>Let <code>result</code> be an array buffer created from the read data
+					 </dd></dl>
+				 </li>
+				 <li>Unset the <a href="#dfn-read-pending-flag" class="internalDFN">read pending flag</a> and run <code>Resolve(<code>readPromise</code>, <code>result</code>)</code> as specified in the promises spec.
+				</li></ol>
+                                
+			<table class="parameters"><tbody><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">size</td><td class="prmType"><code></code></td><td class="prmNullFalse"><span role="img" aria-label="False">✘</span></td><td class="prmOptTrue"><span role="img" aria-label="True">✔</span></td><td class="prmDesc">Number of bytes to read.</td></tr></tbody></table><div><em>Return type: </em><code></code></div></dd><dt id="widl-Stream-skip-Promise---Clamp--unsigned-long-long-size"><code>skip</code></dt><dd>
+				<p>
+                                  This method reads data from the <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> and ignore them.
+                                  This method takes optionally a <code>size</code> which represents the number of bytes to be read and ignored.
+                                  Another read(), skip() or pipe() call must not be made until the returned Promise is resolved or rejected.
+                                  The user agent must run the steps below:
+                                </p>
+
+				<ol>
+				 <li>If the <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> has been neutered, throw an "<code><a href="http://dev.w3.org/2006/webapi/DOM4Core/#invalidstateerror">InvalidStateError</a></code>" [<cite><a class="bibref" href="#bib-DOM4">DOM4</a></cite>] exception and terminate these steps.</li>
+				 <li>If the <span>read pending flag</span> is set, throw an "<code><a href="http://dev.w3.org/2006/webapi/DOM4Core/#invalidstateerror">InvalidStateError</a></code>" [<cite><a class="bibref" href="#bib-DOM4">DOM4</a></cite>] exception and terminate these steps.</li>
+				 <li>If <code>size</code> is specified but is 0, throw a "<code><a href="http://dev.w3.org/2006/webapi/DOM4Core/#syntaxerror">SyntaxError</a></code>" [<cite><a class="bibref" href="#bib-DOM4">DOM4</a></cite>] exception and terminate these steps.</li>
+				 <li>Set <span>read pending flag</span>.</li>
+				 <li>Let <code>readPromise</code> be a new promise.</li>
+				 <li>Return the <code>skip()</code> method with <code>readPromise</code>, but continue to process the steps in this algorithm.</li>
+				 <li>If <code>size</code> is specified, <a href="#read-from-stream">read data from the Stream</a> until <code>size</code> bytes are read.</li>
+				 <li>Otherwise, <a href="#read-from-stream">read data from the Stream</a> until any non-zero bytes are read.</li>
+				 <li>If any error has occurred during reading, neuter the <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a>, let <code>exception</code> be an "<code><a href="http://dev.w3.org/2006/webapi/DOM4Core/#invalidstateerror">InvalidStateError</a></code>" [<cite><a class="bibref" href="#bib-DOM4">DOM4</a></cite>] exception and run <code>Reject(<code>readPromise</code>, <code>exception</code>)</code> as specified in the promises spec and terminate these steps.</li>
+				 <li>Let <code>result</code> be a newly created <a href="#idl-def-StreamConsumeResult" class="idlType"><code>StreamConsumeResult</code></a> object.</li>
+				 <li>If EOF is reached, set the <a href="#widl-StreamConsumeResult-eof">eof</a> attribute of <code>result</code> to true.</li>
+				 <li>Otherwise, set the <a href="#widl-StreamConsumeResult-eof">eof</a> attribute of <code>result</code> set to false.</li>
+				 <li>Set the <a href="#widl-StreamConsumeResult-eof">size</a> attribute of <code>result</code> to the size of the read data in bytes.</li>
+				 <li>Unset the <a href="#dfn-read-pending-flag" class="internalDFN">read pending flag</a> and run <code>Resolve(readPromise, result)</code> as specified in the promises spec.</li>
+				</ol>
+                                
+			<table class="parameters"><tbody><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">size</td><td class="prmType"><code></code></td><td class="prmNullFalse"><span role="img" aria-label="False">✘</span></td><td class="prmOptFalse"><span role="img" aria-label="False">✘</span></td><td class="prmDesc">Number of bytes to read and ignore.</td></tr></tbody></table><div><em>Return type: </em><code></code></div></dd><dt id="widl-Stream-write-Promise-DOMString-ArrayBufferView-Blob-data"><code>write</code></dt><dd>
+				<p>
+                                  This method writes data to the <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a>.
+                                  Another write() or close() call must not be made until the returned Promise is resolved or rejected.
+                                  Resolution of the returned Promise doesn't necessarily mean that the data written has been successfully read.
+                                  The user agent must run the steps below (unless otherwise indicated):
+                                </p>
+
+				<ol>
+				 <li>If the <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> has been neutered, throw an "<code><a href="http://dev.w3.org/2006/webapi/DOM4Core/#invalidstateerror">InvalidStateError</a></code>" [<cite><a class="bibref" href="#bib-DOM4">DOM4</a></cite>] exception and terminate these steps.</li>
+				 <li>If the <a href="#dfn-write-closed-flag" class="internalDFN">write closed flag</a> is set, throw an "<code><a href="http://dev.w3.org/2006/webapi/DOM4Core/#invalidstateerror">InvalidStateError</a></code>" [<cite><a class="bibref" href="#bib-DOM4">DOM4</a></cite>] exception and terminate these steps.</li>
+				 <li>If the <a href="#dfn-write-pending-flag" class="internalDFN">write pending flag</a> is set, throw an "<code><a href="http://dev.w3.org/2006/webapi/DOM4Core/#invalidstateerror">InvalidStateError</a></code>" [<cite><a class="bibref" href="#bib-DOM4">DOM4</a></cite>] exception and terminate these steps.</li>
+				 <li>Set the <a href="#dfn-write-pending-flag" class="internalDFN">write pending flag</a>.</li>
+				 <li>Let <code>writePromise</code> be a new promise.</li>
+				 <li>Return <code>writePromise</code>, but continue to process the steps in this algorithm.</li>
+				 <li>Execute the rules below, depending on the type of <code>data</code>:
+				  <dl class="switch">
+				   <dt><code>ArrayBufferView</code></dt>
+				   	  <dd>Let <code>rawData</code> be the raw data represented by the <code>Blob</code> object.</dd>
+				   <dt><code>Blob</code></dt>
+				   	  <dd>Let <code>rawData</code> be the data stored in the section of the buffer described by the <code>ArrayBuffer</code> object that the <code>ArrayBufferView</code> object references.</dd>
+				   <dt><code>DOMString</code></dt>
+				   	  <dd>Let <code>rawData</code> be the result of <a href="http://encoding.spec.whatwg.org/#encode">encoding</a> <code>data</code> to binary data using the encoding determined by the [<cite><a class="bibref" href="#bib-EncodingDetermination">EncodingDetermination</a></cite>] </dd>
+				  </dl>
+				  </li>
+				 <li><a href="#write-to-stream">Write <code>rawData</code> to the Stream</a>.
+				 </li><li>If an error has occurred during the write, neuter the <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a>, let <code>exception</code> be an "<code><a href="http://dev.w3.org/2006/webapi/DOM4Core/#invalidstateerror">InvalidStateError</a></code>" [<cite><a class="bibref" href="#bib-DOM4">DOM4</a></cite>] exception and run <code>Reject(<code>writePromise</code>, <code>exception</code>)</code> as specified in the promises spec and terminate this algorithm.
+				 </li><li>Unset the <a href="#dfn-write-pending-flag" class="internalDFN">write pending flag</a> and run <code>Resolve(<code>writePromise</code>, <code>undefined</code>)</code> as specified in the promises spec. Implementations may delay this step if appropriate.
+				</li></ol>
+                                
+			<table class="parameters"><tbody><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">data</td><td class="prmType"><code></code></td><td class="prmNullFalse"><span role="img" aria-label="False">✘</span></td><td class="prmOptFalse"><span role="img" aria-label="False">✘</span></td><td class="prmDesc">Data to write.</td></tr></tbody></table><div><em>Return type: </em><code></code></div></dd></dl></section>
+
+
+	</section>
+	<!-- End section: The Stream Interface -->
+
+	<section class="section" id="streamConsumeResult-interface" typeof="bibo:Chapter" resource="#ref" rel="bibo:Chapter">
+		<h3 aria-level="2" role="heading" id="h3_streamConsumeResult-interface"><span class="secno">2.2 </span>StreamConsumeResult Interface</h3>
+		<pre class="idl"><span class="idlInterface" id="idl-def-StreamConsumeResult">interface <span class="idlInterfaceID">StreamConsumeResult</span> {
+<span class="idlAttribute">    readonly    attribute <span class="idlAttrType">boolean</span>            <span class="idlAttrName"><a href="#widl-StreamConsumeResult-eof">eof</a></span>;</span>
+<span class="idlAttribute">    readonly    attribute <span class="idlAttrType">any</span>                <span class="idlAttrName"><a href="#widl-StreamConsumeResult-data">data</a></span>;</span>
+<span class="idlAttribute">    readonly    attribute <span class="idlAttrType">unsigned long long</span> <span class="idlAttrName"><a href="#widl-StreamConsumeResult-size">size</a></span>;</span>
+};</span></pre><section id="attributes-1"><h4 aria-level="3" role="heading" id="h4_attributes-1"><span class="secno">2.2.1 </span>Attributes</h4><dl class="attributes"><dt id="widl-StreamConsumeResult-data"><code>data</code> of type <span class="idlAttrType">any</span>, readonly   </dt><dd>The contents of the read request</dd><dt id="widl-StreamConsumeResult-eof"><code>eof</code> of type <span class="idlAttrType">boolean</span>, readonly   </dt><dd>specifies if the given read resulted in an EOF for the <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a></dd><dt id="widl-StreamConsumeResult-size"><code>size</code> of type <span class="idlAttrType">unsigned long long</span>, readonly   </dt><dd>The size, in bytes, of the data read</dd></dl></section>
+	</section>
+
+	<section class="section" id="streamReadType-interface" typeof="bibo:Chapter" resource="#ref" rel="bibo:Chapter">
+		<h3 aria-level="2" role="heading" id="h3_streamReadType-interface"><span class="secno">2.3 </span>StreamReadType Interface</h3>
+		<pre class="idl"><span class="idlEnum" id="idl-def-StreamReadType">enum <span class="idlEnumID">StreamReadType</span> {
+    "<a href="#idl-def-StreamReadType.blob" class="idlEnumItem">blob</a>",
+    "<a href="#idl-def-StreamReadType.arraybuffer" class="idlEnumItem">arraybuffer</a>",
+    "<a href="#idl-def-StreamReadType.text" class="idlEnumItem">text</a>"
+};</span></pre><table class="simple"><tbody><tr><th colspan="2">Enumeration description</th></tr><tr><td><code id="idl-def-StreamReadType.blob">blob</code></td><td>Read operations should return data as a Blob</td></tr><tr><td><code id="idl-def-StreamReadType.arraybuffer">arraybuffer</code></td><td>Read operations should return data as an ArrayBuffer</td></tr><tr><td><code id="idl-def-StreamReadType.text">text</code></td><td>Read operations should return data as a DOMString</td></tr></tbody></table>
+	</section>
+
+	<section class="section" id="error-uris_for_streams" typeof="bibo:Chapter" resource="#ref" rel="bibo:Chapter">
+	<h3 aria-level="2" role="heading" id="h3_error-uris_for_streams"><span class="secno">2.4 </span>URIs for Stream</h3>
+		<p>
+			To reference a <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a>, <a href="http://dev.w3.org/2006/webapi/FileAPI/#url">the same URI used</a> for <code>Blobs</code> and <code>Files</code> in
+			<a href="http://dev.w3.org/2006/webapi/FileAPI/#url">6.7. A URI for Blob and File reference</a> of
+			the File API specification should be used. [<cite><a class="bibref" href="#bib-FILE-API">FILE-API</a></cite>]
+			The definitions of <strong>Origin</strong>, <strong>Lifetime</strong>, <strong>Referencing</strong>, and <strong>Dereferencing</strong> of a <code>Blob</code> should be applied to a <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a>.
+		</p>
+			<section class="section" id="creating-revoking-streamuri" typeof="bibo:Chapter" resource="#ref" rel="bibo:Chapter">
+			<h4 aria-level="3" role="heading" id="h4_creating-revoking-streamuri"><span class="secno">2.4.1 </span>Creating and Revoking a Stream URI</h4>
+				<p>
+					A <dfn id="stream-uri">Stream URI</dfn> is a <code>Blob URI</code> that is referencing a <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a>.
+					These URIs are created and revoked using methods exposed on the URL object,
+					as defined in <a href="http://dev.w3.org/2006/webapi/FileAPI/#creating-revoking">6.7.5. Creating and Revoking a Blob URI</a>
+					of the File API specification. [<cite><a class="bibref" href="#bib-FILE-API">FILE-API</a></cite>]
+				</p>
+				<p>
+					<a href="http://dev.w3.org/2006/webapi/FileAPI/#dfn-createObjectURL">URL.createObjectURL</a>
+					and <a href="http://dev.w3.org/2006/webapi/FileAPI/#dfn-revokeObjectURL">URL.revokeObjectURL</a>
+					should both be extended as follows:
+				</p>
+				<pre class="idl"><span class="idlInterface" id="idl-def-URL">interface <span class="idlInterfaceID">URL</span> {
+<span class="idlMethod">    static <span class="idlMethType">DOMString?</span> <span class="idlMethName"><a href="#widl-URL-createObjectURL-DOMString-Blob-Stream-object">createObjectURL</a></span> (<span class="idlParam"><span class="idlParamType">(Blob or <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a>)</span> <span class="idlParamName">object</span></span>);</span>
+<span class="idlMethod">    static <span class="idlMethType">DOMString?</span> <span class="idlMethName"><a href="#widl-URL-createFor-DOMString-Blob-Stream-object">createFor</a></span> (<span class="idlParam"><span class="idlParamType">(Blob or <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a>)</span> <span class="idlParamName">object</span></span>);</span>
+<span class="idlMethod">    static <span class="idlMethType">void</span>       <span class="idlMethName"><a href="#widl-URL-revokeObjectURL-void-DOMString-url">revokeObjectURL</a></span> (<span class="idlParam"><span class="idlParamType">DOMString</span> <span class="idlParamName">url</span></span>);</span>
+};</span></pre><section id="methods-1"><h5 aria-level="4" role="heading" id="h5_methods-1"><span class="secno">2.4.1.1 </span>Methods</h5><dl class="methods"><dt id="widl-URL-createFor-DOMString-Blob-Stream-object"><code>createFor</code>, static</dt><dd>
+                        	<p>The extension onto <code>createFor</code> should have the following steps added.</p>
+                                                <p>Returns a unique Blob URL each time it is called on a valid <code>object</code> argument, which is a non-null <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> in scope of the global object's URL property from which this static method is called. Blob URLs created with this method are said to be auto-revoking since user-agents are responsible for the revocation of Blob URLs created with this method, subject to the lifetime stipulation for Blob URLs. This method must act as follows:
+							</p><ol>
+								<li>
+									If called with a <code>Stream</code> argument that is NOT valid, then user agents must return null.</li>
+								<li>
+									If called with a valid <code>Stream</code> argument,
+									user agents must run the following sub-steps:
+                                                                        <ol>
+                                                                          <li>If the <a href="#dfn-read-pending-flag" class="internalDFN">read pending flag</a> of the <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> is set, return null.</li>
+                                                                          <li>Set the <a href="#dfn-read-pending-flag" class="internalDFN">read pending flag</a> of the <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a>.</li>
+                                                                          <li>Return a unique <code>Blob URI</code> that can be used to dereference the <code>stream</code> argument.</li>
+                                                                          <li>Add an entry to the Blob URL Store for this Blob URL.</li>
+                                                                          <li>Add an entry in the Revocation List for this Blob URL.</li>
+                                                                        </ol>
+								</li>
+							</ol>
+                        <table class="parameters"><tbody><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">object</td><td class="prmType"><code></code></td><td class="prmNullFalse"><span role="img" aria-label="False">✘</span></td><td class="prmOptFalse"><span role="img" aria-label="False">✘</span></td><td class="prmDesc"></td></tr></tbody></table><div><em>Return type: </em><code></code>, nullable</div></dd><dt id="widl-URL-createObjectURL-DOMString-Blob-Stream-object"><code>createObjectURL</code>, static</dt><dd>
+						<p>The extension onto <code>createObjectURL</code> should have the following steps added.</p>
+                                                <p>Returns a unique Blob URL each time it is called on a valid <code>object</code> argument, which is a non-null <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> in scope of the global object's URL property from which this static method is called. This method must act as follows:
+							</p><ol>
+								<li>
+									If called with a <code>Stream</code> argument that is NOT valid, then user agents must return null.</li>
+								<li>
+									If called with a valid <code>Stream</code> argument,
+									user agents must run the following sub-steps:
+                                                                        <ol>
+                                                                          <li>If the <a href="#dfn-read-pending-flag" class="internalDFN">read pending flag</a> of the <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> is set, return null.</li>
+                                                                          <li>Set the <a href="#dfn-read-pending-flag" class="internalDFN">read pending flag</a> of the <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a>.</li>
+                                                                          <li>Return a unique <code>Blob URI</code> that can be used to dereference the <code>stream</code> argument.</li>
+                                                                          <li>Add an entry to the Blob URL Store for this Blob URL.</li>
+                                                                        </ol>
+								</li>
+							</ol>
+					<table class="parameters"><tbody><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">object</td><td class="prmType"><code></code></td><td class="prmNullFalse"><span role="img" aria-label="False">✘</span></td><td class="prmOptFalse"><span role="img" aria-label="False">✘</span></td><td class="prmDesc"></td></tr></tbody></table><div><em>Return type: </em><code></code>, nullable</div></dd><dt id="widl-URL-revokeObjectURL-void-DOMString-url"><code>revokeObjectURL</code>, static</dt><dd>
+						<p></p>
+						<p>
+							The extension onto <code>revokeObjectURL</code> should have the following steps added.
+						</p>
+						<ol>
+							<li>
+								If the URL refers to a <code>Blob</code> or <code>Stream</code> that is both
+								valid and in the same origin of the global object’s <code>URL</code> property on which this static method was called,
+								user agents <em class="rfc2119" title="MUST">MUST</em> return a 404 response code when the URL is dereferenced.</li>
+							<li>
+								If the URL refers to a <code>Blob</code> or <code>Stream</code> that is <strong>not</strong> valid
+								or if the value provided for the URL argument is not a <code>Blob URI</code>
+								or if the URL argument refers to a <code>Blob</code> or <code>Stream</code> that is <strong>not</strong> in the same origin
+								as the global object’s <code>URL</code> property, this method call does nothing.
+								User agents <em class="rfc2119" title="MAY">MAY</em> display a message on their error console.
+							</li>
+						</ol>
+					<table class="parameters"><tbody><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">url</td><td class="prmType"><code></code></td><td class="prmNullFalse"><span role="img" aria-label="False">✘</span></td><td class="prmOptFalse"><span role="img" aria-label="False">✘</span></td><td class="prmDesc"></td></tr></tbody></table><div><em>Return type: </em><code></code></div></dd></dl></section>
+			</section>
+	</section>
+</section>
+
+<section class="section" id="producers-consumers" typeof="bibo:Chapter" resource="#ref" rel="bibo:Chapter">
+	<!--OddPage--><h2 aria-level="1" role="heading" id="h2_producers-consumers"><span class="secno">3. </span>Stream Consumers and Producers</h2>
+	<p>
+		Streams can be both produced and consumed by various APIs. APIs which create streams are identified as producers, and ones which read and act on a stream are known as consumers. This section identifies some of the APIs where Streams may be produced and consumed.
+		</p><div class="note"><div class="note-title" aria-level="2" role="heading" id="h_note_1"><span>Note</span></div><section class="">The list of producers and consumers below is not an exhaustive list. It is placed here as informative for the time being.</section></div>
+	<p></p>
+	<section class="section" id="consumers" typeof="bibo:Chapter" resource="#ref" rel="bibo:Chapter">
+		<h3 aria-level="2" role="heading" id="h3_consumers"><span class="secno">3.1 </span>Stream Consumers</h3>
+		<p>This section outlines APIs which can consume a Stream object</p>
+		<ul>
+			<li>WebAudio</li>
+			<li>MediaSourceExtensions</li>
+			<li>WebCrypt</li>
+			<li>TextEncoder</li>
+			<li>TextDecoder</li>
+			<li>WebSockets</li>
+		</ul>
+	</section>
+
+	<section class="section" id="producers" typeof="bibo:Chapter" resource="#ref" rel="bibo:Chapter">
+		<h3 aria-level="2" role="heading" id="h3_producers"><span class="secno">3.2 </span>Stream Producers</h3>
+		<p>This section outlines APIs which can produce a Stream object</p>
+		<ul>
+			<li>XMLHttpRequest</li>
+			<li>FileReader</li>
+			<li>Media Capture</li>
+			<li>Media Recording API</li>
+			<li>IndexedDB</li>
+			<li>WebCrypt</li>
+			<li>TextEncoder</li>
+			<li>TextDecoder</li>
+			<li>WebSockets</li>
+		</ul>
+	</section>
+</section>
+
+<section class="section" id="security" typeof="bibo:Chapter" resource="#ref" rel="bibo:Chapter">
+<!--OddPage--><h2 aria-level="1" role="heading" id="h2_security"><span class="secno">4. </span>Security Considerations</h2>
+	<p>
+		A <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> should have the same security considerations as a <code>Blob</code>.
+		This is outlined in <a href="http://dev.w3.org/2006/webapi/FileAPI/#security-discussion">6.8. Security Considerations</a>
+		of the File API specification. [<cite><a class="bibref" href="#bib-FILE-API">FILE-API</a></cite>]
+		Because a <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> uses a <code>Blob URI</code>, cross origin requests on a <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> will not be supported.
+	</p>
+</section>
+
+<section class="section" id="XMLHttpRequest" typeof="bibo:Chapter" resource="#ref" rel="bibo:Chapter">
+<!--OddPage--><h2 aria-level="1" role="heading" id="h2_XMLHttpRequest"><span class="secno">5. </span>Extension of XMLHttpRequest</h2>
+	<p>
+		This specification proposes an extension to <code>XMLHttpRequest</code> [<cite><a class="bibref" href="#bib-XMLHTTPREQUEST2">XMLHTTPREQUEST2</a></cite>] to add support for <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a>. This section is temporary and is meant to provide a recommendation for how <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> should be incorporated into <code>XMLHttpRequest</code>.
+		This will extend <code>XMLHttpRequest</code> to allow for receiving and uploading of a <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a>.
+		One such scenario is providing access to data during <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#dom-xmlhttprequest-readystate"><code>readyState</code></a> 3 (LOADING).
+		The sections below document in detail what extensions must be done to <code>XMLHttpRequest</code> to support <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a>.
+	</p>
+
+        <section class="section" title="addition-of-stream-response-entity" id="addition-of-stream-response-entity-body">
+          <h3 aria-level="2" role="heading" id="h3_addition-of-stream-response-entity-body"><span class="secno">5.1 </span>Addition of stream response entity body</h3>
+		<p>
+			<a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html#response-entity-body-0">The section named "Response Entity Body"</a>
+			in XMLHttpRequest specification [<cite><a class="bibref" href="#bib-XMLHTTPREQUEST2">XMLHTTPREQUEST2</a></cite>] should have the following additions:
+		</p>
+		<p>
+                  The <dfn id="stream-response-entity">stream response entity body</dfn> is either a <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> representing the <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html#response-entity-body">response entity body</a> or null.
+                  If the <a href="#stream-response-entity">stream response entity body</a> is null, let it be the return value of the following algorithm:
+		</p>
+                <ol>
+                  <li>
+					If the <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html#response-entity-body">response entity body</a> is null,
+					return an empty <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> object.
+				</li>
+				<li>
+					Return a <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> object representing the <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html#response-entity-body">response entity body</a>.
+				</li>
+		</ol>
+              </section>
+
+	<section class="section" title="addition-of-stream" id="addition-of-stream-responsetype">
+	<h3 aria-level="2" role="heading" id="h3_addition-of-stream-responsetype"><span class="secno">5.2 </span>Addition of "<code>stream</code>" responseType</h3>
+		<p>
+		  A new value for the <code>responseType</code> attribute "<code>stream</code>" should be introduced.
+		</p>
+                <p>
+                  In the IDL list in <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html#interface-xmlhttprequest">the section named "Interface XMLHttpRequest"</a> in XMLHttpRequest specification [<cite><a class="bibref" href="#bib-XMLHTTPREQUEST2">XMLHTTPREQUEST2</a></cite>], the definition of <code>XMLHttpRequestResponseType</code> enum should now read:
+                  </p><pre>enum XMLHttpRequestResponseType {
+  "",
+  "arraybuffer",
+  "blob",
+  "stream",
+  "document",
+  "json",
+  "text"
+}</pre>
+                <p></p>
+     </section>
+
+     <section class="section" title="modification-on-response-algorithm" id="modification-on-the-response-attribute">
+       <h3 aria-level="2" role="heading" id="h3_modification-on-the-response-attribute"><span class="secno">5.3 </span>Modification on the <code>response</code> attribute</h3>
+		<p>
+                  The algorithm of the <code>response</code> attribute should be modified to handle the new <code>responseType</code> value "<code>stream</code>".
+			A Stream is binary data obtained sequentially over time.
+			Given this, a <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> should be accessible in <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html#dom-xmlhttprequest-readystate"><code>readyState</code></a> 3 (LOADING).
+                </p><p>
+                </p>
+			<a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#the-response-attribute">The section named "The response attribute"</a> in XMLHttpRequest specification [<cite><a class="bibref" href="#bib-XMLHTTPREQUEST2">XMLHTTPREQUEST2</a></cite>] should now read:
+		<p></p>
+		<p>
+			The <code>response</code> attribute must return the result of running these steps:
+		</p>
+			<dl class="switch">
+				<dt>If <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#dom-xmlhttprequest-responsetype"><code>responseType</code></a> is the empty string or "<code>text</code>"</dt>
+				<dd>
+                                  The same as the original XMLHttpRequest specification.
+				</dd>
+                                <dt>If <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html#dom-xmlhttprequest-responsetype"><code>responseType</code></a> is "<code>stream</code>"</dt>
+                                <dd>
+                                  <ol>
+                                    <li>
+                                      If the state is not <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html#dom-xmlhttprequest-loading">LOADING</a> or
+                                      <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html#dom-xmlhttprequest-done">DONE</a>, return null.
+                                    </li>
+                                    <li>If the <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html#error-flag">error flag</a> is set, return null.</li>
+                                    <li>Return the <a href="#stream-response-entity">stream response entity body</a>.</li>
+                                  </ol>
+                                </dd>
+				<dt>Otherwise</dt>
+				<dd>
+                                  The same as the original XMLHttpRequest specification.
+				</dd>
+			</dl>
+	</section>
+
+	<section class="section" id="modification-on-send-algorithm" typeof="bibo:Chapter" resource="#ref" rel="bibo:Chapter">
+	<h3 aria-level="2" role="heading" id="h3_modification-on-send-algorithm"><span class="secno">5.4 </span>send()</h3>
+		<p>
+                  The switch in otherwise case of step 4 of
+			<a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html#the-send()-method">The section named "The <code>send()</code> method"</a>
+			in XMLHttpRequest specification [<cite><a class="bibref" href="#bib-XMLHTTPREQUEST2">XMLHTTPREQUEST2</a></cite>] should have the following additions:
+		</p>
+		<dl class="switch">
+			<dt><a href="#idl-def-Stream" class="idlType"><code>Stream</code></a></dt>
+			<dd>
+				<p>
+					If the object's <a href="#widl-Stream-type">type</a> attribute is not the empty string let <var>mime type</var> be its value.
+				</p>
+				<p>
+					Set the <a href="#dfn-read-pending-flag" class="internalDFN">read pending flag</a> for the stream.
+				</p>
+				<p>
+					Let the <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html#request-entity-body">request entity body</a> be the raw data represented by <var>data</var>.
+				</p>
+				<p>Once the read is completed for the request, call <a href="#widl-Stream-close-void">close()</a> on the stream</p>
+
+			</dd>
+		</dl>
+	</section>
+
+</section>
+
+<section class="section" id="requirements" typeof="bibo:Chapter" resource="#ref" rel="bibo:Chapter">
+<!--OddPage--><h2 aria-level="1" role="heading" id="h2_requirements"><span class="secno">6. </span>Requirements and Use Cases</h2>
+	<p>
+		The <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> type allows for completion of several end-to-end experiences. This section covers what the requirements are for this API, and
+		illustrates some use cases.
+	</p>
+		<ul>
+			<li>
+				Begin loading a video through <code>XMLHttpRequest</code> in <code>readyState</code> LOADING
+				<p>
+					Videos can typically be large files that may take a long time to download, and require authentication or certain headers to access.
+					For certain video formats, an application can begin playing the video once the first chunks of data are available, and would not need to wait for the entire video to download.
+
+				</p>
+			</li>
+			<li>
+				Begin processing the data of a <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> as it is being read via <code>XMLHttpRequest</code>
+				<p>
+					If a file format is understood, then an application can make sense of the data as it being made available. For example, a given
+					file may be very large and the application wants to begin processing the data immediately, rather than having to wait for full download of the file.
+				</p>
+			</li>
+			<li>
+				Upload of dynamic runtime data using <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> and <code>XMLHttpRequest</code>
+				<p>
+					There are situations where an application may have data to upload once the application is processing. This could involve processing
+					of data an application wants to upload as it is being created. One such case is the upload of GPS coordinates within an application. The
+					coordiantes may constantly change, and the application wants to upload the data as it being collected.
+
+				</p>
+			</li>
+			<li>
+				Media streaming scenarios using <a href="#idl-def-Stream" class="idlType"><code>Stream</code></a> and <code>XMLHttpRequest</code>
+				<p>
+					Media streaming scenarios require the ability to quickly receive data over the network and connect it to a media element. An application can successfully accomplish this by receiving a Stream in <code>readyState</code> LOADING and assign it to a media element. This helps avoid the application from having to buffer the data prior to assigning it to a media element.
+				</p>
+			</li>
+		</ul>
+</section>
+
+<section class="appendix" id="acknowledgements">
+  <!--OddPage--><h2 aria-level="1" role="heading" id="h2_acknowledgements"><span class="secno">A. </span>Acknowledgements</h2>
+  <p>
+    Thanks to Eliot Graff for editorial assistance.
+    Special thanks to the <abbr title="World Wide Web Consortium">W3C</abbr>.
+    The editor would like to thank
+    Anne van Kesteren,
+    Austin William Wright,
+    Aymeric Vitte,
+    Domenic Denicola,
+    Isaac Schlueter,
+    Jonas Sicking,
+    Kenneth Russell,
+    Yusuke Suzuki,
+    Adrian Bateman
+    for their contributions to this specification.
+  </p>
+</section>
+
+
+
+
+<section id="references" class="appendix" typeof="bibo:Chapter" resource="#ref" rel="bibo:Chapter"><!--OddPage--><h2 aria-level="1" role="heading" id="h2_references"><span class="secno">B. </span>References</h2><section id="normative-references" typeof="bibo:Chapter" resource="#ref" rel="bibo:Chapter"><h3 aria-level="2" role="heading" id="h3_normative-references"><span class="secno">B.1 </span>Normative references</h3><dl class="bibliography" about=""><dt id="bib-DOM4">[DOM4]</dt><dd rel="dcterms:requires">Anne van Kesteren; Aryeh Gregor; Lachlan Hunt; Ms2ger. <a href="http://www.w3.org/TR/dom/"><cite>DOM4</cite></a>. 6 December 2012. W3C Working Draft. URL: <a href="http://www.w3.org/TR/dom/">http://www.w3.org/TR/dom/</a>
+</dd><dt id="bib-EncodingDetermination">[EncodingDetermination]</dt><dd rel="dcterms:requires">Anne van Kesteren; Joshua Bell. <a href="http://encoding.spec.whatwg.org/"><cite>Encoding</cite></a>. URL: <a href="http://encoding.spec.whatwg.org/">http://encoding.spec.whatwg.org/</a>
+</dd><dt id="bib-FILE-API">[FILE-API]</dt><dd rel="dcterms:requires">Arun Ranganathan; Jonas Sicking. <a href="http://www.w3.org/TR/FileAPI/"><cite>File API</cite></a>. 12 September 2013. W3C Last Call Working Draft. URL: <a href="http://www.w3.org/TR/FileAPI/">http://www.w3.org/TR/FileAPI/</a>
+</dd><dt id="bib-HTTP11">[HTTP11]</dt><dd rel="dcterms:requires">R. Fielding et al. <a href="http://www.ietf.org/rfc/rfc2616.txt"><cite>Hypertext Transfer Protocol - HTTP/1.1</cite></a>. June 1999. RFC. URL: <a href="http://www.ietf.org/rfc/rfc2616.txt">http://www.ietf.org/rfc/rfc2616.txt</a>
+</dd><dt id="bib-RFC2046">[RFC2046]</dt><dd rel="dcterms:requires">N. Freed; N. Borenstein. <a href="http://www.ietf.org/rfc/rfc2046.txt"><cite>Multipurpose Internet Mail Extensions (MIME) Part Two: Media Types (RFC 2046)</cite></a>. November 1996. RFC. URL: <a href="http://www.ietf.org/rfc/rfc2046.txt">http://www.ietf.org/rfc/rfc2046.txt</a>
+</dd><dt id="bib-WEBWORKERS">[WEBWORKERS]</dt><dd rel="dcterms:requires">Ian Hickson. <a href="http://www.w3.org/TR/workers/"><cite>Web Workers</cite></a>. 1 May 2012. W3C Candidate Recommendation. URL: <a href="http://www.w3.org/TR/workers/">http://www.w3.org/TR/workers/</a>
+</dd><dt id="bib-XMLHTTPREQUEST2">[XMLHTTPREQUEST2]</dt><dd rel="dcterms:requires">Anne van Kesteren. <a href="http://www.w3.org/TR/XMLHttpRequest2/"><cite>XMLHttpRequest Level 2</cite></a>. 16 August 2011. W3C Working Draft. URL: <a href="http://www.w3.org/TR/XMLHttpRequest2/">http://www.w3.org/TR/XMLHttpRequest2/</a>
+</dd></dl></section></section></body></html>
