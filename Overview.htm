@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!DOCTYPE html>
 
 <html>
 
@@ -155,9 +155,9 @@
 		<p>
 			Web applications should have the ability to acquire and manipulate data in a wide variety of forms,
 			including as a sequence of data made available over time.
-			This specification defines the basic representation for <a href="#dfn-stream">Streams</a>,
-			errors raised by <a href="#dfn-stream">Streams</a>,
-			and programmatic ways to create, read, and write to <a href="#dfn-stream">Streams</a>.
+			This specification defines the basic representation for <a href="#h2_streams">Streams</a>,
+			errors raised by <a href="#h2_streams">Streams</a>,
+			and programmatic ways to create, read, and write to <a href="#h2_streams">Streams</a>.
 		</p>
 		<p>
 			The <a>Stream</a> interface represents binary data which can be obtained over time and read once. A <a>Stream</a> can come from API <a href="#producers">producers</a> such as <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#the-xmlhttprequest-interface"><code>XMLHttpRequest</code></a>, or can
@@ -320,7 +320,7 @@ writeData();</pre>
 			</p>
 
 			<p>
-				A Stream object has an associated <dfn>read pending flag</dfn>. It is set when <a href="#widl-Stream-read-Promise--Clamp--unsigned-long-long-size">read()</a>, <a href="#widl-Stream-skip-Promise--Clamp--unsigned-long-long-size">skip()</a> or <a href="#widl-Stream-pipe-Promise-Stream-Stream---destinations--Clamp--unsigned-long-long-size">pipe()</a> method is called and unset when it's completed.
+				A Stream object has an associated <dfn>read pending flag</dfn>. It is set when <a href="#widl-Stream-read-Promise---Clamp--unsigned-long-long-size">read()</a>, <a href="#widl-Stream-skip-Promise---Clamp--unsigned-long-long-size">skip()</a> or <a href="#widl-Stream-pipe-Promise---Stream-or-Stream----destination--Clamp--unsigned-long-long-size">pipe()</a> method is called and unset when it's completed.
 				This flag is internal, so scripts cannot access it directly.
 			</p>
 
@@ -644,24 +644,24 @@ writeData();</pre>
 							</li>
 							<li>
 								Once read and write are both completed for all destination streams, run the following algorithm:
+								<ol>
+									<li>
+										Let <code>result</code> be a newly created <a>StreamConsumeResult</a> object.
+									</li>
+									<li>
+										If <a href="#eof-reached">EOF is reached</a>, set <a href="#widl-StreamConsumeResult-eof">eof</a> attribute of <code>result</code> to true.
+									</li>
+									<li>
+										Otherwise, set <a href="#widl-StreamConsumeResult-eof">eof</a> attribute of <code>result</code> set to false.
+									</li>
+									<li>
+										Set <a href="#widl-StreamConsumeResult-size">size</a> attribute of <code>result</code> to the total size of the read data.
+									</li>
+									<li>
+										Unset the <a>read pending flag</a> and run <code>Resolve(<code>readPromise</code>, <code>result</code>)</code> as specified in the promises spec.
+									</li>
+								</ol>
 							</li>
-							<ol>
-								<li>
-									Let <code>result</code> be a newly created <a>StreamConsumeResult</a> object.
-								</li>
-								<li>
-									If <a href="#eof-reached">EOF is reached</a>, set <a href="#widl-StreamConsumeResult-eof">eof</a> attribute of <code>result</code> to true.
-								</li>
-								<li>
-									Otherwise, set <a href="#widl-StreamConsumeResult-eof">eof</a> attribute of <code>result</code> set to false.
-								</li>
-								<li>
-									Set <a href="#widl-StreamConsumeResult-size">size</a> attribute of <code>result</code> to the total size of the read data.
-								</li>
-								<li>
-									Unset the <a>read pending flag</a> and run <code>Resolve(<code>readPromise</code>, <code>result</code>)</code> as specified in the promises spec.
-								</li>
-							</ol>
 						</ol>
             <dl class="parameters">
               <dt>!(Stream or Stream[]) destination</dt>
