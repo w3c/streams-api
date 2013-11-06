@@ -6,93 +6,91 @@
 	<title>Streams API (Preview version)</title>
 	<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
 
-<!--	<script class=remove src="http://dev.w3.org/2009/dap/ReSpec.js/js/respec.js"></script> -->
-
+	<!-- <script class=remove src="http://dev.w3.org/2009/dap/ReSpec.js/js/respec.js"></script> -->
 	<script class="remove" src="https://www.w3.org/Tools/respec/respec-w3c-common"></script>
-	<!--<script class="remove" src="respec-w3c-common.js"></script>-->
+	<!-- <script class="remove" src="respec-w3c-common.js"></script> -->
 
 	<script class="remove">
-	      var respecConfig = {
-	          // specification status (e.g. WD, LCWD, NOTE, etc.). If in doubt use ED.
-	          specStatus:           "ED",
+var respecConfig = {
+	// specification status (e.g. WD, LCWD, NOTE, etc.). If in doubt use ED.
+	specStatus:           "ED",
 
-	          // the specification's short name, as in http://www.w3.org/TR/short-name/
-	          shortName:            "streams-api",
+	// the specification's short name, as in http://www.w3.org/TR/short-name/
+	shortName:            "streams-api",
 
-	          // if your specification has a subtitle that goes below the main
-	          // formal title, define it here
-	          // subtitle   :  "an excellent document",
+	// if your specification has a subtitle that goes below the main
+	// formal title, define it here
+	// subtitle   :  "an excellent document",
 
-	          // if you wish the publication date to be other than today, set this
-	          // publishDate:  "yyyy-mm-dd",
+	// if you wish the publication date to be other than today, set this
+	// publishDate:  "yyyy-mm-dd",
 
-	          // if the specification's copyright date is a range of years, specify
-	          // the start date here:
-	          // copyrightStart: "2005"
+	// if the specification's copyright date is a range of years, specify
+	// the start date here:
+	// copyrightStart: "2005"
 
-	          // if there is a previously published draft, uncomment this and set its YYYY-MM-DD date
-	          // and its maturity status
-	          // previousPublishDate:  "yyyy-mm-dd",
-	          // previousMaturity:  "WD",
+	// if there is a previously published draft, uncomment this and set its YYYY-MM-DD date
+	// and its maturity status
+	// previousPublishDate:  "yyyy-mm-dd",
+	// previousMaturity:  "WD",
 
+	// if there a publicly available Editor's Draft, this is the link
+	edDraftURI:           "http://dvcs.w3.org/hg/streams-api/raw-file/tip/Overview.htm",
 
-	          // if there a publicly available Editor's Draft, this is the link
-	          edDraftURI:           "http://dvcs.w3.org/hg/streams-api/raw-file/tip/Overview.htm",
+	// if this is a LCWD, uncomment and set the end of its review period
+	// lcEnd: "2009-08-05",
 
-	          // if this is a LCWD, uncomment and set the end of its review period
-	          // lcEnd: "2009-08-05",
+	// if you want to have extra CSS, append them to this list
+	// it is recommended that the respec.css stylesheet be kept
+	//extraCSS:             ["http://dev.w3.org/2009/dap/ReSpec.js/css/respec.css",
+	//	"http://www.w3.org/StyleSheets/TR/W3C-ED.css",
+	//	],
 
-	          // if you want to have extra CSS, append them to this list
-	          // it is recommended that the respec.css stylesheet be kept
-	          //extraCSS:             ["http://dev.w3.org/2009/dap/ReSpec.js/css/respec.css",
-	          //	"http://www.w3.org/StyleSheets/TR/W3C-ED.css",
-	          //	],
+	// editors, add as many as you like
+	// only "name" is required
 
-	          // editors, add as many as you like
-	          // only "name" is required
+	localBiblio: {
+		"EncodingDetermination": {
+			title: "Encoding",
+			href: "http://encoding.spec.whatwg.org/",
+			authors: ["Anne van Kesteren", "Joshua Bell"],
+			publisher: "WHATWG"
+		}
+	},
 
-              localBiblio: {
-                "EncodingDetermination": {
-                  title: "Encoding",
-                  href: "http://encoding.spec.whatwg.org/",
-                  authors: ["Anne van Kesteren", "Joshua Bell"],
-                  publisher: "WHATWG"
-                }
-              },
+	editors:  [
+		{ name: "Feras Moussa", url: "mailto:feras.moussa@hotmail.com",
+			company: "Invited Expert",  },
+		{ name: "Takeshi Yoshino", url: "mailto:tyoshino@google.com",
+			company: "Google, Inc.",  },
+	],
 
-          editors:  [
-              { name: "Feras Moussa", url: "mailto:feras.moussa@hotmail.com",
-                company: "Invited Expert",  },
-              { name: "Takeshi Yoshino", url: "mailto:tyoshino@google.com",
-                company: "Google, Inc.",  },
-          ],
+	// authors, add as many as you like.
+	// This is optional, uncomment if you have authors as well as editors.
+	// only "name" is required. Same format as editors.
 
-	          // authors, add as many as you like.
-	          // This is optional, uncomment if you have authors as well as editors.
-	          // only "name" is required. Same format as editors.
+	//authors:  [
+	//    { name: "Your Name", url: "http://example.org/",
+	//      company: "Your Company", companyURL: "http://example.com/" },
+	//],
 
-	          //authors:  [
-	          //    { name: "Your Name", url: "http://example.org/",
-	          //      company: "Your Company", companyURL: "http://example.com/" },
-	          //],
+	// name of the WG
+	wg:           "W3C Web Applications (WebApps)",
 
-	          // name of the WG
-	          wg:           "W3C Web Applications (WebApps)",
+	// URI of the public WG page
+	wgURI:        "http://www.w3.org/2008/webapps/",
 
-	          // URI of the public WG page
-	          wgURI:        "http://www.w3.org/2008/webapps/",
+	// name (with the @w3c.org) of the public mailing to which comments are due
+	wgPublicList: "public-webapps",
 
-	          // name (with the @w3c.org) of the public mailing to which comments are due
-	          wgPublicList: "public-webapps",
-
-	          // URI of the patent status for this WG, for Rec-track documents
-	          // !!!! IMPORTANT !!!!
-	          // This is important for Rec-track documents, do not copy a patent URI from a random
-	          // document unless you know what you're doing. If in doubt ask your friendly neighbourhood
-	          // Team Contact.
-	          wgPatentURI:  "",
-	      };
-	    </script>
+	// URI of the patent status for this WG, for Rec-track documents
+	// !!!! IMPORTANT !!!!
+	// This is important for Rec-track documents, do not copy a patent URI from a random
+	// document unless you know what you're doing. If in doubt ask your friendly neighbourhood
+	// Team Contact.
+	wgPatentURI:  "",
+};
+</script>
 
 	<!-- Styles to mimic File API spec -->
 	<!-- <style type="text/css"> -->
@@ -166,9 +164,7 @@
 
 		<p>
 			The <a>WritableByteStream</a> interface defines a protocol for data consuming APIs to communicate with other data producing APIs or code.
-			It provides a <code>write</code> method for writing data
-			to a <a>WritableByteStream</a> as a <a>Blob</a>, <a>ArrayBuffer</a>, or as <a>DOMString</a>,
-			and should happen asynchronously on the user agent’s main thread.
+			It provides a <code>write</code> method for writing data to a <a>WritableByteStream</a> as a <a>Blob</a>, <a>ArrayBufferView</a>, or <a>DOMString</a>, and should happen asynchronously on the user agent’s main thread.
 		</p>
 
 		<p>
@@ -743,12 +739,12 @@ writeData();</pre>
 								</ol>
 							</li>
 						</ol>
-            <dl class="parameters">
-              <dt>in !(WritableByteStream or WritableByteStream[]) destination</dt>
-              <dd>Destination <a>WritableByteStream</a>.</dd>
-              <dt>optional [Clamp] unsigned long long size</dt>
-              <dd>Number of bytes to transfer.</dd>
-            </dl>
+						<dl class="parameters">
+							<dt>in !(WritableByteStream or WritableByteStream[]) destination</dt>
+							<dd>Destination <a>WritableByteStream</a>.</dd>
+							<dt>optional [Clamp] unsigned long long size</dt>
+							<dd>Number of bytes to transfer.</dd>
+						</dl>
 					</p>
 				</dd>
 			</dl>
@@ -825,7 +821,7 @@ writeData();</pre>
 						<p>
 							The extension onto <code>createObjectURL</code> should have the following steps added.
 						</p>
-            <p>
+						<p>
 							Returns a unique Blob URL each time it is called on a valid <code>object</code> argument, which is a non-null <a>ByteStream</a> in scope of the global object's URL property from which this static method is called. This method must act as follows:
 							<ol>
 								<li>
