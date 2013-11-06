@@ -176,7 +176,7 @@ var respecConfig = {
 		<p>
 			The <a>ReadableByteStream</a> interface defines a protocol for data producing APIs to communicate with other data consuming APIs or code.
 			It provides a <code>read</code> method for reading data
-			from a <a>ReadableByteStream</a> as a <a>ByteStreamConsumeResult</a>, which provides the data as a <a>Blob</a>, <a>ArrayBufferView</a>, or as <a>DOMString</a>,
+			from a <a>ReadableByteStream</a> as a <a>ByteStreamConsumeResult</a>, which provides the data as a <a>Blob</a>, <a>ArrayBufferView</a>, or <a>DOMString</a>,
 			and should happen asynchronously on the user agent’s main thread. Additionally, the stream can also be used in API <a href="#consumers">consumers</a> such as a media element.
 		</p>
 
@@ -300,6 +300,19 @@ writeData();</pre>
 		</p>
 
 		<dl class="idl" title="interface WritableByteStream">
+			<dt>attribute DOMString writeEncoding</dt>
+			<dd>
+				<p>
+					Specifies a <a>DOMString</a> that represents the label of an encoding [[!EncodingDetermination]].
+					If set, it will be used as part of the encoding determination used when processing a <code>write()</code> method call.
+					It will return the label last set, or the empty <a>DOMString</a> if never set.
+				</p>
+
+				<p>
+					This parameter is not designed to be specified as an argument of write() since it's not likely to be changed frequently.
+				</p>
+			</dd>
+
 			<dt>Promise write()</dt>
 			<dd>
 				<p>
@@ -358,7 +371,11 @@ writeData();</pre>
 				<p>
 					Specifies a <a>DOMString</a> that represents the label of an encoding [[!EncodingDetermination]].
 					If set, it will be used as part of the encoding determination used when processing a <code>read</code> method call.
-					If not set, it will return the empty <a>DOMString</a>.
+					It will return the label last set, or the empty <a>DOMString</a> if never set.
+				</p>
+
+				<p>
+					This parameter is not designed to be specified as an argument of read() since it's not likely to be changed frequently.
 				</p>
 			</dd>
 
