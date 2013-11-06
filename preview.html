@@ -379,13 +379,57 @@ writeData();</pre>
 				</p>
 			</dd>
 
-			<dt>Promise read()</dt>
+			<dt>any read()</dt>
 			<dd>
 				<p>
 					This method reads data from the ReadableByteStream.
 					This method takes an optional <var>size</var> argument which represents the number of bytes to be read.
 					Another read() or pipe() call must not be made until the returned Promise is resolved or rejected.
 					The user agent must run the steps below (unless otherwise indicated):
+				</p>
+
+				<p>
+					<b>Experimental sync/async hybrid read() method algoritm</b>
+
+					<dl class="switch">
+						<dt>EOF is reached</dt>
+						<dd>
+							<ol>
+								<li>Let <var>result</var> be a <a>ByteStreamConsumeResult</a>.</li>
+								<li>Set eof attribute of <var>result</var> to true.</li>
+								<li>Return <var>result</var>.</li>
+							</ol>
+						</dd>
+						<dt>Otherwise</dt>
+						<dd>
+							<ol>
+								<li>Let <var>result</var> be a <a>ByteStreamConsumeResult</a>.</li>
+								<li>Set eof attribute of <var>result</var> to false.</li>
+								<li>
+									<dl class="switch">
+										<dt>There's any data available to be read synchronously (when readType is "text", also the data need to be decoded to non-empty DOMString)</dt>
+										<dd>
+											<ol>
+												<li>Set size attribute of <var>result</var> to the number of bytes consumed.</li>
+												<li>Set data attribute of <var>result</var> to the read data.</li>
+												<li>Return <var>result</var>.
+											</ol>
+										</dd>
+										<dt>Otherwise</dt>
+										<dd>
+											<ol>
+												<li>Set size attribute of <var>result</var> to 0.</li>
+												<li>Let <var>readPromise</var> be a <a>Promise</a>.</li>
+												<li>Set data attribute of <var>result</var> to a <var>promise</var>.</li>
+												<li>Return <var>result</var>.</li>
+												<li>When data becomes available for read, rerun this algorithm to create a <a>ByteStreamConsumeResult</a> and fulfill <var>promise</var> with it.</li>
+											</ol>
+										</dd>
+									</dl>
+								</li>
+							</ol>
+						</dd>
+					</dl>
 				</p>
 
 				<dl class="parameters">
@@ -402,12 +446,30 @@ writeData();</pre>
 					Another read() or pipe() call must not be made until the returned <a>Promise</a> is fulfilled or rejected.
 
 					<dl class="parameters">
-						<dt>!(<a>WritableByteStream</a> or <a>WritableByteStream</a>[]) destination</dt>
+						<dt>WritableByteStream destination</dt>
 						<dd>Destination <a>WritableByteStream</a>.</dd>
 						<dt>optional [Clamp] unsigned long long size</dt>
 						<dd>Number of bytes to transfer.</dd>
 					</dl>
 				</p>
+
+				<dt>Promise substream()</dt>
+				<dd>
+					<p>
+						<b>Experimental substream() method, aka fork() method.</b>
+					</p>
+
+					<p>
+						This method creates a clone of the ReadableByteStream which refers to the same internal data sequence.
+						Internal data sequence of the original ReadableByteStream will be reference counted so that a range in the original data sequence is freed only when all the ReadableByteStreams sharing the sequence.
+
+						<dl class="parameters">
+							<dt>in optional [Clamp] unsigned long long size</dt>
+							<dd>Number of bytes to be readable from the new Stream.</dd>
+						</dl>
+					</p>
+				</dd>
+			</dl>
 
 				<p>
 					Note that fulfillment or rejection of the returned Promise doesn't necessarily mean that the data transferred to the destination Stream has been successfully read from the Stream.
