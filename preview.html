@@ -362,7 +362,7 @@ writeData();</pre>
 			<dd>
 				<p>
 					Specifies the type of data to receive data read from the ReadableByteStream by a <code>read()</code> method call.
-					This can be set to the empty <a>DOMString</a> (default), "arraybuffer", "blob", "text" or "none" to change the type of the read operation.
+					This can be set to the empty <a>DOMString</a> (default), "<code>arraybuffer</code>", "<code>blob</code>", "<code>text</code>" or "<code>none</code>" to change the type of the read operation.
 				</p>
 			</dd>
 
@@ -407,7 +407,7 @@ writeData();</pre>
 								<li>Set eof attribute of <var>result</var> to false.</li>
 								<li>
 									<dl class="switch">
-										<dt>There's any data available to be read synchronously (when readType is "text", also the data need to be decoded to non-empty DOMString)</dt>
+										<dt>There's any data available to be read synchronously (when readType is "<code>text</code>", also the data need to be decoded to non-empty DOMString)</dt>
 										<dd>
 											<ol>
 												<li>Set size attribute of <var>result</var> to the number of bytes consumed.</li>
@@ -570,10 +570,10 @@ writeData();</pre>
 
 						<ol>
 							<li>
-								If the <a>ByteStream</a> has been neutered, throw an "<code><a href="http://dev.w3.org/2006/webapi/DOM4Core/#invalidstateerror">InvalidStateError</a></code>" [[!DOM4]] exception and terminate these steps.
+								If the <a>ByteStream</a> has been neutered, throw an "<code><a>InvalidStateError</a></code>" [[!DOM4]] exception and terminate these steps.
 							</li>
 							<li>
-								If the <a>write closed flag</a> is set, throw an "<code><a href="http://dev.w3.org/2006/webapi/DOM4Core/#invalidstateerror">InvalidStateError</a></code>" [[!DOM4]] exception and terminate these steps.
+								If the <a>write closed flag</a> is set, throw an "<code><a>InvalidStateError</a></code>" [[!DOM4]] exception and terminate these steps.
 							</li>
 							<li>
 								Let <var>writePromise</var> be a new promise.
@@ -605,7 +605,7 @@ writeData();</pre>
 								<a href="#write-to-stream">Write <code>rawData</code> to the Stream</a>.
 							</li>
 							<li>
-								If an error has occurred during the write, neuter the <a>ByteStream</a>, let <code>exception</code> be an "<code><a href="http://dev.w3.org/2006/webapi/DOM4Core/#invalidstateerror">InvalidStateError</a></code>" [[!DOM4]] exception and run <code>Reject(<code>writePromise</code>, <code>exception</code>)</code> as specified in the promises spec and terminate this algorithm.
+								If an error has occurred during the write, neuter the <a>ByteStream</a>, let <code>exception</code> be an "<code><a>InvalidStateError</a></code>" [[!DOM4]] exception and run <code>Reject(<code>writePromise</code>, <code>exception</code>)</code> as specified in the promises spec and terminate this algorithm.
 							<li>
 								Once all bytes are written, remove the write() from <a>write pending queue</a> and run <code>Resolve(<code>writePromise</code>, <code>undefined</code>)</code> as specified in the promises spec.
 								Implementations may delay this step if appropriate.
@@ -630,10 +630,10 @@ writeData();</pre>
 
 					<ol>
 						<li>
-							If the <a>ByteStream</a> has been neutered, throw an "<code><a href="http://dev.w3.org/2006/webapi/DOM4Core/#invalidstateerror">InvalidStateError</a></code>" [[!DOM4]] exception and terminate these steps.
+							If the <a>ByteStream</a> has been neutered, throw an "<code><a>InvalidStateError</a></code>" [[!DOM4]] exception and terminate these steps.
 						</li>
 						<li>
-							If the <a>write closed flag</a> is set, throw an "<code><a href="http://dev.w3.org/2006/webapi/DOM4Core/#invalidstateerror">InvalidStateError</a></code>" [[!DOM4]] exception and terminate these steps.
+							If the <a>write closed flag</a> is set, throw an "<code><a>InvalidStateError</a></code>" [[!DOM4]] exception and terminate these steps.
 						</li>
 						<li>
 							Set the <a>write closed flag</a>.
@@ -666,7 +666,7 @@ writeData();</pre>
 				<dd>
 					<p>
 						Returns the type of the last read operation taken on the <a>ByteStream</a>.
-						On getting, conforming user agents must return the type of the last read operation. If no read operation has taken place and the <code>readType</code> was not set, then return the empty string. This can be set to the empty string (default), "arraybuffer", "blob" and "text" to change the type of the read operation.
+						On getting, conforming user agents must return the type of the last read operation. If no read operation has taken place and the <code>readType</code> was not set, then return the empty string. This can be set to the empty string (default), "<code>arraybuffer</code>", "<code>blob</code>" and "<code>text</code>" to change the type of the read operation.
 					</p>
 				</dd>
 
@@ -688,13 +688,13 @@ writeData();</pre>
 
 					<ol>
 						<li>
-							If the <a>ByteStream</a> has been neutered, throw an "<code><a href="http://dev.w3.org/2006/webapi/DOM4Core/#invalidstateerror">InvalidStateError</a></code>" [[!DOM4]] exception and terminate these steps.
+							If the <a>ByteStream</a> has been neutered, throw an "<code><a>InvalidStateError</a></code>" [[!DOM4]] exception and terminate these steps.
 						</li>
 						<li>
-							If the <a>read pending flag</a> is set, throw an "<code><a href="http://dev.w3.org/2006/webapi/DOM4Core/#invalidstateerror">InvalidStateError</a></code>" [[!DOM4]] exception and terminate these steps.
+							If the <a>read pending flag</a> is set, throw an "<code><a>InvalidStateError</a></code>" [[!DOM4]] exception and terminate these steps.
 						</li>
 						<li>
-							If <code>size</code> is specified but is 0, throw a "<code><a href="http://dev.w3.org/2006/webapi/DOM4Core/#syntaxerror">SyntaxError</a></code>" [[!DOM4]] exception and terminate these steps.
+							If <code>size</code> is specified but is 0, throw a "<code><a>SyntaxError</a></code>" [[!DOM4]] exception and terminate these steps.
 						</li>
 						<li>
 							Set the <a>read pending flag</a>.
@@ -712,7 +712,7 @@ writeData();</pre>
 							Otherwise, <a href="#read-from-stream">read data from the Stream</a> until any non-zero bytes are read.
 						</li>
 						<li>
-							If an error has occurred during reading, neuter the <a>ByteStream</a>, let <code>exception</code> be an "<code><a href="http://dev.w3.org/2006/webapi/DOM4Core/#invalidstateerror">InvalidStateError</a></code>" [[!DOM4]] exception and run <code>Reject(<code>readPromise</code>, <code>exception</code>)</code> as specified in the promises spec and terminate these steps.
+							If an error has occurred during reading, neuter the <a>ByteStream</a>, let <code>exception</code> be an "<code><a>InvalidStateError</a></code>" [[!DOM4]] exception and run <code>Reject(<code>readPromise</code>, <code>exception</code>)</code> as specified in the promises spec and terminate these steps.
 						</li>
 						<li>
 							Let <code>result</code> be a newly created <a>ByteStreamConsumeResult</a>.
@@ -771,13 +771,13 @@ writeData();</pre>
 
 						<ol>
 							<li>
-								If the <a>ByteStream</a> has been neutered, throw an "<code><a href="http://dev.w3.org/2006/webapi/DOM4Core/#invalidstateerror">InvalidStateError</a></code>" [[!DOM4]] exception and terminate these steps.
+								If the <a>ByteStream</a> has been neutered, throw an "<code><a>InvalidStateError</a></code>" [[!DOM4]] exception and terminate these steps.
 							</li>
 							<li>
-								If the <a>read pending flag</a> is set, throw an "<code><a href="http://dev.w3.org/2006/webapi/DOM4Core/#invalidstateerror">InvalidStateError</a></code>" [[!DOM4]] exception and terminate these steps.
+								If the <a>read pending flag</a> is set, throw an "<code><a>InvalidStateError</a></code>" [[!DOM4]] exception and terminate these steps.
 							</li>
 							<li>
-								If <code>size</code> is specified but is 0, throw a "<code><a href="http://dev.w3.org/2006/webapi/DOM4Core/#syntaxerror">SyntaxError</a></code>" [[!DOM4]] exception and terminate these steps.
+								If <code>size</code> is specified but is 0, throw a "<code><a>SyntaxError</a></code>" [[!DOM4]] exception and terminate these steps.
 							</li>
 							<li>
 								If <code>destinations</code> is a <a>ByteStream</a>, let <code>destinations</code> instead be an array consisting of just that <a>ByteStream</a>.
@@ -801,7 +801,7 @@ writeData();</pre>
 								As read data becomes available, <a href="#write-to-stream">write newly read data to <code>destinations</code></a>.
 							</li>
 							<li>
-								If any error has occurred during reading or writing to <code>destinations</code>, neuter the <a>ByteStream</a>, let <code>exception</code> be an "<code><a href="http://dev.w3.org/2006/webapi/DOM4Core/#invalidstateerror">InvalidStateError</a></code>" exception and run <code>Reject(<code>readPromise</code>, <code>exception</code>)</code> as specified in the promises spec and terminate these steps.
+								If any error has occurred during reading or writing to <code>destinations</code>, neuter the <a>ByteStream</a>, let <code>exception</code> be an "<code><a>InvalidStateError</a></code>" exception and run <code>Reject(<code>readPromise</code>, <code>exception</code>)</code> as specified in the promises spec and terminate these steps.
 							</li>
 							<li>
 								Once read and write are both completed for all destination streams, run the following algorithm:
@@ -862,8 +862,8 @@ writeData();</pre>
 			<p>
 				Data can be read as various data types from ReadableByteStream.
 				The ByteStreamReadType enum defines DOMString values to specify the data types.
-				"none" is useful when seeking data by skipping some amount of data.
-				User agents may implement some optimization for "none" type read for example omitting internal data transfer.
+				"<code>none</code>" is useful when seeking data by skipping some amount of data.
+				User agents may implement some optimization for "<code>none</code>" type read for example omitting internal data transfer.
 			</p>
 
 			<dl class="idl" title="enum ByteStreamReadType">
@@ -1174,6 +1174,11 @@ enum XMLHttpRequestResponseType {
 
 		<p>
 			<dfn>DOMString</dfn> is defined in <a href="http://www.w3.org/TR/DOM-Level-3-Core/core.html">DOM Level 3 Core specification</a>.
+		</p>
+
+		<p>
+			<dfn>InvalidStateError</dfn> is defined in <a href="https://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#invalidstateerror">DOM4 specification</a>.
+			<dfn>SyntaxError</dfn> is defined in <a href="https://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#syntaxerror">DOM4 specification</a>.
 		</p>
 	</section>
 
