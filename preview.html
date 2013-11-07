@@ -388,11 +388,11 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 				</p>
 			</dd>
 
-			<dt>Promise&amp;lt;undefined&gt; writeClose()</dt>
+			<dt>void writeClose()</dt>
 			<dd>
 				<p>
 					This method tells the WritableByteStream that no more data will be written to it.
-					Once writeClose() has been called on a WritableByteStream, any method must not be called on the WritableByteStream.
+					Once writeClose() has been called on a WritableByteStream, any more method call must not be made on the WritableByteStream.
 				</p>
 			</dd>
 		</dl>
@@ -701,7 +701,7 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 					</dl>
 				</dd>
 
-				<dt>Promise writeClose()</dt>
+				<dt>void writeClose()</dt>
 				<dd>
 					<p>
 						When all data has been read from the <a>ByteStream</a> on which writeClose() has been called, i.e. <a href="#eof-reached">EOF is reached</a>, it resolves the Promise returned by read() with a <a>ByteStreamReadResult</a> with the <a href="#widl-ByteStreamReadResult-eof">eof</a> attribute set to true.
