@@ -403,7 +403,7 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 				</p>
 
 				<dl class="parameters">
-					<dt>(DOMString or ArrayBufferView or Blob)? data</dt>
+					<dt>(DOMString or ArrayBufferView or Blob) data</dt>
 					<dd>Data to write.</dd>
 				</dl>
 			</dd>
@@ -610,11 +610,11 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 
 		<dl class="idl" title="enum ByteStreamReadType">
 			<dt>blob</dt>
-			<dd>Read operations should return data as a Blob</dd>
+			<dd>Read operations should return data as a <a>Blob</a></dd>
 			<dt>arraybuffer</dt>
-			<dd>Read operations should return data as an ArrayBuffer</dd>
+			<dd>Read operations should return data as an <a>ArrayBuffer</a></dd>
 			<dt>text</dt>
-			<dd>Read operations should return data as a DOMString</dd>
+			<dd>Read operations should return data as a <a>DOMString</a></dd>
 			<dt>none</dt>
 			<dd>
 				Read operations should return nothing.
@@ -636,21 +636,15 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 			<h2>ByteStream Interface</h2>
 
 			<p>
-				This interface represents a sequence of bytes which can be read only once over time.
+				This interface represents a sequence of bytes which can be read only once over time and to which we can push data.
 				Contents of a ByteStream can be stored in memory or backed by slower devices such as a hard disk.
-			</p>
-			<p>
-				It provides a <a href="#widl-ByteStream-type">type</a> attribute which represents the type of data in the Stream.
-			</p>
-			<p>
-				It also provides the ability to read and write the contents of the Stream.
 			</p>
 
 			<p>
 				A ByteStream is an object that:
 				<ul>
-					<li>Has a content type</li>
-					<li>Has unspecified length</li>
+					<li>Has a content type. The <a href="#widl-ByteStream-type">type</a> attribute represents it.</li>
+					<li>Has unspecified length.</li>
 					<li>Data is read first in, first out</li>
 					<li>Once data is read from it, the data is removed and can no longer be re-read</li>
 				</ul>
@@ -661,17 +655,16 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 			</p>
 
 			<p>
-				A ByteStream has an associated integer value called <dfn>minWindow</dfn>.
+				A ByteStream has an associated integer value called <dfn>capacity</dfn>.
 			</p>
 
 			<p>
-				A ByteStream has an associated integer value called <dfn>window</dfn>.
-				This value limits the number of bytes bufferred in the ByteStream.
-				This value equals to <code>max(<a>pullAmount</a>, <a>minWindow</a>)</code> where <dfn>pullAmount</dfn> is sum of non-undefined size argument of pending read() and pipe() calls on this ByteStream.
+				<dfn>temporaryCapacity</dfn> of a ByteStream is defined as <code>max(<a>pullAmount</a>, <a>capacity</a>)</code> where <dfn>pullAmount</dfn> is <var>size</var> argument of pending <code>read()</code>, <code>readExact()</code> or <code>pipe()</code> method call on the ByteStream.
+				This value limits the number of bytes buffered in the ByteStream.
 			</p>
 
 			<p>
-				A Stream holds a sequence of bytes possibly terminated by a terminator.
+				A ByteStream holds a sequence of bytes possibly terminated by a terminator.
 				<dfn id="write-to-stream">Writing bytes to a ByteStream</dfn> means appending the bytes to the sequence.
 				<dfn id="terminate-stream">Terminating a ByteStream</dfn> means appending a terminator to the sequence.
 				<dfn id="read-from-stream">Reading bytes from a ByteStream</dfn> pops bytes from the head of the sequence.
@@ -680,26 +673,24 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 			</p>
 
 			<p>
-				When <var>N</var> bytes of data are written to the sequence, it consumes <var>N</var> from <a>window</a>.
-				When <var>N</var> bytes of data are read from the sequence, it frees <var>N</var> to <a>window</a>.
+				When <var>N</var> bytes of data are written to the sequence, it consumes <var>N</var> from <a>temporaryCapacity</a>.
+				When <var>N</var> bytes of data are read from the sequence, it frees <var>N</var> to <a>temporaryCapacity</a>.
 			</p>
 
 			<p>
-				A ByteStream object has an associated <dfn>pending write queue</dfn>.
-				Arguments of write() method call is queued to this queue.
-				As <a>window</a> becomes available, the data given to the write() is written to the sequence consuming window.
-				Once all data of the write() is written, the Promise returned for the write() is fulfilled.
+				A ByteStream can accept up to <a>temporaryCapacity</a> bytes of data.
+				Overflowing write() requests are queued as well as other <a>WritableByteStream</a>s.
 				This queue is internal, so scripts cannot access it directly.
 			</p>
 
-			<dl class="idl" title="interface ByteStream">
+			<dl class="idl" title="interface ByteStream : ReadableByteStream, WritableByteStream">
 				<dt>Constructor()</dt>
 				<dd>
 					Constructs a <a>ByteStream</a> and sets the <a href="#widl-ByteStream-type">type</a> to the specified value.
 					<dl class="parameters">
-						<dt>in unsigned long long minWindow</dt>
+						<dt>in unsigned long long capacity</dt>
 						<dd>
-							Specifies the initial value of <a>minWindow</a>.
+							Specifies the initial value of <a>capacity</a>.
 						</dd>
 						<dt>in optional DOMString type</dt>
 						<dd>
@@ -708,10 +699,17 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 					</dl>
 				</dd>
 
-				<dt>Promise write()</dt>
+				<dt>attribute DOMString writeEncoding</dt>
+				<dd></dd>
+
+				<dt>Promise&amp;lt;unsigned long long&gt; write()</dt>
 				<dd>
 					<p>
 						The user agent must run the steps below (unless otherwise indicated):
+					</p>
+
+					<p>
+						NEEDS CLEANUP
 
 						<ol>
 							<li>
@@ -761,10 +759,13 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 						Note that completion of write() doesn't necessarily mean that the data written to the Stream has been successfully read.
 					</p>
 					<dl class="parameters">
-						<dt>(DOMString or ArrayBufferView or Blob or unsigned long long)? data</dt>
+						<dt>(DOMString or ArrayBufferView or Blob) data</dt>
 						<dd>Data to write or available <a>window</a> size.</dd>
 					</dl>
 				</dd>
+
+				<dt>Promise&amp;lt;unsigned long long&gt; waitForWritable()</dt>
+				<dd></dd>
 
 				<dt>void writeClose()</dt>
 				<dd>
@@ -813,8 +814,20 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 				<dt>attribute DOMString readEncoding</dt>
 				<dd></dd>
 
-				<dt>Promise read()</dt>
+				<dt>ByteStreamReadResult readExact()</dt>
 				<dd>
+					<dl class="parameters">
+						<dt>[Clamp] unsigned long long size</dt>
+						<dd>Number of bytes to read.</dd>
+					</dl>
+				</dd>
+
+				<dt>ByteStreamReadResult read()</dt>
+				<dd>
+					<p>
+						NEED CLEANUP
+					</p>
+
 					<p>
 						This method reads data from the <a>ByteStream</a>.
 						This method takes an optional <var>size</var> argument which represents the number of bytes to be read.
@@ -890,14 +903,19 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 							Unset the <a>read pending flag</a> and run <code>Resolve(<code>readPromise</code>, <code>result</code>)</code> as specified in the promises spec.
 						</li>
 					</ol>
+
 					<dl class="parameters">
 						<dt>optional [Clamp] unsigned long long size</dt>
 						<dd>Number of bytes to read.</dd>
 					</dl>
 				</dd>
 
-				<dt>Promise pipe()</dt>
+				<dt>ByteStreamReadResult pipe()</dt>
 				<dd>
+					<p>
+						NEEDS CLEANUP
+					</p>
+
 					<p>
 						This method transfers data from the <a>ByteStream</a> to another Stream.
 						This method takes a <code>destinations</code> and optionally a <code>size</code>.
@@ -961,13 +979,19 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 							</li>
 						</ol>
 						<dl class="parameters">
-							<dt>in !(WritableByteStream or WritableByteStream[]) destination</dt>
+							<dt>in WritableByteStream destination</dt>
 							<dd>Destination <a>WritableByteStream</a>.</dd>
 							<dt>optional [Clamp] unsigned long long size</dt>
 							<dd>Number of bytes to transfer.</dd>
 						</dl>
 					</p>
 				</dd>
+
+				<dt>ReadableByteStream fork()</dt>
+				<dd></dd>
+
+				<dt>void readClose()</dt>
+				<dd></dd>
 			</dl>
 		</section>
 
