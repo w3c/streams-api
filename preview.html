@@ -402,7 +402,13 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 		<h2>ReadableByteStream interface</h2>
 
 		<p>
-			The ReadableByteStream interface defines a protocol for APIs that produces byte stream how to receive a read request from the reader and output byte stream.
+			The ReadableByteStream interface defines a protocol for APIs that produces byte stream:
+			<ol>
+				<li>How to receive a read request from the reader and output byte stream.</li>
+				<li>How to transfer bulk data to other <a>WritableByteStream</a> (by pipe() method)</li>
+				<li>How to mirror data to multiple destination <a>WritableByteStream</a>s (by substream() method)</li>
+			</ol>
+
 			By returning a Promise and delaying fulfillment of it, the ReadableByteStream realizes asynchronous data consumption.
 		</p>
 
@@ -410,7 +416,7 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 			<dt>attribute ByteStreamReadType readType</dt>
 			<dd>
 				<p>
-					Specifies the type of data to receive data read from the ReadableByteStream by a <code>read()</code> method call.
+					Specifies as what type data will be read from the ReadableByteStream by a <code>read()</code> and <code>readExact()</code> method call.
 					This can be set to the empty <a>DOMString</a> (default), "<code>arraybuffer</code>", "<code>blob</code>", "<code>text</code>" or "<code>none</code>" to change the type of the read operation.
 				</p>
 			</dd>
@@ -419,33 +425,53 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 			<dd>
 				<p>
 					Specifies a <a>DOMString</a> that represents the label of an encoding [[!EncodingDetermination]].
-					If set, it will be used as part of the encoding determination used when processing a <code>read</code> method call.
-					It will return the label last set, or the empty <a>DOMString</a> if never set.
+					If set, it will be used as part of the encoding determination used when processing a <code>read()</code> method call.
 				</p>
 
+				<section class="note">
+					This parameter is not designed to be specified as an argument of <code>read()</code> since it's not likely to be changed frequently.
+				</section>
+			</dd>
+
+			<dt>ByteStreamConsumeResult readExact()</dt>
+			<dd>
 				<p>
-					This parameter is not designed to be specified as an argument of read() since it's not likely to be changed frequently.
+					The same as <code>read()</code> except for the following points:
+
+					<ol>
+						<li>waits until bytes of the specified number become readable</li>
+						<li><code>readType</code> must be one of "<code>arraybuffer</code>", "<code>blob</code>" and "<code>none</code>"</li>
+						<li>size parameter is not omittable</li>
+					</ol>
 				</p>
+
+				<dl class="parameters">
+					<dt>[Clamp] unsigned long long size</dt>
+					<dd>Number of bytes to read.</dd>
+				</dl>
 			</dd>
 
 			<dt>ByteStreamConsumeResult read()</dt>
 			<dd>
 				<p>
 					This method reads data from the ReadableByteStream.
-					This method takes an optional <var>size</var> argument which represents the number of bytes to be read.
-					Another read() or pipe() call must not be made until the returned Promise is resolved or rejected.
-					The user agent must run the steps below (unless otherwise indicated):
+					If there's no data synchronously readable, waits until any non-empty result can be read.
+					If <var>size</var> argument is specified, this method reads up to <var>size</var> bytes.
 				</p>
 
 				<p>
-					<b>Experimental sync/async hybrid read() method algoritm</b>
+					Another <code>read()</code>, <code>readExact()</code>, <code>pipe()</code> or <code>substream()</code> method call must not be made until this <code>read()</code> completes.
+				</p>
+
+				<p>
+					This method must run the steps below:
 
 					<dl class="switch">
-						<dt>EOF is reached</dt>
+						<dt>If <a>the EOF is reached</a></dt>
 						<dd>
 							<ol>
 								<li>Let <var>result</var> be a <a>ByteStreamConsumeResult</a>.</li>
-								<li>Set eof attribute of <var>result</var> to true.</li>
+								<li>Set eof attribute of <var>result</var> to <code>true</code>.</li>
 								<li>Return <var>result</var>.</li>
 							</ol>
 						</dd>
@@ -453,14 +479,17 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 						<dd>
 							<ol>
 								<li>Let <var>result</var> be a <a>ByteStreamConsumeResult</a>.</li>
-								<li>Set eof attribute of <var>result</var> to false.</li>
+								<li>Set eof attribute of <var>result</var> to <code>false</code>.</li>
 								<li>
 									<dl class="switch">
-										<dt>There's any data available to be read synchronously (when readType is "<code>text</code>", also the data need to be decoded to non-empty DOMString)</dt>
+										<dt>There's any data available to be read synchronously (when readType is "<code>text</code>", also the data need to be decoded to non-empty <a>DOMString</a>)</dt>
 										<dd>
 											<ol>
 												<li>Set size attribute of <var>result</var> to the number of bytes consumed.</li>
-												<li>Set data attribute of <var>result</var> to the read data.</li>
+												<li>
+													Set data attribute of <var>result</var> to the read data.
+													If <var>size</var> argument was specified, convert only the first <var>size</var> bytes.
+												</li>
 												<li>Return <var>result</var>.
 											</ol>
 										</dd>
@@ -469,9 +498,9 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 											<ol>
 												<li>Set size attribute of <var>result</var> to 0.</li>
 												<li>Let <var>readPromise</var> be a <a>Promise</a>.</li>
-												<li>Set data attribute of <var>result</var> to a <var>promise</var>.</li>
+												<li>Set data attribute of <var>result</var> to <var>readPromise</var>.</li>
 												<li>Return <var>result</var>.</li>
-												<li>When data becomes available for read, rerun this algorithm to create a <a>ByteStreamConsumeResult</a> and fulfill <var>promise</var> with it.</li>
+												<li>When data becomes available for read, rerun this algorithm to create a <a>ByteStreamConsumeResult</a> and fulfill <var>readPromise</var> with it.</li>
 											</ol>
 										</dd>
 									</dl>
@@ -487,42 +516,46 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 				</dl>
 			</dd>
 
-			<dt>Promise pipe()</dt>
+			<dt>ByteStreamConsumeResult pipe()</dt>
 			<dd>
 				<p>
 					This method transfers bytes from the ReadableByteStream to a <a>WritableByteStream</a>.
-					This method takes a <var>destination</var> argument and optionally a <var>size</var> argument.
-					Another read() or pipe() call must not be made until the returned <a>Promise</a> is fulfilled or rejected.
-
-					<dl class="parameters">
-						<dt>WritableByteStream destination</dt>
-						<dd>Destination <a>WritableByteStream</a>.</dd>
-						<dt>optional [Clamp] unsigned long long size</dt>
-						<dd>Number of bytes to transfer.</dd>
-					</dl>
 				</p>
 
-				<dt>Promise substream()</dt>
-				<dd>
-					<p>
-						<b>Experimental substream() method, aka fork() method.</b>
-					</p>
-
-					<p>
-						This method creates a clone of the ReadableByteStream which refers to the same internal data sequence.
-						Internal data sequence of the original ReadableByteStream will be reference counted so that a range in the original data sequence is freed only when all the ReadableByteStreams sharing the sequence.
-
-						<dl class="parameters">
-							<dt>in optional [Clamp] unsigned long long size</dt>
-							<dd>Number of bytes to be readable from the new Stream.</dd>
-						</dl>
-					</p>
-				</dd>
-			</dl>
+				<section class="note">
+					Note that fulfillment or rejection of the returned Promise doesn't necessarily mean that the data transferred to the destination <a>WritableByteStream</a> has been successfully read from it.
+				</section>
 
 				<p>
-					Note that fulfillment or rejection of the returned Promise doesn't necessarily mean that the data transferred to the destination Stream has been successfully read from the Stream.
+					Another <code>read()</code>, <code>readExact()</code>, <code>pipe()</code> or <code>substream()</code> method call must not be made until this <code>pipe()</code> completes.
 				</p>
+
+				<dl class="parameters">
+					<dt>WritableByteStream destination</dt>
+					<dd>Destination <a>WritableByteStream</a>.</dd>
+					<dt>optional [Clamp] unsigned long long size</dt>
+					<dd>Number of bytes to transfer.</dd>
+				</dl>
+			</dd>
+
+			<dt>ReadableByteStream substream()</dt>
+			<dd>
+				<p>
+					<b>Experimental substream() method, aka fork() method.</b>
+				</p>
+
+				<p>
+					This method creates a clone of the ReadableByteStream which refers to the same internal data sequence.
+					Internal data sequence of the original ReadableByteStream will be reference counted so that a range in the original data sequence is freed only when all the ReadableByteStreams sharing the sequence.
+
+					<dl class="parameters">
+						<dt>in optional [Clamp] unsigned long long size</dt>
+						<dd>Number of bytes to be readable from the new Stream.</dd>
+					</dl>
+				</p>
+			</dd>
+		</dl>
+
 			</dd>
 		</dl>
 
