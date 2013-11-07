@@ -340,7 +340,13 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 		<h2>WritableByteStream interface</h2>
 
 		<p>
-			The WritableByteStream interface defines a protocol for APIs that consume byte stream how to receive byte stream and notify the writer of completion of receiving and how much data it can receive currently.
+			The WritableByteStream interface defines a protocol for APIs that consume byte stream:
+			<ol>
+				<li>How to receive byte stream</li>
+				<li>How to notify the writer of completion of writing</li>
+				<li>How much data it can accept currently</li>
+			</ol>
+
 			By returning a Promise and delaying fulfillment of it, the WritableByteStream realizes flow control.
 		</p>
 
@@ -358,37 +364,35 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 				</p>
 			</dd>
 
-			<dt>Promise write()</dt>
+			<dt>Promise&amp;lt;unsigned long long&gt; write()</dt>
 			<dd>
 				<p>
-					If <var>data</var> is a <a>DOMString</a>, <a>ArrayBufferView</a> or <a>Blob</a>, this method writes the specified <var>data</var> to the WritableByteStream.
-					Fulfillment or rejection of the returned Promise indicates completion of the write() method call.
+					This method writes the specified <var>data</var> to the WritableByteStream.
+					If <var>data</var> is a <a>DOMString</a>, it will be encoded using writeEncoding.
+					The returned <a>Promise</a> will be fulfilled with the number of bytes written to the WritableByteStream when all of <var>data</var> is successfully written.
+					The returned <a>Promise</a> will be rejected on any error.
 					Incomplete write() operations are queued in the WritableByteStream.
-					The returned Promise will be fulfilled with the number of bytes written to the WritableByteStream.
-				</p>
-
-				<p>
-					If <var>data</var> is an unsigned long long value, this method waits until the WritableByteStream becomes able to accept the specified number of bytes.
-					The returned Promise will be fulfilled with the number of bytes the WritableByteStream can accept.
-				</p>
-
-				<p>
-					If <var>data</var> is undefined, this method waits until the WritableByteStream becomes able to accept any non-zero amount of data.
-					The returned Promise will be fulfilled with the number of bytes the WritableByteStream can accept.
 				</p>
 
 				<dl class="parameters">
-					<dt>(DOMString or ArrayBufferView or Blob or unsigned long long)? data</dt>
-					<dd>Data to write or the number of bytes the WritableByteStream can accept.</dd>
+					<dt>(DOMString or ArrayBufferView or Blob)? data</dt>
+					<dd>Data to write.</dd>
 				</dl>
 			</dd>
 
-			<dt>Promise close()</dt>
+			<dt>Promise&amp;lt;unsigned long long&gt; waitForWritable()</dt>
+			<dd>
+				<p>
+					This method waits until the WritableByteStream becomes able to accept any non-zero amount of data.
+					The returned Promise will be fulfilled with the number of bytes the WritableByteStream can accept.
+				</p>
+			</dd>
+
+			<dt>Promise&amp;lt;undefined&gt; close()</dt>
 			<dd>
 				<p>
 					This method tells the WritableByteStream that no more data will be written to it.
-					This is an irreversible operation.
-					Once close() has been called on a WritableByteStream, no more write() or close() call must be made on it.
+					Once close() has been called on a WritableByteStream, any method must not be called on the WritableByteStream.
 				</p>
 			</dd>
 		</dl>
