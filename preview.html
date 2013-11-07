@@ -199,40 +199,54 @@ var respecConfig = {
 			The example demonstrates how to read a chunk of data from a <a>ByteStream</a> using <code>read</code>. The <a>ByteStream</a> may of come from a <a href="#producers	">producer</a> such as <code>XMLHttpRequest</code>. Additionally, it demonstrates how to read a stream until an EOF is encountered.
 		</p>
 
-		<pre class="example">
-// Read the first 1024 bytes of the stream as UTF-8
+		<pre class="example">// Read up to 1024 bytes from the ReadableByteStream
 stream.readEncoding = "UTF-8";
 stream.readType = "arraybuffer";
-Promise readPromise = stream.read(1024);
-readPromise.then(
-  function(result) {
-    console.log("Loaded" + result.size + " bytes");
-    // Handle result.data
-  },
-  function(error) {
-    // Handle error
-  }
-);
-
-// Read data from the stream repeatedly
-function readUntilEof() {
-  stream.read(1024).then(
-    function(result) {
-      // Handle read data
-      someProcessFunction(result.data);
-
-      // Print progress
-      someReportFunction(result.size);
-
-      if (!result.eof) {
-        readUntilEof();
-      }
+var result = stream.read(1024);
+if (result.eof) {
+  // EOF reached
+} else if (result.size == 0) {
+  result.data.then(
+    function (result) {
+      processData(result.data);
+      ...
     },
-    function(error) {
+    function (error) {
       // Handle error
     }
   );
+} else {
+  // Done synchronously
+  processData(result.data);
+  ...
 }</pre>
+
+		<pre class="example">// Read data from the ReadableByteStream repeatedly
+function readUntilEof() {
+  while (true) {
+    var result = stream.read();
+    if (result.eof) {
+      return;
+    } else if (result.size == 0) {
+      result.data.then(
+        function (result) {
+          processData(result.data);
+
+          if (!result.eof) {
+            readUntilEof();
+          }
+        },
+        function (error) {
+          // Handle error
+        }
+      );
+    } else {
+      processData(result.data);
+    }
+  }
+}
+
+readUntilEof();</pre>
 
 		<p>
 			In the example below, different code blocks handle progress, error, and success conditions.
@@ -240,8 +254,7 @@ function readUntilEof() {
 			The example takes the <a>ReadableByteStream</a> from a <a href="#producers">producer</a>, <a>XMLHttpRequest</a>, and gives to a <a href="#consumers">consumer</a>, the video tag.
 		</p>
 
-		<pre class="example">
-function handler() {
+		<pre class="example">function handler() {
   if(this.readyState == this.LOADING) {
     var theStream = this.response;
     var streamURL = URL.createObjectURL(theStream);
@@ -266,18 +279,18 @@ client.send();</pre>
 			The example below demonstrates how to use <code>write()</code> to load a Stream into the audio tag, whose data could be processed and built dynamically at read time.
 		</p>
 
-		<pre class="example">
-var theStream = new Stream("audio/mp3");
+		<pre class="example">var stream = new ByteStream("audio/mp3");
 
-function writeData(){
-  var moreData;
+function writeData() {
   // Do work to create more data to place into the stream
+  var data = generateMusic();
 
   // If we have no more data to process and place in the stream, we close
   if (moreData == null){
-    theStream.writeClose();
+    stream.writeClose();
   } else{
-    theStream.write(moreData).then(
+    // Wait until write() completes.
+    stream.write(data).then(
       function () {
         writeData();
       },
@@ -292,6 +305,21 @@ var streamURL = URL.createObjectURL(theStream);
 document.getElementById('audioTag').src = streamURL;
 
 writeData();</pre>
+
+		<p>
+			If you have a producer code which should do work only when pulled, <code>waitForWritable()</code> should be used to wait for pull event.
+		</p>
+
+		<pre class="example">function poll() {
+  stream.waitForWritable().then(
+    function (pulledAmount) {
+      stream.write(generateRandomBytes(pulledAmount));
+      poll();
+    }
+  );
+}
+
+poll();</pre>
 	</section>
 
 	<section class="section" id="data_source">
@@ -405,8 +433,8 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 			The ReadableByteStream interface defines a protocol for APIs that produces byte stream:
 			<ol>
 				<li>How to receive a read request from the reader and output byte stream.</li>
-				<li>How to transfer bulk data to other <a>WritableByteStream</a> (by pipe() method)</li>
-				<li>How to mirror data to multiple destination <a>WritableByteStream</a>s (by fork() method)</li>
+				<li>How to transfer bulk data to other <a>WritableByteStream</a> (by <code>pipe()</code> method)</li>
+				<li>How to mirror data to multiple destination <a>WritableByteStream</a>s (by <code>fork()</code> method)</li>
 			</ol>
 
 			By returning a Promise and delaying fulfillment of it, the ReadableByteStream realizes asynchronous data consumption.
