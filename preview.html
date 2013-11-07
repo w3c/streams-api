@@ -190,7 +190,7 @@ var respecConfig = {
 		</p>
 
 		<p>
-			An asynchronous API for reading <a>ReadableByteStreams</a> prevents blocking and UI "freezing" on a user agent’s main thread
+			An asynchronous API for reading <a>ReadableByteStream</a>s prevents blocking and UI "freezing" on a user agent’s main thread
 			This specification defines an asynchronous API to access a <a>ByteStream</a>. Error conditions that may arise during reading of a <a>ByteStream</a> will be handled by a reject callback set to the promise returned by the read() method. An example will be illustrative.
 		</p>
 
@@ -1226,7 +1226,7 @@ enum XMLHttpRequestResponseType {
 		<h2>Terminology</h2>
 
 		<p>
-			<dfn>ArrayBufferView</dfn> is defined in <a href="http://www.khronos.org/registry/typedarray/specs/latest/">Typed Array specification</a>.
+			<dfn>ArrayBuffer</dfn> and <dfn>ArrayBufferView</dfn> are defined in <a href="http://www.khronos.org/registry/typedarray/specs/latest/">Typed Array specification</a>.
 		</p>
 
 		<p>
@@ -1239,6 +1239,10 @@ enum XMLHttpRequestResponseType {
 
 		<p>
 			<dfn>DOMString</dfn> is defined in <a href="http://www.w3.org/TR/DOM-Level-3-Core/core.html">DOM Level 3 Core specification</a>.
+		</p>
+
+		<p>
+			<dfn>XMLHttpRequest</dfn> is defined in [[!XMLHTTPREQUEST2]].
 		</p>
 
 		<p>
