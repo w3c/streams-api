@@ -275,7 +275,7 @@ function writeData(){
 
   // If we have no more data to process and place in the stream, we close
   if (moreData == null){
-    theStream.close();
+    theStream.writeClose();
   } else{
     theStream.write(moreData).then(
       function () {
@@ -294,7 +294,7 @@ document.getElementById('audioTag').src = streamURL;
 writeData();</pre>
 	</section>
 
-	<section class="section" id="model">
+	<section class="section" id="data_source">
 		<h2>Data source model</h2>
 
 		<p>
@@ -332,7 +332,7 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 };</pre>
 
     <p>
-			When substream() is called, a new reader is registered to the original <a>ReadableByteStream</a>'s data source and the new <a>ReadableByteStream</a> uses read() method to fetch data from it.
+			When <a href="#widl-ReadableByteStream-fork-ReadableByteStream--Clamp--unsigned-long-long-size">fork()</a> is called, a new reader is registered to the original <a>ReadableByteStream</a>'s data source and the new <a>ReadableByteStream</a> uses read() method to fetch data from it.
     </p>
 	</section>
 
@@ -388,11 +388,11 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 				</p>
 			</dd>
 
-			<dt>Promise&amp;lt;undefined&gt; close()</dt>
+			<dt>Promise&amp;lt;undefined&gt; writeClose()</dt>
 			<dd>
 				<p>
 					This method tells the WritableByteStream that no more data will be written to it.
-					Once close() has been called on a WritableByteStream, any method must not be called on the WritableByteStream.
+					Once writeClose() has been called on a WritableByteStream, any method must not be called on the WritableByteStream.
 				</p>
 			</dd>
 		</dl>
@@ -406,7 +406,7 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 			<ol>
 				<li>How to receive a read request from the reader and output byte stream.</li>
 				<li>How to transfer bulk data to other <a>WritableByteStream</a> (by pipe() method)</li>
-				<li>How to mirror data to multiple destination <a>WritableByteStream</a>s (by substream() method)</li>
+				<li>How to mirror data to multiple destination <a>WritableByteStream</a>s (by fork() method)</li>
 			</ol>
 
 			By returning a Promise and delaying fulfillment of it, the ReadableByteStream realizes asynchronous data consumption.
@@ -460,7 +460,7 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 				</p>
 
 				<p>
-					Another <code>read()</code>, <code>readExact()</code>, <code>pipe()</code> or <code>substream()</code> method call must not be made until this <code>read()</code> completes.
+					Another <code>read()</code>, <code>readExact()</code>, <code>pipe()</code> or <code>fork()</code> method call must not be made until this <code>read()</code> completes.
 				</p>
 
 				<p>
@@ -527,7 +527,7 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 				</section>
 
 				<p>
-					Another <code>read()</code>, <code>readExact()</code>, <code>pipe()</code> or <code>substream()</code> method call must not be made until this <code>pipe()</code> completes.
+					Another <code>read()</code>, <code>readExact()</code>, <code>pipe()</code> or <code>fork()</code> method call must not be made until this <code>pipe()</code> completes.
 				</p>
 
 				<dl class="parameters">
@@ -538,20 +538,18 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 				</dl>
 			</dd>
 
-			<dt>ReadableByteStream substream()</dt>
+			<dt>ReadableByteStream fork()</dt>
 			<dd>
 				<p>
-					<b>Experimental substream() method, aka fork() method.</b>
+					This method creates a clone of the ReadableByteStream which refers to the same internal <a href="#h2_data_source">data source</a>.
+					The internal data source of the original ReadableByteStream will be range reference counted so that a range in the original data source is freed only when all the ReadableByteStreams sharing the data source finish consuming it.
 				</p>
+			</dd>
 
+			<dt>void readClose()</dt>
+			<dd>
 				<p>
-					This method creates a clone of the ReadableByteStream which refers to the same internal data sequence.
-					Internal data sequence of the original ReadableByteStream will be reference counted so that a range in the original data sequence is freed only when all the ReadableByteStreams sharing the sequence.
-
-					<dl class="parameters">
-						<dt>in optional [Clamp] unsigned long long size</dt>
-						<dd>Number of bytes to be readable from the new Stream.</dd>
-					</dl>
+					This method tells the ReadableByteStream that no more data will be read from it.
 				</p>
 			</dd>
 		</dl>
@@ -703,10 +701,10 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 					</dl>
 				</dd>
 
-				<dt>Promise close()</dt>
+				<dt>Promise writeClose()</dt>
 				<dd>
 					<p>
-						When all data has been read from the <a>ByteStream</a> on which close() has been called, i.e. <a href="#eof-reached">EOF is reached</a>, it resolves the Promise returned by read() with a <a>ByteStreamReadResult</a> with the <a href="#widl-ByteStreamReadResult-eof">eof</a> attribute set to true.
+						When all data has been read from the <a>ByteStream</a> on which writeClose() has been called, i.e. <a href="#eof-reached">EOF is reached</a>, it resolves the Promise returned by read() with a <a>ByteStreamReadResult</a> with the <a href="#widl-ByteStreamReadResult-eof">eof</a> attribute set to true.
 						The user agent must run the steps below:
 					</p>
 
@@ -1229,7 +1227,7 @@ enum XMLHttpRequestResponseType {
 					<p>
 						Let the <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html#request-entity-body">request entity body</a> be the raw data represented by <var>data</var>.
 					</p>
-					<p>Once the read is completed for the request, call <a href="#widl-ByteStream-close-void">close()</a> on the stream</p>
+					<p>Once the read is completed for the request, call <a href="#widl-ByteStream-close-void">writeClose()</a> on the stream</p>
 				</dd>
 			</dl>
 		</section>
