@@ -134,7 +134,7 @@ var respecConfig = {
 				A <a>ByteStream</a> interface which represents a byte sequence which can be read only once and provides APIs for building it, writing data to it, reading and piping data from it.
 			</li>
 			<li>
-				A <a>ByteStreamConsumeResult</a> interface which represents the result of consuming operations such as reading and piping.
+				A <a>ByteStreamReadResult</a> interface which represents the result of consuming operations such as reading and piping.
 				It holds a chunk of content read from a stream, the number of bytes consumed, and EOF signal.
 			</li>
 			<li>
@@ -179,7 +179,7 @@ var respecConfig = {
 		<p>
 			The <a>ReadableByteStream</a> interface defines a protocol for data producing APIs to communicate with other data consuming APIs or code.
 			It provides a <code>read</code> method for reading data
-			from a <a>ReadableByteStream</a> as a <a>ByteStreamConsumeResult</a>, which provides the data as a <a>Blob</a>, <a>ArrayBufferView</a>, or <a>DOMString</a>,
+			from a <a>ReadableByteStream</a> as a <a>ByteStreamReadResult</a>, which provides the data as a <a>Blob</a>, <a>ArrayBufferView</a>, or <a>DOMString</a>,
 			and should happen asynchronously on the user agent’s main thread. Additionally, the stream can also be used in API <a href="#consumers">consumers</a> such as a media element.
 		</p>
 
@@ -433,7 +433,7 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 				</section>
 			</dd>
 
-			<dt>ByteStreamConsumeResult readExact()</dt>
+			<dt>ByteStreamReadResult readExact()</dt>
 			<dd>
 				<p>
 					The same as <code>read()</code> except for the following points:
@@ -451,7 +451,7 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 				</dl>
 			</dd>
 
-			<dt>ByteStreamConsumeResult read()</dt>
+			<dt>ByteStreamReadResult read()</dt>
 			<dd>
 				<p>
 					This method reads data from the ReadableByteStream.
@@ -470,7 +470,7 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 						<dt>If <a>the EOF is reached</a></dt>
 						<dd>
 							<ol>
-								<li>Let <var>result</var> be a <a>ByteStreamConsumeResult</a>.</li>
+								<li>Let <var>result</var> be a <a>ByteStreamReadResult</a>.</li>
 								<li>Set eof attribute of <var>result</var> to <code>true</code>.</li>
 								<li>Return <var>result</var>.</li>
 							</ol>
@@ -478,7 +478,7 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 						<dt>Otherwise</dt>
 						<dd>
 							<ol>
-								<li>Let <var>result</var> be a <a>ByteStreamConsumeResult</a>.</li>
+								<li>Let <var>result</var> be a <a>ByteStreamReadResult</a>.</li>
 								<li>Set eof attribute of <var>result</var> to <code>false</code>.</li>
 								<li>
 									<dl class="switch">
@@ -500,7 +500,7 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 												<li>Let <var>readPromise</var> be a <a>Promise</a>.</li>
 												<li>Set data attribute of <var>result</var> to <var>readPromise</var>.</li>
 												<li>Return <var>result</var>.</li>
-												<li>When data becomes available for read, rerun this algorithm to create a <a>ByteStreamConsumeResult</a> and fulfill <var>readPromise</var> with it.</li>
+												<li>When data becomes available for read, rerun this algorithm to create a <a>ByteStreamReadResult</a> and fulfill <var>readPromise</var> with it.</li>
 											</ol>
 										</dd>
 									</dl>
@@ -516,7 +516,7 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 				</dl>
 			</dd>
 
-			<dt>ByteStreamConsumeResult pipe()</dt>
+			<dt>ByteStreamReadResult pipe()</dt>
 			<dd>
 				<p>
 					This method transfers bytes from the ReadableByteStream to a <a>WritableByteStream</a>.
@@ -706,7 +706,7 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 				<dt>Promise close()</dt>
 				<dd>
 					<p>
-						When all data has been read from the <a>ByteStream</a> on which close() has been called, i.e. <a href="#eof-reached">EOF is reached</a>, it resolves the Promise returned by read() with a <a>ByteStreamConsumeResult</a> with the <a href="#widl-ByteStreamConsumeResult-eof">eof</a> attribute set to true.
+						When all data has been read from the <a>ByteStream</a> on which close() has been called, i.e. <a href="#eof-reached">EOF is reached</a>, it resolves the Promise returned by read() with a <a>ByteStreamReadResult</a> with the <a href="#widl-ByteStreamReadResult-eof">eof</a> attribute set to true.
 						The user agent must run the steps below:
 					</p>
 
@@ -797,16 +797,16 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 							If an error has occurred during reading, neuter the <a>ByteStream</a>, let <code>exception</code> be an "<code><a>InvalidStateError</a></code>" [[!DOM4]] exception and run <code>Reject(<code>readPromise</code>, <code>exception</code>)</code> as specified in the promises spec and terminate these steps.
 						</li>
 						<li>
-							Let <code>result</code> be a newly created <a>ByteStreamConsumeResult</a>.
+							Let <code>result</code> be a newly created <a>ByteStreamReadResult</a>.
 						</li>
 						<li>
-							If EOF is reached, set the <a href="#widl-ByteStreamConsumeResult-eof">eof</a> attribute of <code>result</code> to true.
+							If EOF is reached, set the <a href="#widl-ByteStreamReadResult-eof">eof</a> attribute of <code>result</code> to true.
 						</li>
 						<li>
-							Otherwise, set the <a href="#widl-ByteStreamConsumeResult-eof">eof</a> attribute of <code>result</code> to false.
+							Otherwise, set the <a href="#widl-ByteStreamReadResult-eof">eof</a> attribute of <code>result</code> to false.
 						</li>
 						<li>
-							Set the <a href="#widl-ByteStreamConsumeResult-eof">data</a> attribute of <code>result</code> to the result of executing the steps below.
+							Set the <a href="#widl-ByteStreamReadResult-eof">data</a> attribute of <code>result</code> to the result of executing the steps below.
 							<dl class="switch">
 								<dt>If <a href="#widl-ByteStream-readType">readType</a> is the empty string or "<code title>text</code>"</dt>
 								<dd>
@@ -889,16 +889,16 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 								Once read and write are both completed for all destination streams, run the following algorithm:
 								<ol>
 									<li>
-										Let <code>result</code> be a newly created <a>ByteStreamConsumeResult</a> object.
+										Let <code>result</code> be a newly created <a>ByteStreamReadResult</a> object.
 									</li>
 									<li>
-										If <a href="#eof-reached">EOF is reached</a>, set <a href="#widl-ByteStreamConsumeResult-eof">eof</a> attribute of <code>result</code> to true.
+										If <a href="#eof-reached">EOF is reached</a>, set <a href="#widl-ByteStreamReadResult-eof">eof</a> attribute of <code>result</code> to true.
 									</li>
 									<li>
-										Otherwise, set <a href="#widl-ByteStreamConsumeResult-eof">eof</a> attribute of <code>result</code> set to false.
+										Otherwise, set <a href="#widl-ByteStreamReadResult-eof">eof</a> attribute of <code>result</code> set to false.
 									</li>
 									<li>
-										Set <a href="#widl-ByteStreamConsumeResult-size">size</a> attribute of <code>result</code> to the total size of the read data.
+										Set <a href="#widl-ByteStreamReadResult-size">size</a> attribute of <code>result</code> to the total size of the read data.
 									</li>
 									<li>
 										Unset the <a>read pending flag</a> and run <code>Resolve(<code>readPromise</code>, <code>result</code>)</code> as specified in the promises spec.
@@ -918,17 +918,13 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 		</section>
 
 		<section class="section" id="streamConsumeResult-interface">
-			<h2>ByteStreamConsumeResult Interface</h2>
+			<h2>ByteStreamReadResult Interface</h2>
 
 			<p>
-				ByteStreamConsumeResult represents the result of read() or pipe() method call.
+				ByteStreamReadResult represents the result of read() or pipe() method call.
 			</p>
 
-			<p>
-				It's named as ByteStreamConsumeResult to avoid confusion since it's used for both read() and pipe().
-			</p>
-
-			<dl class="idl" title="interface ByteStreamConsumeResult">
+			<dl class="idl" title="interface ByteStreamReadResult">
 				<dt>readonly attribute boolean eof</dt>
 				<dd>specifies if the given read resulted in an EOF for the <a>ByteStream</a></dd>
 				<dt>readonly attribute any data</dt>
