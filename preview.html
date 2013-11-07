@@ -294,6 +294,48 @@ document.getElementById('audioTag').src = streamURL;
 writeData();</pre>
 	</section>
 
+	<section class="section" id="model">
+		<h2>Data source model</h2>
+
+		<p>
+			Interfaces introduced in the later section provides simple and convenient way to consume data.
+			They connect a raw sequence of bytes to with JavaScript world using Promises and method invocations.
+			Before describing them, here, we'll describe the model of data source which provides to be consumed via the interfaces.
+			To allow multiple consumers, we should do some reference counting on the data source.
+			The algorithm below allows for it.
+		</p>
+
+		<pre>
+function DataSource() {
+  this.data = new Deque([]);
+  // SortedList keeps elements sorted in accending order based
+  // on value.
+  this.sortedReaderPositions = new SortedMap([{key: 0, value: 0}]);
+  // Holds the number of bytes consumed and freed from data.
+  this.bytesConsumed = 0;
+}
+
+DataSource.prototype.read = function(long readerId, unsigned long long amount) {
+  // Calculate offset in data.
+  var startOffset = this.sortedReaderPositions.getAndRemove(readerId) - bytesConsumed;
+
+  var result = this.data.slice(startOffset, amount);
+
+  this.sortedReaderPosisions.put(readerId, end);
+
+  // Free bytes consumed by all readers.
+  var newBytesConsumed = this.sortedReaderPosisions.lastValue();
+  this.data.pop(newBytesConsumed - this.bytesConsumed);
+  this.bytesConsumed = newBytesConsumed;
+
+  return result;
+};</pre>
+
+    <p>
+			When substream() is called, a new reader is registered to the original <a>ReadableByteStream</a>'s data source and the new <a>ReadableByteStream</a> uses read() method to fetch data from it.
+    </p>
+	</section>
+
 	<section class="section" id="writableByteStream">
 		<h2>WritableByteStream interface</h2>
 
@@ -1237,6 +1279,7 @@ enum XMLHttpRequestResponseType {
 			Jonas Sicking,
 			Kenneth Russell,
 			Yusuke Suzuki,
+			Yutaka Hirano,
 			Adrian Bateman
 			for their contributions to this specification.
 		</p>
