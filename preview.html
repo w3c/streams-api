@@ -553,10 +553,47 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 				</p>
 			</dd>
 		</dl>
+	</section>
 
+	<section class="section">
+		<h2>ByteStreamReadResult Interface</h2>
+
+		<p>
+			This interface represents the result of methods on <a>ReadableByteStream</a>.
+		</p>
+
+		<dl class="idl" title="interface ByteStreamReadResult">
+			<dt>readonly attribute boolean eof</dt>
+			<dd>specifies if the given read resulted in an EOF</dd>
+			<dt>readonly attribute any data</dt>
+			<dd>The resulting contents of the read request possibly a <a>Promise</a> when it's done asynchronously</dd>
+			<dt>readonly attribute unsigned long long size</dt>
+			<dd>The size, in bytes, of the data read</dd>
+		</dl>
+	</section>
+
+	<section class="section">
+		<h2>ByteStreamReadType enum</h2>
+
+		<p>
+			Data can be read as various data types from <a>ReadableByteStream</a>.
+			This enum defines <a>DOMString</a> values to specify the data types.
+		</p>
+
+		<dl class="idl" title="enum ByteStreamReadType">
+			<dt>blob</dt>
+			<dd>Read operations should return data as a Blob</dd>
+			<dt>arraybuffer</dt>
+			<dd>Read operations should return data as an ArrayBuffer</dd>
+			<dt>text</dt>
+			<dd>Read operations should return data as a DOMString</dd>
+			<dt>none</dt>
+			<dd>
+				Read operations should return nothing.
+				Useful for seeking data by skipping some amount of data.
+				User agents may implement some optimization for "<code>none</code>" type read for example omitting internal data transfer.
 			</dd>
 		</dl>
-
 	</section>
 
 	<section class="section" id="streams">
@@ -912,45 +949,6 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 						</dl>
 					</p>
 				</dd>
-			</dl>
-		</section>
-
-		<section class="section" id="streamConsumeResult-interface">
-			<h2>ByteStreamReadResult Interface</h2>
-
-			<p>
-				ByteStreamReadResult represents the result of read() or pipe() method call.
-			</p>
-
-			<dl class="idl" title="interface ByteStreamReadResult">
-				<dt>readonly attribute boolean eof</dt>
-				<dd>specifies if the given read resulted in an EOF for the <a>ByteStream</a></dd>
-				<dt>readonly attribute any data</dt>
-				<dd>The contents of the read request</dd>
-				<dt>readonly attribute unsigned long long size</dt>
-				<dd>The size, in bytes, of the data read</dd>
-			</dl>
-		</section>
-
-		<section class="section" id="streamReadType-interface">
-			<h2>ByteStreamReadType enum</h2>
-
-			<p>
-				Data can be read as various data types from ReadableByteStream.
-				The ByteStreamReadType enum defines DOMString values to specify the data types.
-				"<code>none</code>" is useful when seeking data by skipping some amount of data.
-				User agents may implement some optimization for "<code>none</code>" type read for example omitting internal data transfer.
-			</p>
-
-			<dl class="idl" title="enum ByteStreamReadType">
-				<dt>blob</dt>
-				<dd>Read operations should return data as a Blob</dd>
-				<dt>arraybuffer</dt>
-				<dd>Read operations should return data as an ArrayBuffer</dd>
-				<dt>text</dt>
-				<dd>Read operations should return data as a DOMString</dd>
-				<dt>none</dt>
-				<dd>Read operations should return nothing</dd>
 			</dl>
 		</section>
 
