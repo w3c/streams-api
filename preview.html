@@ -467,7 +467,8 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 					The same as <code>read()</code> except for the following points:
 
 					<ol>
-						<li>waits until bytes of the specified number become readable</li>
+						<li>Returns data synchronously only when bytes of the specified number are synchronously readable</li>
+						<li>Fulfills the Promise only when EOF is reached or bytes of the specified number become readable</li>
 						<li><code>readType</code> must be one of "<code>arraybuffer</code>", "<code>blob</code>" and "<code>none</code>"</li>
 						<li>size parameter is not omittable</li>
 					</ol>
