@@ -710,8 +710,9 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 					</p>
 
 					<p>
-						NEEDS CLEANUP
+						NEEDS TO BE UPDATED
 
+						<s>
 						<ol>
 							<li>
 								If the <a>ByteStream</a> has been neutered, throw an "<code><a>InvalidStateError</a></code>" [[!DOM4]] exception and terminate these steps.
@@ -754,7 +755,7 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 								Once all bytes are written, remove the write() from <a>write pending queue</a> and run <code>Resolve(<code>writePromise</code>, <code>undefined</code>)</code> as specified in the promises spec.
 								Implementations may delay this step if appropriate.
 							</li>
-						</ol>
+						</ol></s>
 					</p>
 					<p>
 						Note that completion of write() doesn't necessarily mean that the data written to the Stream has been successfully read.
@@ -775,6 +776,11 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 						The user agent must run the steps below:
 					</p>
 
+					<p>
+						NEEDS TO BE UPDATED
+					</p>
+
+					<s>
 					<ol>
 						<li>
 							If the <a>ByteStream</a> has been neutered, throw an "<code><a>InvalidStateError</a></code>" [[!DOM4]] exception and terminate these steps.
@@ -797,7 +803,7 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 						<li>
 							If an error has occurred during writing a stream termination, neuter the <a>ByteStream</a> and terminate these steps.
 						</li>
-					</ol>
+					</ol></s>
 				</dd>
 
 				<dt>readonly attribute DOMString type</dt>
@@ -826,9 +832,10 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 				<dt>ByteStreamReadResult read()</dt>
 				<dd>
 					<p>
-						NEED CLEANUP
+						NEEDS TO BE UPDATED
 					</p>
 
+					<s>
 					<p>
 						This method reads data from the <a>ByteStream</a>.
 						This method takes an optional <var>size</var> argument which represents the number of bytes to be read.
@@ -904,6 +911,7 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 							Unset the <a>read pending flag</a> and run <code>Resolve(<code>readPromise</code>, <code>result</code>)</code> as specified in the promises spec.
 						</li>
 					</ol>
+					</s>
 
 					<dl class="parameters">
 						<dt>optional [Clamp] unsigned long long size</dt>
@@ -914,9 +922,10 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 				<dt>ByteStreamReadResult pipe()</dt>
 				<dd>
 					<p>
-						NEEDS CLEANUP
+						NEEDS TO BE UPDATED
 					</p>
 
+					<s>
 					<p>
 						This method transfers data from the <a>ByteStream</a> to another Stream.
 						This method takes a <code>destinations</code> and optionally a <code>size</code>.
@@ -985,7 +994,7 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 							<dt>optional [Clamp] unsigned long long size</dt>
 							<dd>Number of bytes to transfer.</dd>
 						</dl>
-					</p>
+					</p></s>
 				</dd>
 
 				<dt>ReadableByteStream fork()</dt>
