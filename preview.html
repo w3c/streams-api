@@ -441,15 +441,15 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 		</p>
 
 		<p>
-			ReadableByteStream interface has an associated <a>data source</a>.
-			ReadableByteStream is given a reader ID for the <a>data source</a> on construction.
+			ReadableByteStream interface has an associated internal <a href="#h2_data_source">data source</a>.
+			ReadableByteStream is given a reader ID for the <a href="#h2_data_source">data source</a> on construction.
 		</p>
 
 		<p>
 			ReadableByteStream interface has associated integer variables <dfn>outputLimit</dfn>, <dfn>readExactPullAmount</dfn>, <dfn>pipePullAmount</dfn> and <dfn>lastFulfillAmount</dfn>.
 		</p>
 		<p>
-			<a>outputLimit</a> is determined by <code>max(max(<a href="#widl-ReadableByteStream-pullAmount">pullAmount</a>, <a>readExactPullAmount</a>, <a>pipePullAmount) - lastFulfillAmount, 0)</code>.
+			<a>outputLimit</a> is determined by <code>max(max(<a href="#widl-ReadableByteStream-pullAmount">pullAmount</a>, <a>readExactPullAmount</a>, <a>pipePullAmount</a>) - <a>lastFulfillAmount</a>, 0)</code>.
 			Interpretation of <a>outputLimit</a> is up to each implementation of ReadableByteStream.
 
 			<section class="note">
@@ -466,6 +466,10 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 			<a>lastFulfillAmount</a> is initialized to 0 by default on construction.
 			lastFulfillAmount is set to the number of bytes used to fulfill the returned Promise of <code>read()</code> and <code>readExact()</code> method call on fulfillment, or bytes being transferred to the destination WritableByteStream by <code>pipe()</code> but not yet acknowledged.
 			lastFulfillAmount is set to 0 at the beginning of <code>read()</code> and <code>readExact()</code> method call, or bytes trasnferred by <code>pipe()</code> are acknowledged.
+
+			<section class="note">
+				Using this attribute, ReadableByteStream delays replenishment of outputLimit until the next read/pipe operation.
+			</section>
 		</p>
 
 		<dl class="idl" title="interface ReadableByteStream">
@@ -495,6 +499,10 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 					This attribute is used to compute <a>outputLimit</a> to tell the ReadableByteStream a hint how many bytes the reader can consume currently.
 					Each implementation of ReadableByteStream must define how to determine the initial value of pullAmount and set it to the value on construction.
 				</p>
+
+				<section class="note">
+					This flow control functionality is provided as a separated attribute rather than as an argument of the read() method based on assumption that most people don't change the value so frequently.
+				</section>
 			</dd>
 
 			<dt>Promise&amp;lt;ByteStreamReadResult&gt; readExact()</dt>
@@ -568,7 +576,7 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 								<dd>
 									<ol>
 										<li>
-											Wait until bytes become available for read which will be converted into a non-empty <a>DOMString</a> when decoded using <var>latchedEncoding</var>, or <a>the EOF is reached</a>
+											Wait until bytes become available for read where the first <a href="#widl-ReadableByteStream-pullAmount">pullAmount</a> or less bytes can be converted into a non-empty <a>DOMString</a> when decoded using <var>latchedEncoding</var>, or <a>the EOF is reached</a>
 										</li>
 										<li>
 											If <a>the EOF is reached</a>, let <var>readBytes</var> be all bytes until EOF.
@@ -617,7 +625,7 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 				</p>
 
 				<section class="note">
-					Note that fulfillment or rejection of the returned Promise doesn't necessarily mean that the data transferred to the destination <a>WritableByteStream</a> has been successfully read from it.
+					Fulfillment of the returned Promise doesn't necessarily mean that the data transferred to the destination <a>WritableByteStream</a> has been successfully read from it.
 				</section>
 
 				<p>
@@ -640,13 +648,13 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 								<li>Let <var>bytesWritable</var> be the number and update <a>pipePullAmount</a> to <code>min(<var>bytesRemaining</var>, <var>bytesWritable</var>)</code></li>
 								<li>Set <a>lastFulfillAmount</a> to 0</li>
 								<li>Wait until non-zero number of bytes become avalable for read, or <a>the EOF is reached</a></li>
-								<li>Transfer the bytes up to <var>bytesRemaining</var> to destination</li>
-								<li>Let <var>bytesTransferred</var> be the size of the bytes</li>
+								<li>Transfer the bytes up to <a>pipePullAmount</a> to destination</li>
+								<li>Let <var>bytesTransferred</var> be the size of the transferred bytes</li>
 								<li>Update <var>totalBytesTransferred</var> to <var>totalBytesTransferred</var> + <var>bytesTransferred</var></li>
 								<li>Update <var>bytesRemaining</var> to <var>bytesRemaining</var> - <var>bytesTransferred</var></li>
 								<li>Set <a>lastFulfillAmount</a> to <var>bytesTransferred</var></li>
 								<li>Advance the read cursor of this ReadableByteStream on the associated internal data source by <var>bytesTransferred</var></li>
-								<li>Break when <a>the EOF is reached</a> or bytesRemaining is 0</li>
+								<li>Break when <a>the EOF is reached</a> or <var>bytesRemaining</var> is 0</li>
 							</ol>
 						</li>
 
@@ -655,7 +663,12 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 						<li>Set <a href="#widl-ByteStreamReadResult-data">data</a> attribute of <var>result</var> to <var>readData</var> to <code>undefined</code>.
 						<li>Set <a href="#widl-ByteStreamReadResult-eof">eof</a> attribute of <var>result</var> to <code>true</code> if <a>the EOF is reached</a></li>
 						<li>Set <a href="#widl-ByteStreamReadResult-size">size</a> attribute of <var>result</var> to <var>totalBytesTransferred</var></li>
-						<li>Fulfill <var>readPromise</var> with <var>result</var></li>
+						<li>
+							Fulfill <var>readPromise</var> with <var>result</var>
+							<section class="note">
+								At his point, <a>lastFulfillAmount</a> is not yet reset
+							</section>
+						</li>
 					</ol>
 				</p>
 
