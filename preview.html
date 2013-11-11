@@ -568,9 +568,12 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 								<dd>
 									<ol>
 										<li>
-											Wait until bytes become available for read which will be converted into non-empty <a>DOMString</a> when decoded using <var>latchedEncoding</var>, or <a>the EOF is reached</a>
+											Wait until bytes become available for read which will be converted into a non-empty <a>DOMString</a> when decoded using <var>latchedEncoding</var>, or <a>the EOF is reached</a>
 										</li>
-										<li>If <a>the EOF is reached</a>, let <var>readBytes</var> be all bytes until EOF if <a>the EOF is reached</a>. Otherwise, let <var>readBytes</var> be the bytes which will be converted into non-empty <a>DOMString</a></li>
+										<li>
+											If <a>the EOF is reached</a>, let <var>readBytes</var> be all bytes until EOF.
+											Otherwise, let <var>readBytes</var> be the bytes which can be converted into a non-empty <a>DOMString</a>.
+										</li>
 										<li>Let <var>readData</var> be the result of decoding the bytes using <var>latchedEncoding</var></li>
 									</ol>
 								</dd>
@@ -578,8 +581,11 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 								<dd>
 									<ol>
 										<li>Wait until non-zero number of bytes become avalable for read, or <a>the EOF is reached</a></li>
-										<li>If <a>the EOF is reached</a>, let <var>readBytes</var> be all bytes until EOF if <a>the EOF is reached</a>. Otherwise, let <var>readBytes</var> be the readable bytes</a></li>
-										<li>Let <var>readData</var> be an object of the type specified by <var>latchedType</var> which represents the bytes</li>
+										<li>
+											If <a>the EOF is reached</a>, let <var>readBytes</var> be all bytes until EOF.
+											Otherwise, let <var>readBytes</var> be the readable bytes
+										</li>
+										<li>Let <var>readData</var> be an object of the type specified by <var>latchedType</var> which represents <var>readBytes</var></li>
 									</ol>
 								</dd>
 							</dl>
