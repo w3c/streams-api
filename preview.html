@@ -360,7 +360,7 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 };</pre>
 
     <p>
-			When <a href="#widl-ReadableByteStream-fork-ReadableByteStream--Clamp--unsigned-long-long-size">fork()</a> is called, a new reader is registered to the original <a>ReadableByteStream</a>'s data source and the new <a>ReadableByteStream</a> uses read() method to fetch data from it.
+			When <a href="#widl-ReadableByteStream-fork-ReadableByteStream">fork()</a> is called, a new reader is registered to the original <a>ReadableByteStream</a>'s data source and the new <a>ReadableByteStream</a> uses read() method to fetch data from it.
     </p>
 	</section>
 
@@ -434,10 +434,38 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 			<ol>
 				<li>How to receive a read request from the reader and output byte stream.</li>
 				<li>How to transfer bulk data to other <a>WritableByteStream</a> (by <code>pipe()</code> method)</li>
-				<li>How to mirror data to multiple destination <a>WritableByteStream</a>s (by <code>fork()</code> method)</li>
+				<li>How to mirror data to multiple destination <a>WritableByteStream</a>s (by <code>fork()</code> and <code>pipe()</code> method)</li>
 			</ol>
 
-			By returning a Promise and delaying fulfillment of it, the ReadableByteStream realizes asynchronous data consumption.
+			By returning a <a>Promise</a> and delaying fulfillment of it, the ReadableByteStream realizes asynchronous data consumption.
+		</p>
+
+		<p>
+			ReadableByteStream interface has an associated <a>data source</a>.
+			ReadableByteStream is given a reader ID for the <a>data source</a> on construction.
+		</p>
+
+		<p>
+			ReadableByteStream interface has associated integer variables <dfn>outputLimit</dfn>, <dfn>readExactPullAmount</dfn>, <dfn>pipePullAmount</dfn> and <dfn>lastFulfillAmount</dfn>.
+		</p>
+		<p>
+			<a>outputLimit</a> is determined by <code>max(max(<a href="#widl-ReadableByteStream-pullAmount">pullAmount</a>, <a>readExactPullAmount</a>, <a>pipePullAmount) - lastFulfillAmount, 0)</code>.
+			Interpretation of <a>outputLimit</a> is up to each implementation of ReadableByteStream.
+
+			<section class="note">
+				outputLimit typically limits the size of buffer.
+			</section>
+		</p>
+		<p>
+			<a>readExactPullAmount</a> is initialized to 0 by default on construction.
+		</p>
+		<p>
+			<a>pipePullAmount</a> is initialized to 0 by default on construction.
+		</p>
+		<p>
+			<a>lastFulfillAmount</a> is initialized to 0 by default on construction.
+			lastFulfillAmount is set to the number of bytes used to fulfill the returned Promise of <code>read()</code> and <code>readExact()</code> method call on fulfillment, or bytes being transferred to the destination WritableByteStream by <code>pipe()</code> but not yet acknowledged.
+			lastFulfillAmount is set to 0 at the beginning of <code>read()</code> and <code>readExact()</code> method call, or bytes trasnferred by <code>pipe()</code> are acknowledged.
 		</p>
 
 		<dl class="idl" title="interface ReadableByteStream">
@@ -445,7 +473,7 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 			<dd>
 				<p>
 					Specifies as what type data will be read from the ReadableByteStream by a <code>read()</code> and <code>readExact()</code> method call.
-					This can be set to the empty <a>DOMString</a> (default), "<code>arraybuffer</code>", "<code>blob</code>", "<code>text</code>" or "<code>none</code>" to change the type of the read operation.
+					This attribute can be set to the empty <a>DOMString</a> (default), "<code>arraybuffer</code>", "<code>blob</code>", "<code>text</code>" or "<code>none</code>".
 				</p>
 			</dd>
 
@@ -461,16 +489,43 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 				</section>
 			</dd>
 
-			<dt>ByteStreamReadResult readExact()</dt>
+			<dt>attribute unsigned long long pullAmount</dt>
 			<dd>
 				<p>
-					The same as <code>read()</code> except for the following points:
+					This attribute is used to compute <a>outputLimit</a> to tell the ReadableByteStream a hint how many bytes the reader can consume currently.
+					Each implementation of ReadableByteStream must define how to determine the initial value of pullAmount and set it to the value on construction.
+				</p>
+			</dd>
 
+			<dt>Promise&amp;lt;ByteStreamReadResult&gt; readExact()</dt>
+			<dd>
+				<p>
 					<ol>
-						<li>Returns data synchronously only when bytes of the specified number are synchronously readable</li>
-						<li>Fulfills the Promise only when EOF is reached or bytes of the specified number become readable</li>
-						<li><code>readType</code> must be one of "<code>arraybuffer</code>", "<code>blob</code>" and "<code>none</code>"</li>
-						<li>size parameter is not omittable</li>
+						<li>If <a href="#widl-ReadableByteStream-readType">readType</a> is not any of "<code>arraybuffer</code>", "<code>blob</code>" and "<code>none</code>", throw a "<code><a>SyntaxError</a></code>"</li>
+						<li>Let <var>latchedType</var> be the current value of <a href="#widl-ReadableByteStream-readType">readType</a> attribute</li>
+						<li>Let <var>latchedEncoding</var> be the current value of <a href="#widl-ReadableByteStream-readEncoding">readEncoding</a> attribute</li>
+						<li>Set <a>readExactPullAmount</a> to <var>size</var></li>
+						<li>Set <a>lastFulfillAmount</a> to 0</li>
+						<li>Let <var>readPromise</var> be a <a>Promise</a></li>
+						<li>Return <var>readPromise</var> and continue to process the steps in this algorithm</li>
+						<li>Wait until bytes of the number specified by <var>size</var> argument become available for read or <a>the EOF is reached</a></li>
+						<li>If <a>the EOF is reached</a>, let <var>readBytes</var> be all bytes until EOF if <a>the EOF is reached</a>. Otherwise, let <var>readBytes</var> be the first <var>size</var> bytes of readable bytes</li>
+						<li>Let <var>bytesConsumed</var> be the size of <var>readBytes</var></li>
+						<li>Set <a>lastFulfillAmount</a> to <var>bytesConsumed</var></li>
+						<li>Set <a>readExactPullAmount</a> to 0</li>
+						<li>Advance the read cursor of this ReadableByteStream on the associated internal data source by <var>bytesConsumed</var></li>
+						<li>Let <var>result</var> be a <a>ByteStreamReadResult</a></li>
+						<li>
+							If <var>latchedType</var> is "<code>none</code>", set <a href="#widl-ByteStreamReadResult-data">data</a> attribute of <var>result</var> to <var>readData</var> to <code>undefined</code>.
+							Otherwise, run these steps.
+							<ol>
+								<li>Let <var>readData</var> be the result of converting <var>readBytes</var> into an object of the type specified by <var>latchedType</var></li>
+								<li>Set <a href="#widl-ByteStreamReadResult-data">data</a> attribute of <var>result</var> to <var>readData</var></li>
+							</ol>
+						</li>
+						<li>Set <a href="#widl-ByteStreamReadResult-eof">eof</a> attribute of <var>result</var> to <code>true</code> if <a>the EOF is reached</a></li>
+						<li>Set <a href="#widl-ByteStreamReadResult-size">size</a> attribute of <var>result</var> to <var>bytesConsumed</var></li>
+						<li>Fulfill <var>readPromise</var> with <var>result</var></li>
 					</ol>
 				</p>
 
@@ -478,14 +533,21 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 					<dt>[Clamp] unsigned long long size</dt>
 					<dd>Number of bytes to read.</dd>
 				</dl>
+
+				<section class="note">
+					This method is useful if
+					<ol>
+						<li>You don't want to get notified of new data unless bytes of the specified number become available</li>
+						<li>You don't want to get result fragmented into multiple objects</li>
+					</ol>
+				</section>
 			</dd>
 
-			<dt>ByteStreamReadResult read()</dt>
+			<dt>Promise&amp;lt;ByteStreamReadResult&gt; read()</dt>
 			<dd>
 				<p>
 					This method reads data from the ReadableByteStream.
-					If there's no data synchronously readable, waits until any non-empty result can be read.
-					If <var>size</var> argument is specified, this method reads up to <var>size</var> bytes.
+					The returned Promise will be fulfilled when any non-empty result can be read or EOF is reached.
 				</p>
 
 				<p>
@@ -495,60 +557,57 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 				<p>
 					This method must run the steps below:
 
-					<dl class="switch">
-						<dt>If <a>the EOF is reached</a></dt>
-						<dd>
-							<ol>
-								<li>Let <var>result</var> be a <a>ByteStreamReadResult</a>.</li>
-								<li>Set eof attribute of <var>result</var> to <code>true</code>.</li>
-								<li>Return <var>result</var>.</li>
-							</ol>
-						</dd>
-						<dt>Otherwise</dt>
-						<dd>
-							<ol>
-								<li>Let <var>result</var> be a <a>ByteStreamReadResult</a>.</li>
-								<li>Set eof attribute of <var>result</var> to <code>false</code>.</li>
-								<li>
-									<dl class="switch">
-										<dt>There's any data available to be read synchronously (when readType is "<code>text</code>", also the data need to be decoded to non-empty <a>DOMString</a>)</dt>
-										<dd>
-											<ol>
-												<li>Set size attribute of <var>result</var> to the number of bytes consumed.</li>
-												<li>
-													Set data attribute of <var>result</var> to the read data.
-													If <var>size</var> argument was specified, convert only the first <var>size</var> bytes.
-												</li>
-												<li>Return <var>result</var>.
-											</ol>
-										</dd>
-										<dt>Otherwise</dt>
-										<dd>
-											<ol>
-												<li>Set size attribute of <var>result</var> to 0.</li>
-												<li>Let <var>readPromise</var> be a <a>Promise</a>.</li>
-												<li>Set data attribute of <var>result</var> to <var>readPromise</var>.</li>
-												<li>Return <var>result</var>.</li>
-												<li>When data becomes available for read, rerun this algorithm to create a <a>ByteStreamReadResult</a> and fulfill <var>readPromise</var> with it.</li>
-											</ol>
-										</dd>
-									</dl>
-								</li>
-							</ol>
-						</dd>
-					</dl>
+					<ol>
+						<li>Let <var>latchedType</var> be the current value of <a href="#widl-ReadableByteStream-readType">readType</a> attribute and <var>latchedEncoding</var> be the current value of <a href="#widl-ReadableByteStream-readEncoding">readEncoding</a> attribute</li>
+						<li>Set <a>lastFulfillAmount</a> to 0</li>
+						<li>Let <var>readPromise</var> be a <a>Promise</a></li>
+						<li>Return <var>readPromise</var> and continue to process the steps in this algorithm</li>
+						<li>
+							<dl class="switch">
+								<dt>If <var>latchedType</var> is "<code>text</code>"</dt>
+								<dd>
+									<ol>
+										<li>
+											Wait until bytes become available for read which will be converted into non-empty <a>DOMString</a> when decoded using <var>latchedEncoding</var>, or <a>the EOF is reached</a>
+										</li>
+										<li>If <a>the EOF is reached</a>, let <var>readBytes</var> be all bytes until EOF if <a>the EOF is reached</a>. Otherwise, let <var>readBytes</var> be the bytes which will be converted into non-empty <a>DOMString</a></li>
+										<li>Let <var>readData</var> be the result of decoding the bytes using <var>latchedEncoding</var></li>
+									</ol>
+								</dd>
+								<dt>Otherwise</dt>
+								<dd>
+									<ol>
+										<li>Wait until non-zero number of bytes become avalable for read, or <a>the EOF is reached</a></li>
+										<li>If <a>the EOF is reached</a>, let <var>readBytes</var> be all bytes until EOF if <a>the EOF is reached</a>. Otherwise, let <var>readBytes</var> be the readable bytes</a></li>
+										<li>Let <var>readData</var> be an object of the type specified by <var>latchedType</var> which represents the bytes</li>
+									</ol>
+								</dd>
+							</dl>
+						</li>
+						<li>Let <var>bytesConsumed</var> be the size of <var>readBytes</var></li>
+						<li>Set <a>lastFulfillAmount</a> to <var>bytesConsumed</var></li>
+						<li>Advance the read cursor of this ReadableByteStream on the associated internal data source by <var>bytesConsumed</var></li>
+						<li>Let <var>result</var> be a <a>ByteStreamReadResult</a>.</li>
+						<li>Set <a href="#widl-ByteStreamReadResult-data">data</a> attribute of <var>result</var> to <var>readData</var></li>
+						<li>Set <a href="#widl-ByteStreamReadResult-eof">eof</a> attribute of <var>result</var> to <code>true</code> if <a>the EOF is reached</a></li>
+						<li>Set <a href="#widl-ByteStreamReadResult-size">size</a> attribute of <var>result</var> to <var>bytesConsumed</var>.</li>
+						<li>Fulfill <var>readPromise</var> with <var>result</var></li>
+					</ol>
 				</p>
 
-				<dl class="parameters">
-					<dt>optional [Clamp] unsigned long long size</dt>
-					<dd>Number of bytes to read.</dd>
-				</dl>
+				<section class="note">
+					This method is useful if
+					<ol>
+						<li>You don't care in what size and as how many fragments the data will be received</li>
+						<li>You want to limit the number of bytes read for flow control</li>
+					</ol>
+				</section>
 			</dd>
 
 			<dt>ByteStreamReadResult pipe()</dt>
 			<dd>
 				<p>
-					This method transfers bytes from the ReadableByteStream to a <a>WritableByteStream</a>.
+					This method bulk transfers bytes from the ReadableByteStream to a <a>WritableByteStream</a>.
 				</p>
 
 				<section class="note">
@@ -557,6 +616,41 @@ DataSource.prototype.read = function(long readerId, unsigned long long amount) {
 
 				<p>
 					Another <code>read()</code>, <code>readExact()</code>, <code>pipe()</code> or <code>fork()</code> method call must not be made until this <code>pipe()</code> completes.
+				</p>
+
+				<p>
+					This method must run the steps below:
+
+					<ol>
+						<li>Let <var>bytesRemaining</var> be <var>size</var> argument if specified</li>
+						<li>Set <a>lastFulfillAmount</a> to 0</li>
+						<li>Let <var>pipePromise</var> be a <a>Promise</a></li>
+						<li>Return <var>pipePromise</var> and continue to process the steps in this algorithm</li>
+						<li>Let <var>totalBytesTransferred</var> be 0</li>
+						<li>
+							Repeat the steps below:
+							<ol>
+								<li>Wait until non-zero number of bytes can be written to destination</li>
+								<li>Let <var>bytesWritable</var> be the number and update <a>pipePullAmount</a> to <code>min(<var>bytesRemaining</var>, <var>bytesWritable</var>)</code></li>
+								<li>Set <a>lastFulfillAmount</a> to 0</li>
+								<li>Wait until non-zero number of bytes become avalable for read, or <a>the EOF is reached</a></li>
+								<li>Transfer the bytes up to <var>bytesRemaining</var> to destination</li>
+								<li>Let <var>bytesTransferred</var> be the size of the bytes</li>
+								<li>Update <var>totalBytesTransferred</var> to <var>totalBytesTransferred</var> + <var>bytesTransferred</var></li>
+								<li>Update <var>bytesRemaining</var> to <var>bytesRemaining</var> - <var>bytesTransferred</var></li>
+								<li>Set <a>lastFulfillAmount</a> to <var>bytesTransferred</var></li>
+								<li>Advance the read cursor of this ReadableByteStream on the associated internal data source by <var>bytesTransferred</var></li>
+								<li>Break when <a>the EOF is reached</a> or bytesRemaining is 0</li>
+							</ol>
+						</li>
+
+						<li>Set <a>pipePullAmount</a> to 0</li>
+						<li>Let <var>result</var> be a <a>ByteStreamReadResult</a></li>
+						<li>Set <a href="#widl-ByteStreamReadResult-data">data</a> attribute of <var>result</var> to <var>readData</var> to <code>undefined</code>.
+						<li>Set <a href="#widl-ByteStreamReadResult-eof">eof</a> attribute of <var>result</var> to <code>true</code> if <a>the EOF is reached</a></li>
+						<li>Set <a href="#widl-ByteStreamReadResult-size">size</a> attribute of <var>result</var> to <var>totalBytesTransferred</var></li>
+						<li>Fulfill <var>readPromise</var> with <var>result</var></li>
+					</ol>
 				</p>
 
 				<dl class="parameters">
@@ -1361,9 +1455,13 @@ enum XMLHttpRequestResponseType {
 			Austin William Wright,
 			Aymeric Vitte,
 			Domenic Denicola,
+			Elliott Sprehn,
 			Isaac Schlueter,
 			Jonas Sicking,
 			Kenneth Russell,
+			Kinuko Yasuda,
+			Michael Davidson,
+			Taiju Tsuiki,
 			Yusuke Suzuki,
 			Yutaka Hirano,
 			Adrian Bateman
