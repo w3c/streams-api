@@ -589,12 +589,12 @@ poll();</pre>
 				<li>Let <var>bytesReadable</var> be the number of bytes in <a>retrievedDataBuffer</a></li>
 				<li>Let <var>bytesToRetrieve</var> be max(max(<a href="#widl-ReadableByteStream-pullAmount">pullAmount</a>, <a>readExactPullAmount</a>, <a>pipePullAmount</a>) - (<var>bytesReadable</var> + <a>bytesBeingOutput</a>) - <a>bytesBeingRetrieved</a>, 0)</li>
 				<li>Set <a>bytesBeingRetrieved</a> to <a>bytesBeingRetrieved</a> + <var>bytesToRetrieve</var></li>
-				<li>Pull <var>bytesToRetrieve</var> more bytes from <a>dataSource</a> possibly asynchronously</li>
+				<li>Retrieve <var>bytesToRetrieve</var> more bytes from <a>dataSource</a> possibly asynchronously</li>
 			</ol>
 		</p>
 
 		<p>
-			When data arrives from <a>dataSource</a>, queue a task which runs the steps below:
+			When bytes arrive from <a>dataSource</a>, queue a task which runs the steps below:
 			<ol>
 				<li>Let <var>bytesRead</var> be the number of bytes arrived</li>
 				<li>Set <a>bytesBeingRetrieved</a> to <a>bytesBeingRetrieved</a> - <var>bytesRead</var></li>
@@ -603,7 +603,7 @@ poll();</pre>
 		</p>
 
 		<p>
-			When the EOF is reached on <a>dataSource</a>, set <a>eofReached</a>
+			When the EOF is reached on <a>dataSource</a>, set <a>eofReached</a>.
 		</p>
 
 		<section class="section">
