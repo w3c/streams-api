@@ -609,16 +609,16 @@ poll();</pre>
 		<section class="section">
 			<h3>ReadableByteStream interface</h3>
 
-			<dt>readonly attribute DOMString type</dt>
-			<dd>
-				Returns the ASCII-encoded string in lower case representing the media type of the <code>Stream</code>,
-				expressed as an RFC2046 MIME type [[!RFC2046]].
-				Conforming user agents SHOULD return the MIME type of the <code>Stream</code>, if it is known.
-				If conforming user agents cannot determine the media type of the <code>Stream</code>, they MUST return the empty string.
-				A string is a valid MIME type if it matches the media-type token defined in section 3.7 "Media Types" of RFC 2616 [[!HTTP11]].
-			</dd>
-
 			<dl class="idl" title="interface ReadableByteStream">
+				<dt>readonly attribute DOMString type</dt>
+				<dd>
+					Returns the ASCII-encoded string in lower case representing the media type of the <code>Stream</code>,
+					expressed as an RFC2046 MIME type [[!RFC2046]].
+					Conforming user agents SHOULD return the MIME type of the <code>Stream</code>, if it is known.
+					If conforming user agents cannot determine the media type of the <code>Stream</code>, they MUST return the empty string.
+					A string is a valid MIME type if it matches the media-type token defined in section 3.7 "Media Types" of RFC 2616 [[!HTTP11]].
+				</dd>
+
 				<dt>attribute ByteStreamReadType readType</dt>
 				<dd>
 					<p>
