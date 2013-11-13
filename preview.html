@@ -318,7 +318,12 @@ poll();</pre>
 			A data source from which <a>ReadableByteStream</a> retrieves bytes can be anything that:
 			<ol>
 				<li>Produce bytes</li>
-				<li>Can retrieval request for generation of bytes from <a>ReadableByteStream</a> and reply to it with newly produced bytes</li>
+				<li>
+					Receives retrieval request for generation of bytes from <a>ReadableByteStream</a> and reply to it with newly produced bytes.
+					Interpretation of the request is up to data sources.
+					Data sources may respond to retrieval requests with data larger than requested.
+					Data sources may produce bytes and send to <a>ReadableByteStream</a> unsolicitedly without receiving any retrieval request.
+				</li>
 			</ol>
 		</p>
 
@@ -346,7 +351,11 @@ poll();</pre>
 			A data sink to which <a>WritableByteStream</a> interface writes bytes can be anything that:
 			<ol>
 				<li>Accepts bytes</li>
-				<li>Can notify <a>WritableByteStream</a> of how much data the data sink can newly accept</li>
+				<li>
+					Can notify <a>WritableByteStream</a> of how much data the data sink can newly accept.
+					When and how to generate such notifications is up to data sinks.
+					Data sinks must be able to accept data more than it notified <a>WritableByteStream</a> of.
+				</li>
 			</ol>
 		</p>
 	</section>
@@ -577,6 +586,11 @@ poll();</pre>
 		<p>
 			An associated queue <dfn>retrievedDataBuffer</dfn> holds bytes retrieved from <a>dataSource</a>.
 			This queue is initialized to an empty queue on construction.
+			<section class="note">
+				Retrieved bytes can be queued in <a>retrievedDataBuffer</a> in any form.
+				For example, if bytes were retrieved as <a>ArrayBufferView</a> fragments, it's ok to store them as-is to avoid unnecessary copy.
+				If the object representing retrieved bytes is a DOMString, that should be accompanied with the encoding to use to decode it.
+			</section>
 		</p>
 
 		<p>
@@ -756,12 +770,8 @@ poll();</pre>
 												Wait until bytes in <a>retrievedDataBuffer</a> can be converted into a non-empty <a>DOMString</a> when decoded using <var>latchedEncoding</var> or <a>eofReached</a> is set
 											</li>
 											<li>
-												<dl class="switch">
-													<dt>If <a>eofReached</a> is set</dt>
-													<dd>Pop all bytes from <a>retrievedDataBuffer</a>, and then let <var>readBytes</var> be the popped bytes</dd>
-													<dt>Otherwise</dt>
-													<dd>Let <var>readBytes</var> be the longest bytes in <a>retrievedDataBuffer</a> which can be fully converted into a <a>DOMString</a> when decoded using <var>latchedEncoding</var></dd>
-												</dl>
+												Pop non-zero number of bytes from <a>retrievedDataBuffer</a> which can be fully converted into a non-empty <a>DOMString</a> when decoded using <var>latchedEncoding</var>, and then let <var>readBytes</var> be the result of the conversion.
+												If <a>eofReached</a> is set and there are no such bytes, reject <var>readPromise</var> and terminate these steps.
 											</li>
 											<li>Let <var>readData</var> be the result of decoding <var>readBytes</var> using <var>latchedEncoding</var></li>
 										</ol>
@@ -770,7 +780,12 @@ poll();</pre>
 									<dd>
 										<ol>
 											<li>Wait until <a>retrievedDataBuffer</a> becomes non-empty or <a>eofReached</a> is set</li>
-											<li>Pop all bytes from <a>retrievedDataBuffer</a>, and then let <var>readBytes</var> be the popped bytes</li>
+											<li>
+												Pop non-zero number of bytes from <a>retrievedDataBuffer</a>, and then let <var>readBytes</var> be the popped bytes
+												<section class="note">
+													Implementations may choose to pop only part of bytes readable if it helps reducing memory copy.
+												</section>
+											</li>
 											<li>
 												<dl class="switch">
 													<dt>If <var>latchedType</var> is "<code>none</code>"</dt>
@@ -790,7 +805,7 @@ poll();</pre>
 
 							<li>Let <var>result</var> be a new <a>ByteStreamReadResult</a>.</li>
 							<li>Set <a href="#widl-ByteStreamReadResult-data">data</a> of <var>result</var> to <var>readData</var></li>
-							<li>Set <a href="#widl-ByteStreamReadResult-eof">eof</a> of <var>result</var> to <a>eofReached</a></li>
+							<li>Set <a href="#widl-ByteStreamReadResult-eof">eof</a> of <var>result</var> to <code>true</code> if <a>retrievedDataBuffer</a> is empty and <a>eofReached</a> is set</li>
 							<li>Set <a href="#widl-ByteStreamReadResult-size">size</a> of <var>result</var> to <var>bytesConsumed</var>.</li>
 							<li>Fulfill <var>readPromise</var> with <var>result</var></li>
 						</ol>
@@ -987,22 +1002,22 @@ poll();</pre>
 			</p>
 
 			<p>
-				A ByteStream has an associated <dfn>bufferQueue</dfn>.
+				A ByteStream has an associated <dfn>bufferedDataQueue</dfn>.
 				The buffer can be stored in memory or backed by slower devices such as a disk.
 			</p>
 
 			<p>
 				The ByteStream inherits the <a>WritableByteStream</a> interface.
-				Its <a>dataSink</a> is <a>bufferQueue</a> wrapped with a <a>dataSourceWrapper</a>.
+				Its <a>dataSink</a> is <a>bufferedDataQueue</a> wrapped with a <a>dataSourceWrapper</a>.
 			</p>
 
 			<p>
 				The ByteStream inherits the <a>ReadableByteStream</a> interface.
-				Its <a>dataSource</a> is <a>bufferQueue</a>.
+				Its <a>dataSource</a> is also <a>bufferedDataQueue</a>.
 			</p>
 
 			<p>
-				<a>bufferQueue</a> just forwards retrieval requests coming from the <a>WritableByteStream</a> to the <a>ReadableByteStream</a> as a notification of the number of newly acceptable bytes with the same amount.
+				<a>bufferedDataQueue</a> just forwards retrieval requests coming from the <a>dataSourceWrapper</a> to the <a>WritableByteStream</a> as a notification of the number of newly acceptable bytes with the same amount.
 			</p>
 
 			<dl class="idl" title="interface ByteStream : ReadableByteStream, WritableByteStream">
