@@ -167,38 +167,48 @@ var respecConfig = {
 		<h2>Introduction</h2>
 
 		<p>
-			Web applications should have the ability to acquire and manipulate data in a wide variety of forms, including as a sequence of data made available over time.
-			This specification defines the basic representation for byte streams, and programmatic ways to create, read, and write to byte streams and errors raised on those operations.
+			Web applications should have the ability to acquire, manipulate and pass data in a wide variety of forms, including as a sequence of data made available over time.
+			This specification defines the basic representation for byte streams, and programmatic ways to read and write byte streams and errors raised on those operations.
 		</p>
 
 		<p>
-			The <a>WritableByteStream</a> interface defines a protocol for data consuming APIs to communicate with other data producing APIs or code.
-			It provides a <code>write</code> method for writing data to a <a>WritableByteStream</a> as a <a>Blob</a>, <a>ArrayBufferView</a>, or <a>DOMString</a>, and should happen asynchronously on the user agent’s main thread.
+			The <a>WritableByteStream</a> interface defines a general protocol to communicate with data producing code for <a href="#consumers">data consuming APIs</a>.
+			Data producing code writes data to the data sink inside a data consuming API using:
+			<ul>
+				<li><code>write()</code> method for writing bytes to the data sink as a <a>ArrayBufferView</a>, <a>DOMString</a> or <a>Blob</a></li>
+				<li><code>waitForWritable()</code> method for waiting for the consumer requests for bytes and then producing and writing data</li>
+			</ul>
+			Actual transfer of bytes to the data sink may happen either synchronously or asynchronously.
+			<a>WritableByteStream</a> hides details of actual communication with the data sink while allowing for efficient transfer of bytes.
 		</p>
 
 		<p>
-			The <a>ReadableByteStream</a> interface defines a protocol for data producing APIs to communicate with other data consuming APIs or code.
-			It provides a <code>read</code> method for reading data
-			from a <a>ReadableByteStream</a> as a <a>ByteStreamReadResult</a>, which provides the data as a <a>Blob</a>, <a>ArrayBufferView</a>, or <a>DOMString</a>,
-			and should happen asynchronously on the user agent’s main thread. Additionally, the stream can also be used in API <a href="#consumers">consumers</a> such as a media element.
+			The <a>ReadableByteStream</a> interface defines a general protocol to communicate with data consuming code for <a href="#producers">data producing APIs</a>.
+			This interface represents possibly infinite byte streams which are obtained over time and read once.
+			Data consuming code reads data from the data source inside a data producing API using:
+			<ul>
+				<li><code>read()</code> method for reading bytes from the data source as a <a>ArrayBufferView</a>, <a>DOMString</a> or <a>Blob</a></li>
+				<li><code>pullAmount</code> attribute to pace data retrieval from the data source</li>
+			</ul>
+			Actual transfer of bytes from the data source may happen either synchronously or asynchronously.
+			<a>ReadableByteStream</a> hides details of actual communication with the data source while allowing for efficient transfer of bytes.
 		</p>
 
 		<p>
-			The <a>ByteStream</a> interface represents binary data which can be obtained over time and read once. A <a>ByteStream</a> can come from API <a href="#producers">producers</a> such as <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#the-xmlhttprequest-interface"><code>XMLHttpRequest</code></a>, or can
-			be built using the <a>ByteStream</a> constructor.
-			Producer APIs themselves can implement the <a>ReadableByteStream</a> interface.
+			The <a>ByteStream</a> is a simple implementation of both <a>WritableByteStream</a> and <a>ReadableByteStream</a> interface.
+			A ByteStream has a single queue of bytes and it works as a data sink for the WritableByteStream interface and a data source for the ReadableByteStream interface.
 		</p>
 
 		<p>
-			An asynchronous API for reading <a>ReadableByteStream</a>s prevents blocking and UI "freezing" on a user agent’s main thread
-			This specification defines an asynchronous API to access a <a>ReadableByteStream</a>.
-			Error conditions that may arise during reading of a <a>ReadableByteStream</a> will be handled by a reject callback set to the promise returned by the read() method.
+			Read and write operations on these interfaces are implemented using <a>Promise</a>.
+			When an operation completes, the Promise returned by a method will be fulfilled, and then the fulfill callback set to the Promise will handle the result.
+			Error conditions that may arise during an operation will be handled by the reject callback set to the Promise.
 			An example will be illustrative.
 		</p>
 
 		<p>
 			In the example below, different code blocks handle progress, error, and success conditions.
-			The example demonstrates how to read a chunk of data from a <a>ReadableByteStream</a> using <code>read</code>.
+			The example demonstrates how to read a chunk of data from a <a>ReadableByteStream</a> using <code>read()</code>.
 			The <a>ReadableByteStream</a> may of come from a <a href="#producers">producer</a> such as <code>XMLHttpRequest</code>.
 			Additionally, it demonstrates how to read a stream until an EOF is encountered.
 		</p>
