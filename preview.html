@@ -324,7 +324,7 @@ writeData();</pre>
 poll();</pre>
 	</section>
 
-	<section class="section" id="data_source">
+	<section class="section">
 		<h2>Data source model</h2>
 
 		<p>
@@ -334,7 +334,7 @@ poll();</pre>
 		</p>
 
 		<p>
-			A data source from which <a>ReadableByteStream</a> retrieves bytes can be anything that:
+			A <dfn>data source</dfn> from which <a>ReadableByteStream</a> retrieves bytes can be anything that:
 			<ol>
 				<li>Produce bytes</li>
 				<li>
@@ -347,12 +347,12 @@ poll();</pre>
 		</p>
 
 		<p>
-			To allow multiple consumers, we use a wrapper <dfn>dataSourceWrapper</dfn> for range reference counting on produced bytes.
-			A <a>dataSourceWrapper</a> has the following functionalities:
+			To allow multiple consumers, we use a wrapper <dfn>data source wrapper</dfn> for range reference counting on produced bytes.
+			A <a>data source wrapper</a> has the following functionalities:
 			<ul>
 				<li>has a <var>queue</var> to which newly produced bytes are pushed</li>
 				<li>has a sorted map <dfn>cursorMap</dfn> whose key is reader ID and value is integer called cursor</li>
-				<li>can issue reader IDs which are unique to the <a>dataSourceWrapper</a> instance when requested</li>
+				<li>can issue reader IDs which are unique to the <a>data source wrapper</a> instance when requested</li>
 				<li>pops bytes from <var>queue</var> when the smallest cursor in <a>cursorMap</a> by the difference of the new smallest cursor and the old smallest cursor</li>
 				<li>when there's not sufficient bytes in <var>queue</var> to respond to coming retrieval request, retrieves bytes from the wrapped data source</li>
 			</ul>
@@ -367,7 +367,7 @@ poll();</pre>
 		<h2>Data sink model</h2>
 
 		<p>
-			A data sink to which <a>WritableByteStream</a> interface writes bytes can be anything that:
+			A <dfn>data sink</dfn> to which <a>WritableByteStream</a> interface writes bytes can be anything that:
 			<ol>
 				<li>Accepts bytes</li>
 				<li>
@@ -394,8 +394,10 @@ poll();</pre>
 		</p>
 
 		<p>
-			A WritableByteStream has an associated data sink <dfn>dataSink</dfn> and it notifies the WritableByteStream of the number of bytes the data sink can newly accept.
-			An associated integer variable <dfn>bytesWritable</dfn> holds the number of bytes can be written to the data sink.
+			A WritableByteStream has an associated <a>data sink</a> <dfn>dataSink</dfn> and it notifies the WritableByteStream of the number of bytes the data sink can newly accept.
+		</p>
+		<p>
+			An associated integer variable <dfn>bytesRequested</dfn> holds the number of bytes can be written to the <a>dataSink</a>.
 			This variable is initialized to 0 on construction.
 		</p>
 
@@ -405,9 +407,24 @@ poll();</pre>
 		</p>
 
 		<p>
-			A struct type <dfn>pendingWrite</dfn> has three members, <var>writePromise</var>, <var>size</var> and <var>bytesWritten</var>.
-			<var>writePromise</var> holds a <a>Promise</a>.
-			<var>size</var> and <var>bytesWritten</var> hold an integer.
+			To <dfn>abort wait</dfn>, run the steps below:
+			<ol>
+				<li>If <a>waitPromise</a> is <code>null</code>, terminate these steps</li>
+				<li>Let <var>detachedWaitPromise</var> be <a>waitPromise</a></li>
+				<li>Set <a>waitPromise</a> to <code>null</code></li>
+				<li>Reject <var>detachedWaitPromise</var> with an "<code><a>AbortError</a></code>"</li>
+			</ol>
+		</p>
+
+		<p>
+			A struct type <dfn>pendingWrite</dfn> has the following members:
+			<ul>
+				<li>A <a>Promise</a> <var>writePromise</var></li>
+				<li>An integer <var>size</var></li>
+				<li>An integer <var>bytesAcknowledged</var></li>
+			</ul>
+		</p>
+		<p>
 			An associated queue <dfn>pendingWriteQueue</dfn> holds <a>pendingWrite</a>s.
 			This queue is initialized to an empty queue on construction.
 		</p>
@@ -417,23 +434,22 @@ poll();</pre>
 			<ol>
 				<li>If <a>pendingWriteQueue</a> is empty, break from this loop</li>
 				<li>Let <var>headTuple</var> be the head element of <a>pendingWriteQueue</a></li>
-				<li>Let <var>bytesToAcknowledge</var> be min((<var>size</var> of <var>headTuple</var>) - (<var>bytesWritten<var> of <var>headTuple</var>), <a>bytesWritable</a>)</li>
-				<li>Set <var>bytesWritten</var> of <var>headTuple</var> to (<var>bytesWritten</var> of <var>head</var>) + <var>bytesToAcknowledge</var></li>
-				<li>Set <a>bytesWritable</a> to <a>bytesWritable</a> - <var>bytesWritten</var></li>
+				<li>Let <var>bytesToAcknowledge</var> be min((<var>size</var> of <var>headTuple</var>) - (<var>bytesAcknowledged<var> of <var>headTuple</var>), <a>bytesRequested</a>)</li>
+				<li>Set <a>bytesRequested</a> to <a>bytesRequested</a> - <var>bytesToAcknowledge</var></li>
+				<li>Set <var>bytesAcknowledged</var> of <var>headTuple</var> to (<var>bytesAcknowledged</var> of <var>head</var>) + <var>bytesToAcknowledge</var></li>
 				<li>
-					If <var>bytesWritten</var> of <var>headTuple</var> equals to <var>size</var> of <var>headTuple</var>, run the steps below:
+					If <var>bytesAcknowledged</var> of <var>headTuple</var> equals to <var>size</var> of <var>headTuple</var>, run the steps below:
 					<ol>
 						<li>Pop <var>headTuple</var> form <a>pendingWriteQueue</a></li>
-						<li>Fulfill <var>writePromise</var> of <var>headTuple</var> with <var>size</var> of <var>headTuple</var></li>
+						<li>If <var>writePromise</var> of <var>headTuple</var> is not <code>null</code>, fulfill it with <var>size</var> of <var>headTuple</var></li>
 					</ol>
 			</ol>
 		</p>
 
 		<p>
-			When the number of bytes the data sink can newly accept arrives, run the steps below:
+			When <a>dataSink</a> requests <var>bytesNewlyRequested</var> more bytes, queue a task which runs the steps below:
 			<ol>
-				<li>Let <var>bytesNewlyWritable</var> be the number of bytes</li>
-				<li>Set <a>bytesWritable</a> to <a>bytesWritable</a> + <var>bytesNewlyWritable</var></li>
+				<li>Set <a>bytesRequested</a> to <a>bytesRequested</a> + <var>bytesNewlyRequested</var></li>
 				<li><a>Process pendingWriteQueue</a></li>
 			</ol>
 		</p>
@@ -464,9 +480,9 @@ poll();</pre>
 					<p>
 						This method must run the steps below:
 						<ol>
-							<li>If <a>waitPromise</a> is not null, throw an "<code><a>InvalidStateError</a></code>"</li>
+							<li>Let <var>latchedEncoding</var> be the current value of <a href="#widl-WritableByteStream-writeEncoding">writeEncoding</a></li>
 
-							<li>Let <var>latchedEncoding</var> be the current value of <a href="#widl-ReadableByteStream-writeEncoding">writeEncoding</a></li>
+							<li><a>Abort wait</a></li>
 
 							<li>
 								<dl class="switch">
@@ -494,16 +510,16 @@ poll();</pre>
 							<li>Set <var>size</var> of <var>tuple</var> to <var>numBytesToWrite</var></li>
 							<li>Push <var>tuple</var> to <a>pendingWriteQueue</a></li>
 
-							<li>Return <var>writePromise</var> and continue to process the steps in this algorithm</li>
+							<li><a>Process pendingWriteQueue</a></li>
+
+							<li>Return <var>writePromise</var>, and then continue to process the steps in this algorithm</li>
 
 							<li>Write <var>bytesToWrite</var> to <a>dataSink</a></li>
-
-							<li><a>Process pendingWriteQueue</a></li>
 						</ol>
 					</p>
 
 					<p>
-						If <var>data</var> argument is an <a>ArrayBufferView</a>, modification made on the ArrayBufferView's contents between <code>write()</code> method call and fulfill of the returned Promise may be affect the data written to the WritableByteStream.
+						If <var>data</var> argument is an <a>ArrayBufferView</a>, modification made on the ArrayBufferView's contents between <code>write()</code> method call and fulfill of the returned Promise may affect the data written to <a>dataSink</a>.
 					</p>
 
 					<dl class="parameters">
@@ -516,20 +532,26 @@ poll();</pre>
 				<dd>
 					<p>
 						This method waits until the WritableByteStream becomes able to accept any non-zero amount of data.
-						The returned Promise will be fulfilled with the number of bytes the WritableByteStream can accept.
+						The returned <a>Promise</a> will be fulfilled with the number of bytes the WritableByteStream can accept.
 					</p>
 
 					<p>
 						This method must run the steps below:
 						<ol>
-							<li>If <a>waitPromise</a> is not null, throw an "<code><a>InvalidStateError</a></code>"</li>
+							<li><a>Abort wait</a></li>
 
 							<li>Set <a>waitPromise</a> to a new <a>Promise</a></li>
-							<li>Return <a>waitPromise</a> and continue to process the steps in this algorithm</li>
-							<li>Wait until <a>pendingWriteQueue</a> is empty and <a>bytesWritable</a> is not 0</li>
-							<li>Let <var>detachedWaitPromise</var> be <a>waitPromise</a></li>
-							<li>Set <a>waitPromise</a> to null</li>
-							<li>Fulfill <var>detachedWaitPromise</var> with <a>bytesWritable</a></li>
+							<li>Return <a>waitPromise</a>, and then continue to process the steps in this algorithm</li>
+							<li>Wait until <a>pendingWriteQueue</a> is empty and <a>bytesRequested</a> is not 0</li>
+							<li>
+								Queue a task to run the steps below:
+								<ol>
+									<li>If <a>waitPromise</a> is <code>null</code>, terminate these steps</li>
+									<li>Let <var>detachedWaitPromise</var> be <a>waitPromise</a></li>
+									<li>Set <a>waitPromise</a> to <code>null</code></li>
+									<li>Fulfill <var>detachedWaitPromise</var> with <a>bytesRequested</a></li>
+								</ol>
+							</li>
 						</ol>
 					</p>
 				</dd>
@@ -569,17 +591,18 @@ poll();</pre>
 		</section>
 
 		<p>
-			A ReadableByteStream has an associated data source referred by <dfn>dataSource</dfn> from which ReadableByteStream retrieves bytes.
+			A ReadableByteStream has an associated <a>data source</a> referred by <dfn>dataSource</dfn> from which the ReadableByteStream retrieves bytes.
 			The data source model is explained in <a href="#h2_data_source">this section</a>.
 			A data source can be shared by multiple ReadableByteStream instances when <code>fork()</code> is used.
 			A ReadableByteStream is registered with a data source on construction and given a reader ID.
-			<a>dataSource</a> is set to refer to the data source and <dfn>readerId</dfn> is set to the reader ID.
+			<a>dataSource</a> of the ReadableByteStream is set to refer to the data source and <dfn>readerId</dfn> of the ReadableByteStream is set to the reader ID.
 		</p>
 
 		<p>
-			An associated integer variable <dfn>bytesBeingRetrieved</dfn> holds the number of bytes being retrieved from the associated data source.
-			This variable is initialized to 0 on construction.
+			An associated flag <dfn>readPending</dfn> prevents multiple read operations from being run.
+			This flag is set to false on construction.
 		</p>
+
 		<p>
 			An associated integer variable <dfn>readExactPullAmount</dfn> temporarily overrides <a href="#widl-ReadableByteStream-pullAmount">pullAmount</a> if necessary for <code>readExact()</code> method call.
 			This variable is initialized to 0 on construction.
@@ -588,18 +611,18 @@ poll();</pre>
 			An associated integer variable <dfn>pipePullAmount</dfn> temporarily overrides <a href="#widl-ReadableByteStream-pullAmount">pullAmount</a> if necessary for <code>pipe()</code> method call.
 			This variable is initialized to 0 on construction.
 		</p>
+
+		<p>
+			An associated integer variable <dfn>bytesBeingRetrieved</dfn> holds the number of bytes being retrieved from <a>dataSource</a>.
+			This variable is initialized to 0 on construction.
+		</p>
 		<p>
 			An associated integer variable <dfn>bytesBeingOutput</dfn> holds the number of bytes consumed on the last read operation.
 			This variable is initialized to 0 on construction.
 
 			<section class="note">
-				bytesBeingOutput delays replenishment of outputLimit until the next read/pipe operation is requested.
+				bytesBeingOutput delays replenishment of pullAmount until the next read()/pipe() operation is made.
 			</section>
-		</p>
-
-		<p>
-			An associated flag <dfn>readPending</dfn> prevents multiple read operations from being run.
-			This flag is set to false on construction.
 		</p>
 
 		<p>
@@ -613,30 +636,31 @@ poll();</pre>
 		</p>
 
 		<p>
-			An associated flag <dfn>eofReached</dfn> indicates that the EOF is reached during reading data from <a>dataSource</a>.
+			An associated flag <dfn>eofReached</dfn> indicates that the EOF is received from <a>dataSource</a>.
 		</p>
 
 		<p>
-			To <dfn>retrieve data</dfn>, run the steps below:
+			To <dfn>retrieve bytes</dfn>, run the steps below:
 			<ol>
 				<li>Let <var>bytesReadable</var> be the number of bytes in <a>retrievedDataBuffer</a></li>
-				<li>Let <var>bytesToRetrieve</var> be max(max(<a href="#widl-ReadableByteStream-pullAmount">pullAmount</a>, <a>readExactPullAmount</a>, <a>pipePullAmount</a>) - (<var>bytesReadable</var> + <a>bytesBeingOutput</a>) - <a>bytesBeingRetrieved</a>, 0)</li>
+				<li>Let <var>bytesToRetrieve</var> be max(max(<a href="#widl-ReadableByteStream-pullAmount">pullAmount</a>, <a>readExactPullAmount</a>, <a>pipePullAmount</a>) - (<a>bytesBeingRetrieved</a> + <var>bytesReadable</var> + <a>bytesBeingOutput</a>), 0)</li>
 				<li>Set <a>bytesBeingRetrieved</a> to <a>bytesBeingRetrieved</a> + <var>bytesToRetrieve</var></li>
-				<li>Retrieve <var>bytesToRetrieve</var> more bytes from <a>dataSource</a> possibly asynchronously</li>
+				<li>Request <a>dataSource</a> to send <var>bytesToRetrieve</var> more bytes to the ReadableByteStream</li>
 			</ol>
 		</p>
 
 		<p>
-			When bytes arrive from <a>dataSource</a>, queue a task which runs the steps below:
+			When bytes are received from <a>dataSource</a>, queue a task which runs the steps below:
 			<ol>
-				<li>Let <var>bytesRead</var> be the number of bytes arrived</li>
-				<li>Set <a>bytesBeingRetrieved</a> to <a>bytesBeingRetrieved</a> - <var>bytesRead</var></li>
-				<li><a>Retrieve data</a></li>
+				<li>Let <var>bytesReceived</var> be the received bytes</li>
+				<li>Let <var>numBytesReceived</var> be the size of <var>bytesReceived</var></li>
+				<li>Set <a>bytesBeingRetrieved</a> to <a>bytesBeingRetrieved</a> - <var>numBytesReceived</var></li>
+				<li>Push <var>bytesReceived</var> to <a>retrievedDataBuffer</a></li>
 			</ol>
 		</p>
 
 		<p>
-			When the EOF is reached on <a>dataSource</a>, set <a>eofReached</a>.
+			When the EOF is received from <a>dataSource</a>, queue a task which sets <a>eofReached</a>.
 		</p>
 
 		<section class="section">
@@ -681,11 +705,14 @@ poll();</pre>
 					</p>
 
 					<p>
-						When this attribute is set, <a>retrieve data</a>.
+						When this attribute is set, <a>retrieve bytes</a>.
 					</p>
 
 					<section class="note">
 						This flow control functionality is provided as a separated attribute rather than as an argument of the read() method based on assumption that most people don't change the value so frequently.
+					</section>
+					<section class="note">
+						It's possible bytes more than pullAmount value is received by <code>read()</code>.
 					</section>
 				</dd>
 
@@ -711,34 +738,39 @@ poll();</pre>
 							<li>Set <a>readExactPullAmount</a> to <var>size</var></li>
 							<li>Set <a>bytesBeingOutput</a> to 0</li>
 
-							<li><a>Retrieve data</a></li>
+							<li><a>Retrieve bytes</a></li>
 
 							<li>Let <var>readPromise</var> be a new <a>Promise</a></li>
-							<li>Return <var>readPromise</var> and continue to process the steps in this algorithm</li>
+							<li>Return <var>readPromise</var>, and then continue to process the steps in this algorithm</li>
 
 							<li>Wait until the number of bytes in <a>retrievedDataBuffer</a> becomes equal to or greater than <var>size</var> or <a>eofReached</a> is set</li>
 
-							<li>Let <var>bytesReadable</var> be the number of bytes in <a>retrievedDataBuffer</a></li>
-							<li>Let <var>bytesToOutput</var> be min(<var>size</var>, <var>bytesReadable</var>)</li>
-							<li>Set <a>bytesBeingOutput</a> to <var>bytesToOutput</var></li>
-							<li>Pop <var>bytesToOutput</var> bytes from <a>retrievedDataBuffer</a>, and then let <var>readBytes</var> be the popped bytes</li>
-
-							<li>Set <a>readExactPullAmount</a> to 0</li>
-
-							<li>Unset <a>readPending</a></li>
-
-							<li>Let <var>result</var> be a new <a>ByteStreamReadResult</a></li>
 							<li>
-								<dl class="switch">
-									<dt>If <var>latchedType</var> is "<code>none</code>"</dt>
-									<dd>Set <a href="#widl-ByteStreamReadResult-data">data</a> of <var>result</var> to <code>undefined</code></dd>
-									<dt>Otherwise</dt>
-									<dd>Set <a href="#widl-ByteStreamReadResult-data">data</a> of <var>result</var> to an object of the type specified by <var>latchedType</var> which represents <var>readBytes</var></dd>
-								</dl>
+								Queue a task which runs the steps below:
+								<ol>
+									<li>Let <var>bytesReadable</var> be the number of bytes in <a>retrievedDataBuffer</a></li>
+									<li>Let <var>bytesToOutput</var> be min(<var>size</var>, <var>bytesReadable</var>)</li>
+									<li>Set <a>bytesBeingOutput</a> to <var>bytesToOutput</var></li>
+									<li>Pop <var>bytesToOutput</var> bytes from <a>retrievedDataBuffer</a>, and then let <var>readBytes</var> be the popped bytes</li>
+
+									<li>Set <a>readExactPullAmount</a> to 0</li>
+
+									<li>Unset <a>readPending</a></li>
+
+									<li>Let <var>result</var> be a new <a>ByteStreamReadResult</a></li>
+									<li>
+										<dl class="switch">
+											<dt>If <var>latchedType</var> is "<code>none</code>"</dt>
+											<dd>Set <a href="#widl-ByteStreamReadResult-data">data</a> of <var>result</var> to <code>undefined</code></dd>
+											<dt>Otherwise</dt>
+											<dd>Set <a href="#widl-ByteStreamReadResult-data">data</a> of <var>result</var> to an object of the type specified by <var>latchedType</var> which represents <var>readBytes</var></dd>
+										</dl>
+									</li>
+									<li>Set <a href="#widl-ByteStreamReadResult-eof">eof</a> of <var>result</var> to <code>true</code> if <a>retrievedDataBuffer</a> is empty and <a>eofReached</a> is set</li>
+									<li>Set <a href="#widl-ByteStreamReadResult-size">size</a> of <var>result</var> to <var>bytesToOutput</var></li>
+									<li>Fulfill <var>readPromise</var> with <var>result</var></li>
+								</ol>
 							</li>
-							<li>Set <a href="#widl-ByteStreamReadResult-eof">eof</a> of <var>result</var> to <code>true</code> if <a>retrievedDataBuffer</a> is empty and <a>eofReached</a> is set</li>
-							<li>Set <a href="#widl-ByteStreamReadResult-size">size</a> of <var>result</var> to <var>bytesToOutput</var></li>
-							<li>Fulfill <var>readPromise</var> with <var>result</var></li>
 						</ol>
 					</p>
 
@@ -775,10 +807,11 @@ poll();</pre>
 							<li>Let <var>latchedEncoding</var> be the current value of <a href="#widl-ReadableByteStream-readEncoding">readEncoding</a> attribute</li>
 
 							<li>Set <a>bytesBeingOutput</a> to 0</li>
-							<li><a>Retrieve data</a></li>
+
+							<li><a>Retrieve bytes</a></li>
 
 							<li>Let <var>readPromise</var> be a new <a>Promise</a></li>
-							<li>Return <var>readPromise</var> and continue to process the steps in this algorithm</li>
+							<li>Return <var>readPromise</var>, and then continue to process the steps in this algorithm</li>
 
 							<li>
 								<dl class="switch">
@@ -789,16 +822,25 @@ poll();</pre>
 												Wait until bytes in <a>retrievedDataBuffer</a> can be converted into a non-empty <a>DOMString</a> when decoded using <var>latchedEncoding</var> or <a>eofReached</a> is set
 											</li>
 											<li>
+												Queue a task which runs the rest of this algorithm
+											</li>
+											<li>
 												Pop non-zero number of bytes from <a>retrievedDataBuffer</a> which can be fully converted into a non-empty <a>DOMString</a> when decoded using <var>latchedEncoding</var>, and then let <var>readBytes</var> be the result of the conversion.
 												If <a>eofReached</a> is set and there are no such bytes, reject <var>readPromise</var> and terminate these steps.
 											</li>
-											<li>Let <var>readData</var> be the result of decoding <var>readBytes</var> using <var>latchedEncoding</var></li>
+											<li>
+												Let <var>readData</var> be the result of decoding <var>readBytes</var> using <var>latchedEncoding</var>.
+												If this throws an <var>exception</var>, reject <var>readPromise</var> with <var>exception</var>.
+											</li>
 										</ol>
 									</dd>
 									<dt>Otherwise</dt>
 									<dd>
 										<ol>
 											<li>Wait until <a>retrievedDataBuffer</a> becomes non-empty or <a>eofReached</a> is set</li>
+											<li>
+												Queue a task which runs the rest of this algorithm
+											</li>
 											<li>
 												Pop non-zero number of bytes from <a>retrievedDataBuffer</a>, and then let <var>readBytes</var> be the popped bytes
 												<section class="note">
@@ -808,9 +850,9 @@ poll();</pre>
 											<li>
 												<dl class="switch">
 													<dt>If <var>latchedType</var> is "<code>none</code>"</dt>
-													<dd>Let <var>readData</var> to <code>undefined</code></dd>
+													<dd>Let <var>readData</var> be <code>undefined</code></dd>
 													<dt>Otherwise</dt>
-													<dd>Let <var>readData</var> to an object of the type specified by <var>latchedType</var> which represents <var>readBytes</var></dd>
+													<dd>Let <var>readData</var> be an object of the type specified by <var>latchedType</var> which represents <var>readBytes</var></dd>
 												</dl>
 											</li>
 										</ol>
@@ -818,14 +860,16 @@ poll();</pre>
 								</dl>
 							</li>
 							<li>Let <var>bytesConsumed</var> be the size of <var>readBytes</var></li>
+
+							<li>Let <var>result</var> be a new <a>ByteStreamReadResult</a>.</li>
+							<li>Set <a href="#widl-ByteStreamReadResult-data">data</a> of <var>result</var> to <var>readData</var></li>
+							<li>Set <a href="#widl-ByteStreamReadResult-eof">eof</a> of <var>result</var> to <code>true</code> if <a>eofReached</a> is set and <a>retrievedDataBuffer</a> is empty</li>
+							<li>Set <a href="#widl-ByteStreamReadResult-size">size</a> of <var>result</var> to <var>bytesConsumed</var>.</li>
+
 							<li>Set <a>bytesBeingOutput</a> to <var>bytesConsumed</var></li>
 
 							<li>Unset <a>readPending</a></li>
 
-							<li>Let <var>result</var> be a new <a>ByteStreamReadResult</a>.</li>
-							<li>Set <a href="#widl-ByteStreamReadResult-data">data</a> of <var>result</var> to <var>readData</var></li>
-							<li>Set <a href="#widl-ByteStreamReadResult-eof">eof</a> of <var>result</var> to <code>true</code> if <a>retrievedDataBuffer</a> is empty and <a>eofReached</a> is set</li>
-							<li>Set <a href="#widl-ByteStreamReadResult-size">size</a> of <var>result</var> to <var>bytesConsumed</var>.</li>
 							<li>Fulfill <var>readPromise</var> with <var>result</var></li>
 						</ol>
 					</p>
@@ -842,11 +886,15 @@ poll();</pre>
 				<dt>Promise&amp;lt;ByteStreamReadResult&gt; pipe()</dt>
 				<dd>
 					<p>
-						This method bulk transfers bytes from the ReadableByteStream to a <a>WritableByteStream</a>.
+						This method bulk transfers bytes from the ReadableByteStream to another <a>WritableByteStream</a>.
 					</p>
 
 					<section class="note">
 						Fulfillment of the returned Promise doesn't necessarily mean that the data transferred to <var>destination</var> has been successfully read from it.
+					</section>
+
+					<section class="note">
+						TODO: Rewrite this to update bytesBeingOutput as bytesAcknowledged of pendingWrites are updated
 					</section>
 
 					<p>
@@ -856,18 +904,27 @@ poll();</pre>
 							<li>If <a>readPending</a> is set, throw an "<code><a>InvalidStateError</a></code>"</li>
 							<li>Set <a>readPending</a></li>
 
-							<li>Let <var>pipePromise</var> be a new <a>Promise</a></li>
-							<li>Return <var>pipePromise</var> and continue to process the steps in this algorithm</li>
+							<li><a>Abort wait</a> <var>destination</var></a>
 
 							<li>Set <a>bytesBeingOutput</a> to 0</li>
-							<li><a>Retrieve data</a></li>
+
+							<li><a>Retrieve bytes</a></li>
+
+							<li>Let <var>pipePromise</var> be a new <a>Promise</a></li>
+							<li>Return <var>pipePromise</var>, and then continue to process the steps in this algorithm</li>
 
 							<li>Let <var>totalBytesTransferred</var> be 0</li>
 							<li>
 								Repeat the steps below:
 								<ul>
 									<li>
-										Whenever <a>retrievedDataBuffer</a> is not empty or <a>the EOF is reached</a>, run the steps below:
+										Whenever <a>retrievedDataBuffer</a> is not empty or <a>eofReached</a> is set,
+										<dl class="switch">
+											<dt>If this happened in the event loop</dt>
+											<dd>Run the steps below</dd>
+											<dt>Otherwise</dt>
+											<dd>Queue a task which runs the steps below</dd>
+										</dl>
 										<ol>
 											<li>Let <var>bytesReadable</var> be the number of bytes in <a>retrievedDataBuffer</a></li>
 											<li>
@@ -878,14 +935,19 @@ poll();</pre>
 													<dd>Let <var>bytesToTransfer</var> be <var>bytesReadable</var></dd>
 												</dl>
 											</li>
-											<li>Set <a>bytesBeingOutput</a> to bytesBeingOutput + <var>bytesToTransfer</var></li>
-											<li>Pop <var>bytesToTransfer</var> bytes from <a>retrievedDataBuffer</a>, and then write it to <var>destination</var></li>
+											<li>Set <a>bytesBeingOutput</a> to <a>bytesBeingOutput</a> + <var>bytesToTransfer</var></li>
+											<li>Pop <var>bytesToTransfer</var> bytes from <a>retrievedDataBuffer</a>, and then write it to <a>dataSink</a> of <var>destination</var></li>
+
+											<li>Let <var>tuple</var> be a new <a>pendingWrite</a></li>
+											<li>Set <var>writePromise</var> of <var>tuple</var> to <code>null</code></li>
+											<li>Set <var>size</var> of <var>tuple</var> to <var>bytesToTransfer</var></li>
+											<li>Push <var>tuple</var> to <a>pendingWriteQueue</a> of <var>destination</var></li>
 
 											<li>Set <var>totalBytesTransferred</var> to <var>totalBytesTransferred</var> + <var>bytesToTransfer</var></li>
 
 											<li>
 												<dl class="switch">
-													<dt>If <a>the EOF is reached</a></dt>
+													<dt>If <a>eofReached</a> is set</dt>
 													<dd>Break from this loop</dd>
 													<dt>If <var>size</var> is specified and <var>totalBytesTransferred</var> equals to <var>size</var></dt>
 													<dd>Break from this loop</dd>
@@ -894,19 +956,34 @@ poll();</pre>
 										</ol>
 									</li>
 									<li>
-										Whenever the number of bytes <var>destination</var> can accept changes, run the steps below:
+										Whenever <a>pendingWriteQueue</a> of <var>destination</var> is empty and <a>bytesRequested</a> of <var>destination</var> is not 0,
+										<dl class="switch">
+											<dt>If this happened in the event loop</dt>
+											<dd>Run the steps below</dd>
+											<dt>Otherwise</dt>
+											<dd>Queue a task which runs the steps below</dd>
+										</dl>
 										<ol>
-											<li>Let <var>bytesWritable</var> be the number of bytes <var>destination</var> can accept</li>
+											<li>Let <var>bytesRequested</var> be <a>bytesRequested</a> of <var>destination</var></li>
 											<li>
 												<dl class="switch">
 													<dt>If <var>size</var> is specified</dt>
-													<dd>Set <a>pipePullAmount</a> to min(<var>size</var> - <var>totalBytesTransferred</var>, <var>bytesWritable</var>)</dd>
+													<dd>
+														Set <a>pipePullAmount</a> to min(<var>size</var> - <var>totalBytesTransferred</var>, <var>bytesRequested</var>)
+														<section class="note">
+															If <a href="#widl-ReadableByteStream-pullAmount">pullAmount</a> is set to 0, pipe() transfers data in pull style.
+															I.e. only bytes of the same number as the number of bytes writable to <var>destination</var> are retrieved from the data source.
+														</section>
+														<section class="note">
+															Setting <a href="#widl-ReadableByteStream-pullAmount">pullAmount</a> to a small value doesn't have an effect of throttling the pace of pipe().
+														</section>
+													</dd>
 													<dt>Otherwise</dt>
-													<dd>Set <a>pipePullAmount</a> to <var>bytesWritable</var></dd>
+													<dd>Set <a>pipePullAmount</a> to <var>bytesRequested</var></dd>
 												</dl>
 											</li>
 											<li>Set <a>bytesBeingOutput</a> to 0</li>
-											<li><a>Retrieve data</a></li>
+											<li><a>Retrieve bytes</a></li>
 										</ol>
 									</li>
 								</ul>
@@ -1027,7 +1104,7 @@ poll();</pre>
 
 			<p>
 				The ByteStream inherits the <a>WritableByteStream</a> interface.
-				Its <a>dataSink</a> is <a>bufferedDataQueue</a> wrapped with a <a>dataSourceWrapper</a>.
+				Its <a>dataSink</a> is <a>bufferedDataQueue</a> wrapped with a <a>data source wrapper</a>.
 			</p>
 
 			<p>
@@ -1036,7 +1113,7 @@ poll();</pre>
 			</p>
 
 			<p>
-				<a>bufferedDataQueue</a> just forwards retrieval requests coming from the <a>dataSourceWrapper</a> to the <a>WritableByteStream</a> as a notification of the number of newly acceptable bytes with the same amount.
+				<a>bufferedDataQueue</a> just forwards retrieval requests coming from the <a>data source wrapper</a> to the <a>WritableByteStream</a> as a notification of the number of newly acceptable bytes with the same amount.
 			</p>
 
 			<dl class="idl" title="interface ByteStream : ReadableByteStream, WritableByteStream">
@@ -1360,6 +1437,7 @@ enum XMLHttpRequestResponseType {
 		</p>
 
 		<p>
+			<dfn>AbortError</dfn> is defined in <a href="https://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#aborterror">DOM4 specification</a>.
 			<dfn>InvalidStateError</dfn> is defined in <a href="https://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#invalidstateerror">DOM4 specification</a>.
 			<dfn>SyntaxError</dfn> is defined in <a href="https://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#syntaxerror">DOM4 specification</a>.
 		</p>
