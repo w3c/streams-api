@@ -118,27 +118,26 @@ var respecConfig = {
 	</section>
 
 	<section id="abstract">
-		<!-- TODO: are all of the links and objects in the abstract formatted? -->
 		<p>
-			This specification provides an API for representing byte stream in web applications, as well as programmatically building and reading its contents.
+			This specification provides an API for representing byte stream in web applications, as well as programmatically reading and writing it.
 			This includes:
 		</p>
 		<ul>
 			<li>
-				A <a>WritableByteStream</a> interface which defines a protocol for data consuming APIs to communicate with other data producing APIs or code.
+				An interface named <a>WritableByteStream</a> which defines a general protocol for data consuming APIs to communicate with data producing code.
 			</li>
 			<li>
-				A <a>ReadableByteStream</a> interface which defines a protocol for data producing APIs to communicate with other data consuming APIs or code.
+				An interface named <a>ReadableByteStream</a> which defines a general protocol for data producing APIs to communicate with data consuming code.
 			</li>
 			<li>
-				A <a>ByteStream</a> interface which represents a byte sequence which can be read only once and provides APIs for building it, writing data to it, reading and piping data from it.
+				An interface named <a>ByteStream</a> which inherits both WritableByteStream and ReadableByteStream and represents a byte sequence.
 			</li>
 			<li>
-				A <a>ByteStreamReadResult</a> interface which represents the result of consuming operations such as reading and piping.
-				It holds a chunk of content read from a stream, the number of bytes consumed, and EOF signal.
+				A tuple named <a>ByteStreamReadResult</a> which represents the result of consuming operations such as <code>read()</code> and <code>pipe()</code>.
+				It holds a chunk of content read from a <a>ReadableByteStream</a>, the number of bytes consumed, and EOF signal.
 			</li>
 			<li>
-				A <a>ByteStreamReadType</a> enum which represents data types as which the <a>ReadableByteStream</a> can be read.
+				An enum <a>ByteStreamReadType</a> which represents data types as which data can be read from a <a>ReadableByteStream</a>.
 			</li>
 			<li>
 				A list of notable byte stream <a href="#producers">producers</a> and <a href="#consumers">consumers</a> for which we can apply either or both of <a>ReadableByteStream</a> and <a>WritableByteStream</a> model.
@@ -172,7 +171,7 @@ var respecConfig = {
 		</p>
 
 		<p>
-			The <a>WritableByteStream</a> interface defines a general protocol to communicate with data producing code for <a href="#consumers">data consuming APIs</a>.
+			The <a>WritableByteStream</a> interface defines a general protocol for <a href="#consumers">data consuming APIs</a> to communicate with data producing code.
 			Data producing code writes data to the data sink inside a data consuming API using:
 			<ul>
 				<li><code>write()</code> method for writing bytes to the data sink as a <a>ArrayBufferView</a>, <a>DOMString</a> or <a>Blob</a></li>
@@ -183,15 +182,25 @@ var respecConfig = {
 		</p>
 
 		<p>
-			The <a>ReadableByteStream</a> interface defines a general protocol to communicate with data consuming code for <a href="#producers">data producing APIs</a>.
+			The <a>ReadableByteStream</a> interface defines a general protocol for <a href="#producers">data producing APIs</a> to communicate with data consuming code.
 			This interface represents possibly infinite byte streams which are obtained over time and read once.
 			Data consuming code reads data from the data source inside a data producing API using:
 			<ul>
-				<li><code>read()</code> method for reading bytes from the data source as a <a>ArrayBufferView</a>, <a>DOMString</a> or <a>Blob</a></li>
+				<li><code>read()</code> and <code>readExact()</code> method for reading bytes from the data source as a <a>ArrayBufferView</a>, <a>DOMString</a> or <a>Blob</a></li>
 				<li><code>pullAmount</code> attribute to pace data retrieval from the data source</li>
+				<li><code>pipe()</code> method for transferring data in bulk from the data source to the data sink of another <a>WritableByteStream</a></li>
 			</ul>
 			Actual transfer of bytes from the data source may happen either synchronously or asynchronously.
 			<a>ReadableByteStream</a> hides details of actual communication with the data source while allowing for efficient transfer of bytes.
+		</p>
+
+		<p>
+			By the combination of the following features, this interface suite responds to various needs of byte stream handling.
+			<ul>
+				<li>Delayed notification of completion by using <a>Promise</a>s</li>
+				<li>Explicit back pressure by propagating room for consumption back to producers</li>
+				<li><a>WritableByteStream</a> always accepts incoming data synchronously</li>
+			</ul>
 		</p>
 
 		<p>
