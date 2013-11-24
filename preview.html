@@ -461,7 +461,7 @@ poll();</pre>
 				<dd>
 					<p>
 						Specifies a <a>DOMString</a> that represents the label of an encoding [[!EncodingDetermination]].
-						If set, it will be used as part of the encoding determination used when processing a <code>write()</code> method call.
+						If set, it will be used as part of the encoding determination used when processing a <a>DOMString</a> provided in a <code>write()</code> method call.
 						It will return the label last set, or the empty DOMString if never set.
 					</p>
 
@@ -785,8 +785,8 @@ poll();</pre>
 					<section class="note">
 						This method is useful if
 						<ol>
-							<li>You don't want to get notified of new data unless bytes of the specified number become available</li>
-							<li>You don't want to get your data fragmented into multiple parts, thus avoiding the need to buffer and combine chunks yourself</li>
+							<li>You don't want to get notified of new data unless bytes of the specified number become available.</li>
+							<li>You don't want to get your data fragmented into multiple parts, thus avoiding the need to buffer and combine chunks yourself.</li>
 						</ol>
 					</section>
 				</dd>
