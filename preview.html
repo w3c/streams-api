@@ -328,7 +328,7 @@ poll();</pre>
 
 		<p>
 			Interfaces introduced in the later sections provide simple and convenient ways to consume data.
-			They connect raw sequences of bytes using Promises and method invocations.
+			They connect arbitrary byte stream producer and byte stream consuming JavaScript code using Promises and method invocations.
 			Before describing them, we'll describe the model for a data source, which produces the bytes to be consumed via the <a>ReadableByteStream</a> interface instances. The data source model is not directly surfaced in the API, and is described here to provide details on how internal operations such as <a href="#widl-ReadableByteStream-fork-ReadableByteStream">fork()</a> can be handled.
 		</p>
 
@@ -366,7 +366,7 @@ poll();</pre>
 		<h2>Data sink model</h2>
 
 		<p>
-			A <dfn>datasink</dfn> to which the <a>WritableByteStream</a> interface writes bytes can be anything that:
+			A data sink to which the <a>WritableByteStream</a> interface writes bytes can be anything that:
 			<ol>
 				<li>Accepts bytes</li>
 				<li>
@@ -393,10 +393,10 @@ poll();</pre>
 		</p>
 
 		<p>
-			A WritableByteStream has an associated <a>datasink</a>, which notifies the WritableByteStream of the number of bytes the data sink can newly accept.
+			A WritableByteStream has an associated data sink identified by <dfn>dataSink</dfn>, which notifies the WritableByteStream of the number of bytes the data sink can newly accept.
 		</p>
 		<p>
-			An associated integer variable <dfn>bytesRequested</dfn> holds the number of bytes which can be written to the <a>dataSink</a>.
+			An associated integer variable <dfn>bytesRequested</dfn> holds the number of bytes which can be written to <a>dataSink</a>.
 			This variable is initialized to 0 on construction.
 		</p>
 
@@ -530,7 +530,7 @@ poll();</pre>
 				<dt>Promise&amp;lt;unsigned long long&gt; waitForWritable()</dt>
 				<dd>
 					<p>
-						This method waits until the WritableByteStream bcomes able to accept any non-zero amount of data.
+						This method waits until the WritableByteStream becomes able to accept any non-zero amount of data.
 						The returned <a>Promise</a> will be fulfilled with the number of bytes the WritableByteStream can accept.
 					</p>
 
@@ -578,7 +578,7 @@ poll();</pre>
 			<ol>
 				<li>How to receive a read request from the reader and output bytes</li>
 				<li>How to transfer data in bulk to another <a>WritableByteStream</a> (by using the <code>pipe()</code> method)</li>
-				<li>How to mirror data to multiple destinations or <a>WritableByteStream</a>s (by using the <code>fork()</code>)</li>
+				<li>How to mirror data to multiple destinations (by using the <code>fork()</code>)</li>
 			</ol>
 
 			By returning a <a>Promise</a> and delaying fulfillment of it, the ReadableByteStream realizes asynchronous data consumption.
