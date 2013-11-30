@@ -3,104 +3,102 @@
 <html>
 
 <head>
-	<title>Streams API</title>
+	<title>Streams API (Preview version)</title>
 	<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
 
-<!--	<script class=remove src="http://dev.w3.org/2009/dap/ReSpec.js/js/respec.js"></script> -->
-
+	<!-- <script class=remove src="http://dev.w3.org/2009/dap/ReSpec.js/js/respec.js"></script> -->
 	<script class="remove" src="https://www.w3.org/Tools/respec/respec-w3c-common"></script>
-	<!--<script class="remove" src="respec-w3c-common.js"></script>-->
+	<!-- <script class="remove" src="respec-w3c-common.js"></script> -->
 
 	<script class="remove">
-	      var respecConfig = {
-	          // specification status (e.g. WD, LCWD, NOTE, etc.). If in doubt use ED.
-	          specStatus:           "ED",
+var respecConfig = {
+	// specification status (e.g. WD, LCWD, NOTE, etc.). If in doubt use ED.
+	specStatus:           "ED",
 
-	          // the specification's short name, as in http://www.w3.org/TR/short-name/
-	          shortName:            "streams-api",
+	// the specification's short name, as in http://www.w3.org/TR/short-name/
+	shortName:            "streams-api",
 
-	          // if your specification has a subtitle that goes below the main
-	          // formal title, define it here
-	          // subtitle   :  "an excellent document",
+	// if your specification has a subtitle that goes below the main
+	// formal title, define it here
+	// subtitle   :  "an excellent document",
 
-	          // if you wish the publication date to be other than today, set this
-	          // publishDate:  "yyyy-mm-dd",
+	// if you wish the publication date to be other than today, set this
+	// publishDate:  "yyyy-mm-dd",
 
-	          // if the specification's copyright date is a range of years, specify
-	          // the start date here:
-	          // copyrightStart: "2005"
+	// if the specification's copyright date is a range of years, specify
+	// the start date here:
+	// copyrightStart: "2005"
 
-	          // if there is a previously published draft, uncomment this and set its YYYY-MM-DD date
-	          // and its maturity status
-	          // previousPublishDate:  "yyyy-mm-dd",
-	          // previousMaturity:  "WD",
+	// if there is a previously published draft, uncomment this and set its YYYY-MM-DD date
+	// and its maturity status
+	// previousPublishDate:  "yyyy-mm-dd",
+	// previousMaturity:  "WD",
 
+	// if there a publicly available Editor's Draft, this is the link
+	edDraftURI:           "http://dvcs.w3.org/hg/streams-api/raw-file/tip/Overview.htm",
 
-	          // if there a publicly available Editor's Draft, this is the link
-	          edDraftURI:           "http://dvcs.w3.org/hg/streams-api/raw-file/tip/Overview.htm",
+	// if this is a LCWD, uncomment and set the end of its review period
+	// lcEnd: "2009-08-05",
 
-	          // if this is a LCWD, uncomment and set the end of its review period
-	          // lcEnd: "2009-08-05",
+	// if you want to have extra CSS, append them to this list
+	// it is recommended that the respec.css stylesheet be kept
+	//extraCSS:             ["http://dev.w3.org/2009/dap/ReSpec.js/css/respec.css",
+	//	"http://www.w3.org/StyleSheets/TR/W3C-ED.css",
+	//	],
 
-	          // if you want to have extra CSS, append them to this list
-	          // it is recommended that the respec.css stylesheet be kept
-	          //extraCSS:             ["http://dev.w3.org/2009/dap/ReSpec.js/css/respec.css",
-	          //	"http://www.w3.org/StyleSheets/TR/W3C-ED.css",
-	          //	],
+	// editors, add as many as you like
+	// only "name" is required
 
-	          // editors, add as many as you like
-	          // only "name" is required
+	localBiblio: {
+		"EncodingDetermination": {
+			title: "Encoding",
+			href: "http://encoding.spec.whatwg.org/",
+			authors: ["Anne van Kesteren", "Joshua Bell"],
+			publisher: "WHATWG"
+		}
+	},
 
-              localBiblio: {
-                "EncodingDetermination": {
-                  title: "Encoding",
-                  href: "http://encoding.spec.whatwg.org/",
-                  authors: ["Anne van Kesteren", "Joshua Bell"],
-                  publisher: "WHATWG"
-                }
-              },
+	editors:  [
+		{ name: "Feras Moussa", url: "mailto:feras.moussa@hotmail.com",
+			company: "Invited Expert",  },
+		{ name: "Takeshi Yoshino", url: "mailto:tyoshino@google.com",
+			company: "Google, Inc.",  },
+	],
 
-          editors:  [
-              { name: "Feras Moussa", url: "mailto:feras.moussa@hotmail.com",
-                company: "Invited Expert",  },
-              { name: "Takeshi Yoshino", url: "mailto:tyoshino@google.com",
-                company: "Google, Inc.",  },
-          ],
+	// authors, add as many as you like.
+	// This is optional, uncomment if you have authors as well as editors.
+	// only "name" is required. Same format as editors.
 
-	          // authors, add as many as you like.
-	          // This is optional, uncomment if you have authors as well as editors.
-	          // only "name" is required. Same format as editors.
+	//authors:  [
+	//    { name: "Your Name", url: "http://example.org/",
+	//      company: "Your Company", companyURL: "http://example.com/" },
+	//],
 
-	          //authors:  [
-	          //    { name: "Your Name", url: "http://example.org/",
-	          //      company: "Your Company", companyURL: "http://example.com/" },
-	          //],
+	// name of the WG
+	wg:           "W3C Web Applications (WebApps)",
 
-	          // name of the WG
-	          wg:           "W3C Web Applications (WebApps)",
+	// URI of the public WG page
+	wgURI:        "http://www.w3.org/2008/webapps/",
 
-	          // URI of the public WG page
-	          wgURI:        "http://www.w3.org/2008/webapps/",
+	// name (with the @w3c.org) of the public mailing to which comments are due
+	wgPublicList: "public-webapps",
 
-	          // name (with the @w3c.org) of the public mailing to which comments are due
-	          wgPublicList: "public-webapps",
-
-	          // URI of the patent status for this WG, for Rec-track documents
-	          // !!!! IMPORTANT !!!!
-	          // This is important for Rec-track documents, do not copy a patent URI from a random
-	          // document unless you know what you're doing. If in doubt ask your friendly neighbourhood
-	          // Team Contact.
-	          wgPatentURI:  "",
-	      };
-	    </script>
+	// URI of the patent status for this WG, for Rec-track documents
+	// !!!! IMPORTANT !!!!
+	// This is important for Rec-track documents, do not copy a patent URI from a random
+	// document unless you know what you're doing. If in doubt ask your friendly neighbourhood
+	// Team Contact.
+	wgPatentURI:  "",
+};
+</script>
 
 	<!-- Styles to mimic File API spec -->
-	<style type="text/css">
-		table.error { border-collapse:collapse; border-style:hidden hidden none hidden }
-		table.error thead { border-bottom:solid }
-		table.error tbody th:first-child { border-left:solid }
-		table.error td, table th { border-left:solid; border-right:solid; border-bottom:solid thin; vertical-align:top; padding:0.2em }
-	</style>
+	<!-- <style type="text/css"> -->
+	<!-- 	table.error { border-collapse:collapse; border-style:hidden hidden none hidden } -->
+	<!-- 	table.error thead { border-bottom:solid } -->
+	<!-- 	table.error tbody th:first-child { border-left:solid } -->
+	<!-- 	table.error td, table th { border-left:solid; border-right:solid; border-bottom:solid thin; vertical-align:top; padding:0.2em } -->
+	<!-- </style> -->
 
 </head>
 <body>
@@ -120,30 +118,36 @@
 	</section>
 
 	<section id="abstract">
-		<!-- TODO: are all of the links and objects in the abstract formatted? -->
 		<p>
-			This specification provides an API for representing binary and string data in web applications as a <a>Stream</a> object, as well as programmatically building and reading its contents.
+			This specification provides an API for representing a byte stream in web applications, as well as programmatically reading and writing it.
 			This includes:
 		</p>
 		<ul>
 			<li>
-				A <a>Stream</a> interface, which represents a sequence of data which can be read only once and provides APIs for reading, writing, and piping the data.
+				An interface named <a>WritableByteStream</a> which defines a general protocol for data consuming APIs (<a href="#consumers">consumers</a>) to communicate with data producing code (<a href="#producers">producers</a>).
 			</li>
 			<li>
-				A <a>StreamConsumeResult</a> interface, which represents a chunk of content read from a stream.
+				An interface named <a>ReadableByteStream</a> which defines a general protocol for data producing APIs to communicate with data consuming code.
 			</li>
 			<li>
-				A <a>StreamReadType</a> interface, which represents how the <a>Stream</a> is currently being read.
+				An interface named <a>ByteStream</a> which inherits both WritableByteStream and ReadableByteStream and represents a byte sequence.
 			</li>
 			<li>
-				A list of notable stream <a href="#producers">producers</a> a and <a href="#consumers">consumers</a> for a <a>Stream</a> object.
+				A tuple named <a>ByteStreamReadResult</a> which represents the result of consuming operations such as <code>read()</code> and <code>pipe()</code>.
+				It holds a chunk of content read from a <a>ReadableByteStream</a>, the number of bytes consumed, and EOF signal.
 			</li>
 			<li>
-				Extensions to <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#the-xmlhttprequest-interface">XMLHttpRequest</a> [[!XMLHTTPREQUEST2]] to add support for upload and download of a <a>Stream</a>.
+				An enum <a>ByteStreamReadType</a> which represents data types as which data can be read from a <a>ReadableByteStream</a>.
+			</li>
+			<li>
+				A list of notable byte stream <a href="#producers">producers</a> and <a href="#consumers">consumers</a> for which we can apply either or both of <a>ReadableByteStream</a> and <a>WritableByteStream</a> model.
+			</li>
+			<li>
+				Extensions to <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#the-xmlhttprequest-interface">XMLHttpRequest</a> [[!XMLHTTPREQUEST2]] to add support for uploading data via <a>WritableByteStream</a> and downloading a response as a <a>ReadableByteStream</a>.
 			</li>
 			<li>
 				Extensions to <a href="http://dev.w3.org/2006/webapi/FileAPI/#dfn-createObjectURL">URL.createObjectURL</a> and
-				<a href="http://dev.w3.org/2006/webapi/FileAPI/#dfn-revokeObjectURL">URL.revokeObjectURL</a> to add support for <a>Stream</a>.
+				<a href="http://dev.w3.org/2006/webapi/FileAPI/#dfn-revokeObjectURL">URL.revokeObjectURL</a> to add support for <a>ReadableByteStream</a>.
 			</li>
 		</ul>
 
@@ -152,7 +156,7 @@
 			<a href="http://dev.w3.org/2006/webapi/FileAPI">File</a> [[!FILE-API]],
 			<a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2">XMLHttpRequest</a>
 			(e.g. with an overloaded <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#the-send-method"><code>send()</code></a> method
-			and <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#the-responsetype-attribute"><code>response</code></a> object for <a>Stream</a> objects) [[!XMLHTTPREQUEST2]],
+			and <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#the-responsetype-attribute"><code>response</code></a> object for <a>ReadableByteStream</a> objects) [[!XMLHTTPREQUEST2]],
 			<a href="http://dev.w3.org/html5/postmsg/#dom-window-postmessage"><code>postMessage</code></a>, and
 			Web Workers [[!WEBWORKERS]].
 		</p>
@@ -162,82 +166,96 @@
 		<h2>Introduction</h2>
 
 		<p>
-			Web applications should have the ability to acquire and manipulate data in a wide variety of forms,
-			including as a sequence of data made available over time.
-			This specification defines the basic representation for <a href="#h2_streams">Streams</a>,
-			errors raised by <a href="#h2_streams">Streams</a>,
-			and programmatic ways to create, read, and write to <a href="#h2_streams">Streams</a>.
-		</p>
-		<p>
-			The <a>Stream</a> interface represents binary data which can be obtained over time and read once. A <a>Stream</a> can come from API <a href="#producers">producers</a> such as <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#the-xmlhttprequest-interface"><code>XMLHttpRequest</code></a>, or can
-			be built using the <a>Stream</a> constructor.
+			Web applications should have the ability to acquire, manipulate, and pass data in a wide variety of forms, including as a sequence of data made available over time.
+			This specification defines the basic representation for byte streams, and programmatic ways to read and write streams of data and errors raised on those operations.
 		</p>
 
 		<p>
-			The <a>Stream</a> interface provides a <code>read</code> method for reading the data
-			from a <a>Stream</a> as a <a>StreamConsumeResult</a>, which provides the data as a <code>Blob</code>, <code>ArrayBuffer</code>, or as <code>DOMString</code>,
-			and should happen asynchronously on the user agent’s main thread. Additionally, the stream can also be used in API <a href="#consumers">consumers</a> such as a media element.
+			The <a>WritableByteStream</a> interface defines a general protocol for <a href="#consumers">data consuming APIs</a> to communicate with data producing code. In these cases, the data consuming API, such as a decoder, provides a <a>WritableByteStream</a> for other applications to write to, enabling the decoder to begin decoding data as it becomes available. The data is written to the internal data sink of a data consuming API using:
+			<ul>
+				<li>The <code>write()</code> method for writing bytes to the data sink as a <a>ArrayBufferView</a>, <a>DOMString</a> or <a>Blob</a></li>
+				<li>The <code>awaitSpaceAvailable()</code> method for allowing a data-producer to write to the stream only when a data-consumer specifies it is now available to consume more data. This is useful for cases where an app may want to avoid backpressure and filling the internal buffer.</li>
+			</ul>
+			Actual transfer of bytes to the data sink may happen either synchronously or asynchronously.
+			<a>WritableByteStream</a> hides the details of actual communication with the data sink while allowing for an efficient transfer of bytes.
 		</p>
 
 		<p>
-			The <a>Stream</a> interface also provides a <code>write</code> method for writing data
-			to a <a>Stream</a> as a <code>Blob</code>, <code>ArrayBuffer</code>, or as <code>DOMString</code>,
-			and should happen asynchronously on the user agent’s main thread.
+			The <a>ReadableByteStream</a> interface defines a general protocol for <a href="#producers">data producing APIs</a> to communicate with data consuming code.
+			This interface represents the potential for an infinite amount of bytes which are obtained over time and read once.
+			Data consuming code reads data from the data source inside a data producing API using:
+			<ul>
+				<li>The <code>read()</code> and <code>readExact()</code> methods for reading bytes from the data source as a <a>ArrayBufferView</a>, <a>DOMString</a> or <a>Blob</a></li>
+				<li>The <code>pullAmount</code> attribute to pace data retrieval from the data source</li>
+				<li>The <code>pipe()</code> method for transferring data in bulk from the data source into the data sink of a <a>WritableByteStream</a> from another API</li>
+			</ul>
+			Actual transfer of bytes from the data source may happen either synchronously or asynchronously.
+			<a>ReadableByteStream</a> hides the details of actual communication with the data source while allowing for an efficient transfer of bytes.
 		</p>
 
 		<p>
-			An asynchronous API for reading <a href="#idl-def-Stream"><code>Streams</code></a> prevents blocking and UI “freezing” on a user agent’s main thread.
-			This specification defines an asynchronous API to access a <a>Stream</a>. Error conditions that may arise during reading of a <a>Stream</a> will be handled by a reject callback set to the promise returned by the read() method. An example will be illustrative.
+			With the combination of the following features, this interface suite responds to various simple and complex needs of byte stream handling.
+			<ul>
+				<li>Delayed notification of completion by using <a>Promise</a>s</li>
+				<li>Explicit back pressure management by propagating room for consumption back to producers</li>
+				<li><a>WritableByteStream</a> always accepts incoming data synchronously</li>
+			</ul>
+		</p>
+
+		<p>
+			The <a>ByteStream</a> is a simple implementation of both the <a>WritableByteStream</a> and <a>ReadableByteStream</a> interface.
+			A ByteStream has a single queue of bytes and it works as a data sink for the WritableByteStream interface and as a data source for the ReadableByteStream interface.
+		</p>
+
+		<p>
+			Read and write operations on these interfaces are implemented using <a>Promise</a>.
+			When an operation completes, the Promise returned by a method will be fulfilled, and then the fulfill callback set to the Promise will handle the result.
+			Error conditions that may arise during an operation will be handled by the reject callback set to the Promise.
+			An example will be illustrative.
 		</p>
 
 		<p>
 			In the example below, different code blocks handle progress, error, and success conditions.
-			The example demonstrates how to read a chunk of data from a <a>Stream</a> using <code>read</code>. The <a>Stream</a> may of come from a <a href="#producers	">producer</a> such as <code>XMLHttpRequest</code>. Additionally, it demonstrates how to read a stream until an EOF is encountered.
+			The example demonstrates how to read a chunk of data from a <a>ReadableByteStream</a> using <code>read()</code>.
+			The <a>ReadableByteStream</a> may of come from a <a href="#producers">producer</a> such as <code>XMLHttpRequest</code>.
+			Additionally, it demonstrates how to read a stream until an EOF is encountered.
 		</p>
 
-		<pre class="example">
-// Read the first 1024 bytes of the stream as UTF-8
+		<pre class="example">// Read up to 1024 bytes from the ReadableByteStream
 stream.readEncoding = "UTF-8";
 stream.readType = "arraybuffer";
-Promise readPromise = stream.read(1024);
-readPromise.then(
-  function(result) {
-    console.log("Loaded" + result.size + " bytes");
-    // Handle result.data
+stream.read(1024).then(
+  function (result) {
+    // Process data
   },
-  function(error) {
+  function (error) {
     // Handle error
-  }
-);
+  });</pre>
 
-// Read data from the stream repeatedly
+		<pre class="example">// Read data from the ReadableByteStream repeatedly
 function readUntilEof() {
-  stream.read(1024).then(
-    function(result) {
-      // Handle read data
-      someProcessFunction(result.data);
-
-      // Print progress
-      someReportFunction(result.size);
+  stream.read().then(
+    function (result) {
+      processData(result.data);
 
       if (!result.eof) {
         readUntilEof();
       }
     },
-    function(error) {
+    function (error) {
       // Handle error
-    }
-  );
+    });
 }
-		</pre>
+
+readUntilEof();</pre>
 
 		<p>
 			In the example below, different code blocks handle progress, error, and success conditions.
-			The example below demonstrates how to obtain a <a>Stream</a> from <code>XMLHttpRequest</code> to begin playing a large video in <code>readystate</code> 3. The example takes the <a>Stream</a> from a <a href="#producers">producer</a>, <code>XMLHttpRequest</code>, and gives to a <a href="#consumers">consumer</a>, the video tag.
+			The example below demonstrates how to obtain a <a>ReadableByteStream</a> from <a>XMLHttpRequest</a> to begin playing a large video in <code>readystate</code> LOADING.
+			The example takes the <a>ReadableByteStream</a> from a <a href="#producers">producer</a>, <a>XMLHttpRequest</a>, and gives it to a <a href="#consumers">consumer</a>, the video tag.
 		</p>
 
-		<pre class="example">
-function handler() {
+		<pre class="example">function handler() {
   if(this.readyState == this.LOADING) {
     var theStream = this.response;
     var streamURL = URL.createObjectURL(theStream);
@@ -251,30 +269,29 @@ client.setRequestHeader('customHeader', 'value');
 client.setRequestHeader('customHeader2', 'value2');
 client.open("GET", "myvideo.h264");
 client.responseType = "stream";
-client.send();
-		</pre>
+client.send();</pre>
 
 		<p>
-			In addition to reading a Stream, this specification introduces a programatic way to write data to a Stream.
-			The <a>Stream</a> interface provides a <code>write()</code> method which allows applications to build the data to be read by a Stream <a href="#consumers">consumer</a> by appending the data to an internal buffer.
-			<code>write()</code> supports appending data as a <code>Blob</code>, <code>ArrayBuffer</code>, or <code>DOMString</code> to the buffer.
+			In addition to the <a>ReadableByteStream</a> interface, this specification introduces an interface called <a>WritableByteStream</a> for data consuming APIs.
+			The <a>WritableByteStream</a> interface provides a <code>write()</code> method which allows applications to write data to a <a href="#consumers">data consuming API</a>.
+			<code>write()</code> supports writing bytes represented as a <a>Blob</a>, <a>ArrayBuffer</a>, or <a>DOMString</a>.
 		</p>
 		<p>
 			The example below demonstrates how to use <code>write()</code> to load a Stream into the audio tag, whose data could be processed and built dynamically at read time.
 		</p>
 
-		<pre class="example">
-var theStream = new Stream("audio/mp3");
+		<pre class="example">var stream = new ByteStream("audio/mp3");
 
-function writeData(){
-  var moreData;
+function writeData() {
   // Do work to create more data to place into the stream
+  var data = generateMusic();
 
   // If we have no more data to process and place in the stream, we close
   if (moreData == null){
-    theStream.close();
+    stream.writeClose();
   } else{
-    theStream.write(moreData).then(
+    // Wait until write() completes.
+    stream.write(data).then(
       function () {
         writeData();
       },
@@ -285,441 +302,884 @@ function writeData(){
   }
 }
 
-var streamURL = URL.createObjectURL(theStream);
+var streamURL = URL.createObjectURL(stream);
 document.getElementById('audioTag').src = streamURL;
 
 writeData();</pre>
-	</section>
-
-	<section class="section" id="streams">
-		<h2>Streams</h2>
 
 		<p>
-			This section introduces the <code>Stream</code> interface, as well as accompanying interfaces required as part of the <a>Stream</a> implementation. This includes a constructor to build a <a>Stream</a>, as well as methods to <code>read</code>, <code>write</code>, <code>skip</code>, <code>pipe</code>, and <code>close</code> streams.
+			An producer can also do work only when pulled by using <code>awaitSpaceAvailable()</code>, which will inform the producer when to produce data. This is useful when high-performance is necessary.
 		</p>
 
-		<section class="section" id="stream-interface">
-			<h2>The Stream Interface</h2>
+		<pre class="example">function poll() {
+  stream.awaitSpaceAvailable().then(
+    function (pulledAmount) {
+      stream.write(generateRandomBytes(pulledAmount));
+      poll();
+    }
+  );
+}
 
-			<p>
-				This interface represents a raw sequence of linear data which can be read only once over time.
-				It provides a <a href="#widl-Stream-type">type</a> attribute which represents the type of data in the Stream.
-				It also provides the ability to read and write the contents of the Stream.
-			</p>
+poll();</pre>
+	</section>
 
-			<p>
-				A Stream is an object that:
-			</p>
-			<ul>
-				<li>Has a content type;</li>
-				<li>Has unspecified length;</li>
-				<li>Data is read first in, first out;</li>
-				<li>Once data is read from it, the data is removed and can no longer be re-read;</li>
-			</ul>
+	<section class="section" id="writableByteStream">
+		<h2>WriteableByteStream Interface</h2>
+		<p>
+			The WritableByteStream interface defines a protocol for APIs which consume byte streams. The protocol includes:
+			<ol>
+				<li>How to receive the byte stream</li>
+				<li>How to notify the writer of completion of writing</li>
+				<li>How to notify the writer of how much data can be currently accepted</li>
+			</ol>
 
-			<p>
-				A Stream object has an associated <dfn>write closed flag</dfn>.
-				It is set when the <a href="#widl-Stream-close-void">close()</a> method is called.
-				This flag is internal, so scripts cannot access it directly.
-			</p>
+			By returning a <a>Promise</a> and delaying fulfillment of it, the WritableByteStream realizes flow control.
+		</p>
 
-			<p>
-				A Stream object has an associated <dfn>write pending flag</dfn>. It is set when the <a href="#widl-Stream-write-Promise-DOMString-ArrayBufferView-Blob-data">write()</a> method is called and unset when it's completed.
-				This flag is internal, so scripts cannot access it directly.
-			</p>
+		<p>
+			A WritableByteStream has an associated data sink identified by <dfn>dataSink</dfn>, which notifies the WritableByteStream of the number of bytes the data sink can newly accept.
+		</p>
 
-			<p>
-				A Stream object has an associated <dfn>read pending flag</dfn>. It is set when <a href="#widl-Stream-read-Promise---Clamp--unsigned-long-long-size">read()</a>, <a href="#widl-Stream-skip-Promise---Clamp--unsigned-long-long-size">skip()</a> or <a href="#widl-Stream-pipe-Promise---Stream-or-Stream----destination--Clamp--unsigned-long-long-size">pipe()</a> method is called and unset when it's completed.
-				This flag is internal, so scripts cannot access it directly.
-			</p>
+		<p>
+			A WritableByteStream has a one-to-one mapping with the associated data sink, and has defined semantics for <a href='#interactingWithDataSink'>interacting with the data sink internally</a>.
+		</p>
 
-			<p>
-				A Stream holds a sequence of bytes possibly terminated by a terminator.
-				<dfn id="write-to-stream">Writing bytes to a Stream</dfn> means appending the bytes to the sequence.
-				<dfn id="terminate-stream">Terminating a Stream</dfn> means appending a terminator to the sequence.
-				<dfn id="read-from-stream">Reading bytes from a Stream</dfn> pops bytes from the head of the sequence.
-				If a terminator is encountered while reading bytes from a Stream, it is said <dfn id="eof-reached">the EOF is reached</dfn>.
-				This sequence is internal, so scripts cannot access it directly.
-			</p>
+		<section class="section">
+			<h3>WritableByteStream interface</h3>
 
-			<dl class="idl" title="interface Stream">
-				<dt>Constructor(optional DOMString type)</dt>
-				<dd>Constructs a <a>Stream</a> and sets the <a href="#widl-Stream-type">type</a> to the specified value.
-					<dl class="parameters">
-						<dt>in optional DOMString type</dt>
-						<dd>
-							Specifies the MIME type [[!RFC2046]] of the <a>Stream</a>.
-						</dd>
-					</dl>
-				</dd>
-
-				<dt>readonly attribute DOMString type</dt>
-				<dd>
-					Returns the ASCII-encoded string in lower case representing the media type of the <code>Stream</code>,
-					expressed as an RFC2046 MIME type [[!RFC2046]].
-					Conforming user agents SHOULD return the MIME type of the <code>Stream</code>, if it is known.
-					If conforming user agents cannot determine the media type of the <code>Stream</code>, they MUST return the empty string.
-					A string is a valid MIME type if it matches the media-type token defined in section 3.7 "Media Types" of RFC 2616 [[!HTTP11]].
-				</dd>
-
-				<dt>attribute <a>StreamReadType</a> readType</dt>
+			<dl class="idl" title="interface WritableByteStream">
+				<dt>attribute DOMString writeEncoding</dt>
 				<dd>
 					<p>
-						Returns the type of the last read operation taken on the <a>Stream</a>. On getting, conforming user agents must return the type of the last read operation. If no read operation has taken place and the <code>readType</code> was not set, then return the empty string. This can be set to the empty string (default), "<code>arraybuffer</code>", "<code>blob</code>" and "<code>text</code>" to change the type of the read operation.
+						Specifies a <a>DOMString</a> that represents the label of an encoding [[!EncodingDetermination]].
+						If set, it will be used as part of the encoding determination used when processing a <a>DOMString</a> provided in a <code>write()</code> method call.
+						It will return the label last set, or the empty DOMString if never set.
 					</p>
+
+					<section class="note">
+						This parameter is not designed to be specified as an argument of write() since it's not likely to be changed frequently.
+					</section>
 				</dd>
 
-				<dt>attribute DOMString readEncoding</dt>
+				<dt>Promise&amp;lt;unsigned long long&gt; write()</dt>
 				<dd>
 					<p>
-						A <code>DOMString</code> that represents the label of an encoding [[!EncodingDetermination]]. If set, it will be used as part of the encoding determination used when processing a <code>read</code> call. If not set, it will return the empty string.
+						This method writes the specified <var>data</var> to the WritableByteStream.
 					</p>
-				</dd>
 
-				<dt>Promise write((DOMString or ArrayBufferView or Blob) data)</dt>
-				<dd>
 					<p>
-						This method writes data to the <a>Stream</a>.
-						Another write() or close() call must not be made until the returned Promise is resolved or rejected.
-						Resolution of the returned Promise doesn't necessarily mean that the data written has been successfully read.
-						The user agent must run the steps below (unless otherwise indicated):
+						This method must run the steps below:
+						<ol>
+							<li>Let <var>latchedEncoding</var> be the current value of <a href="#widl-WritableByteStream-writeEncoding">writeEncoding</a></li>
+
+							<li><a>Abort wait</a></li>
+
+							<li>
+								<dl class="switch">
+									<dt>If <var>data</var> is a <a>Blob</a> or an <a>ArrayBufferView</a></dt>
+									<dd>
+										<ol>
+											<li>Let <var>bytesToWrite</var> be the bytes represented by <var>data</var></li>
+										</ol>
+									</dd>
+									<dt>Otherwise</dt>
+									<dd>
+										<ol>
+											<li>If <var>data</var> is not a <a>DOMString</a>, let <var>data</var> be a DOMString representing <var>data</var></li>
+											<li>Let <var>bytesToWrite</var> be the result of encoding <var>data</var> using <var>latchedEncoding</var></li>
+										</ol>
+									</dd>
+								</dl>
+							</li>
+							<li>Let <var>numBytesToWrite</var> be the size of <var>bytesToWrite</var></li>
+
+							<li>Let <var>writePromise</var> be a new <a>Promise</a></li>
+
+							<li>Let <var>tuple</var> be a new <a>pendingWrite</a></li>
+							<li>Set <var>writePromise</var> of <var>tuple</var> to <var>writePromise</var></li>
+							<li>Set <var>size</var> of <var>tuple</var> to <var>numBytesToWrite</var></li>
+							<li>Push <var>tuple</var> to <a>pendingWriteQueue</a></li>
+
+							<li><a>Process pendingWriteQueue</a></li>
+
+							<li>Return <var>writePromise</var>, and then continue to process the steps in this algorithm</li>
+
+							<li>Write <var>bytesToWrite</var> to <a>dataSink</a></li>
+						</ol>
 					</p>
 
-					<ol>
-						<li>
-							If the <a>Stream</a> has been neutered, throw an "<code><a>InvalidStateError</a></code>" [[!DOM4]] exception and terminate these steps.
-						</li>
-						<li>
-							If the <a>write closed flag</a> is set, throw an "<code><a>InvalidStateError</a></code>" [[!DOM4]] exception and terminate these steps.
-						</li>
-						<li>
-							If the <a>write pending flag</a> is set, throw an "<code><a>InvalidStateError</a></code>" [[!DOM4]] exception and terminate these steps.
-						</li>
-						<li>
-							Set the <a>write pending flag</a>.
-						</li>
-						<li>
-							Let <code>writePromise</code> be a new promise.
-						</li>
-						<li>
-							Return <code>writePromise</code>, but continue to process the steps in this algorithm.
-						</li>
-						<li>
-							Execute the rules below, depending on the type of <code>data</code>:
-							<dl class="switch">
-								<dt><code>ArrayBufferView</code></dt>
-								<dd>
-									Let <code>rawData</code> be the raw data represented by the <code>Blob</code> object.
-								</dd>
-								<dt><code>Blob</code></dt>
-								<dd>
-									Let <code>rawData</code> be the data stored in the section of the buffer described by the <code>ArrayBuffer</code> object that the <code>ArrayBufferView</code> object references.
-								</dd>
-								<dt><code>DOMString</code></dt>
-								<dd>
-									Let <code>rawData</code> be the result of <a href="http://encoding.spec.whatwg.org/#encode">encoding</a> <code>data</code> to binary data using the encoding determined by the [[!EncodingDetermination]].
-								</dd>
-							</dl>
-						</li>
-						<li>
-							<a href="#write-to-stream">Write <code>rawData</code> to the Stream</a>.
-						</li>
-						<li>
-							If an error has occurred during the write, neuter the <a>Stream</a>, let <code>exception</code> be an "<code><a>InvalidStateError</a></code>" [[!DOM4]] exception and run <code>Reject(<code>writePromise</code>, <code>exception</code>)</code> as specified in the promises spec and terminate this algorithm.
-						<li>
-							Unset the <a>write pending flag</a> and run <code>Resolve(<code>writePromise</code>, <code>undefined</code>)</code> as specified in the promises spec. Implementations may delay this step if appropriate.
-						</li>
-					</ol>
+					<p>
+						If <var>data</var> argument is an <a>ArrayBufferView</a>, modifications made on the ArrayBufferView's contents between <code>write()</code> method call and fulfill of the returned Promise may affect the data written to <a>dataSink</a>.
+					</p>
+
 					<dl class="parameters">
 						<dt>(DOMString or ArrayBufferView or Blob) data</dt>
 						<dd>Data to write.</dd>
 					</dl>
 				</dd>
 
-				<dt>void close()</dt>
+				<dt>Promise&amp;lt;unsigned long long&gt; awaitSpaceAvailable()</dt>
 				<dd>
 					<p>
-						This method closes the <a>Stream</a> and does not allow any future writes. This is an irreversible operation; once a <a>Stream</a> has been closed, it cannot be written to again.
-						When all data has been read from the <a>Stream</a> on which close() has been called, i.e. <a href="#eof-reached">EOF is reached</a>, it resolves the Promise returned by read() with a <a>StreamConsumeResult</a> with the <a href="#widl-StreamConsumeResult-eof">eof</a> attribute set to true.
-						The user agent must run the steps below:
+						This method waits until the WritableByteStream becomes able to accept any non-zero amount of data.
+						The returned <a>Promise</a> will be fulfilled with the number of bytes the WritableByteStream can accept.
 					</p>
 
-					<ol>
-						<li>
-							If the <a>Stream</a> has been neutered, throw an "<code><a>InvalidStateError</a></code>" [[!DOM4]] exception and terminate these steps.
-						</li>
-						<li>
-							If the <a>write closed flag</a> is set, throw an "<code><a>InvalidStateError</a></code>" [[!DOM4]] exception and terminate these steps.
-						</li>
-						<li>
-							If the <a>write pending flag</a> is set, throw an "<code><a>InvalidStateError</a></code>" [[!DOM4]] exception and terminate these steps.
-						</li>
-						<li>
-							Set the <a>write closed flag</a>.
-						</li>
-						<li>
-							<a href="#terminate-stream">Terminate the Stream</a>.
-						</li>
-						<li>
-							If an error has occurred during writing a stream termination, neuter the <a>Stream</a> and terminate these steps.
-						</li>
-					</ol>
-				</dd>
-
-				<dt>Promise read(optional [Clamp] unsigned long long size)</dt>
-				<dd>
 					<p>
-						This method reads data from the <a>Stream</a>.
-						This method takes an optional <code>size</code> which represents the number of bytes to be read.
-						Another read(), skip() or pipe() call must not be made until the returned Promise is resolved or rejected.
-						The user agent must run the steps below (unless otherwise indicated):
-					</p>
-
-					<ol>
-						<li>
-							If the <a>Stream</a> has been neutered, throw an "<code><a>InvalidStateError</a></code>" [[!DOM4]] exception and terminate these steps.
-						</li>
-						<li>
-							If the <a>read pending flag</a> is set, throw an "<code><a>InvalidStateError</a></code>" [[!DOM4]] exception and terminate these steps.
-						</li>
-						<li>
-							If <code>size</code> is specified but is 0, throw a "<code><a>SyntaxError</a></code>" [[!DOM4]] exception and terminate these steps.
-						</li>
-						<li>
-							Set the <a>read pending flag</a>.
-						</li>
-						<li>
-							Let <code>readPromise</code> be a new promise.
-						</li>
-						<li>
-							Return <code>readPromise</code>, but continue to process the steps in this algorithm.
-						</li>
-						<li>
-							If <code>size</code> is specified, <a href="#read-from-stream">read data from the Stream</a> until <code>size</code> bytes are read.
-						</li>
-						<li>
-							Otherwise, <a href="#read-from-stream">read data from the Stream</a> until any non-zero bytes are read.
-						</li>
-						<li>
-							If an error has occurred during reading, neuter the <a>Stream</a>, let <code>exception</code> be an "<code><a>InvalidStateError</a></code>" [[!DOM4]] exception and run <code>Reject(<code>readPromise</code>, <code>exception</code>)</code> as specified in the promises spec and terminate these steps.
-						</li>
-						<li>
-							Let <code>result</code> be a newly created <a>StreamConsumeResult</a>.
-						</li>
-						<li>
-							If EOF is reached, set the <a href="#widl-StreamConsumeResult-eof">eof</a> attribute of <code>result</code> to true.
-						</li>
-						<li>
-							Otherwise, set the <a href="#widl-StreamConsumeResult-eof">eof</a> attribute of <code>result</code> to false.
-						</li>
-						<li>
-							Set the <a href="#widl-StreamConsumeResult-eof">data</a> attribute of <code>result</code> to the result of executing the steps below.
-							<dl class="switch">
-								<dt>If <a href="#widl-Stream-readType">readType</a> is the empty string or "<code title>text</code>"</dt>
-								<dd>
-									<ol>
-										<li>
-											If readEncoding is not null, let <var>charset</var> be <code>readEncoding</code>.
-										</li>
-										<li>
-											Otherwise, let <var>charset</var> be utf-8.
-										</li>
-										<li>
-											Let <code>result</code> be result of <a href="http://encoding.spec.whatwg.org/#decode">decoding</a> the data read using fallback encoding <var>charset</var>.
-										</li>
-									</ol>
-								</dd>
-								<dt>If <a href="#widl-Stream-readType">readType</a> is the empty string or "<code title>blob</code>"</dt>
-								<dd>
-									Let <code>result</code> be a blob created from the read data.
-								</dd>
-								<dt>If <a href="#widl-Stream-readType">readType</a> is the empty string or "<code title>arraybuffer</code>"</dt>
-								<dd>
-									Let <code>result</code> be an array buffer created from the read data.
-								</dd>
-							</dl>
-						</li>
-						<li>
-							Unset the <a>read pending flag</a> and run <code>Resolve(<code>readPromise</code>, <code>result</code>)</code> as specified in the promises spec.
-						</li>
-					</ol>
-					<dl class="parameters">
-						<dt>optional [Clamp] unsigned long long size</dt>
-						<dd>Number of bytes to read.</dd>
-					</dl>
-				</dd>
-
-				<dt>Promise skip(![Clamp] unsigned long long size)</dt>
-				<dd>
-					<p>
-						This method reads data from the <a>Stream</a> and ignore them.
-						This method takes optionally a <code>size</code> which represents the number of bytes to be read and ignored.
-						Another read(), skip() or pipe() call must not be made until the returned Promise is resolved or rejected.
-						The user agent must run the steps below:
-					</p>
-
-					<ol>
-						<li>
-							If the <a>Stream</a> has been neutered, throw an "<code><a>InvalidStateError</a></code>" [[!DOM4]] exception and terminate these steps.
-						</li>
-						<li>
-							If the <span>read pending flag</span> is set, throw an "<code><a>InvalidStateError</a></code>" [[!DOM4]] exception and terminate these steps.
-						</li>
-						<li>
-							If <code>size</code> is specified but is 0, throw a "<code><a>SyntaxError</a></code>" [[!DOM4]] exception and terminate these steps.
-						</li>
-						<li>
-							Set <span>read pending flag</span>.
-						</li>
-						<li>
-							Let <code>readPromise</code> be a new promise.
-						</li>
-						<li>
-							Return the <code>skip()</code> method with <code>readPromise</code>, but continue to process the steps in this algorithm.
-						</li>
-						<li>
-							If <code>size</code> is specified, <a href="#read-from-stream">read data from the Stream</a> until <code>size</code> bytes are read.
-						</li>
-						<li>
-							Otherwise, <a href="#read-from-stream">read data from the Stream</a> until any non-zero bytes are read.
-						</li>
-						<li>
-							If any error has occurred during reading, neuter the <a>Stream</a>, let <code>exception</code> be an "<code><a>InvalidStateError</a></code>" [[!DOM4]] exception and run <code>Reject(<code>readPromise</code>, <code>exception</code>)</code> as specified in the promises spec and terminate these steps.
-						</li>
-						<li>
-							Let <code>result</code> be a newly created <a>StreamConsumeResult</a> object.
-						</li>
-						<li>
-							If EOF is reached, set the <a href="#widl-StreamConsumeResult-eof">eof</a> attribute of <code>result</code> to true.
-						</li>
-						<li>
-							Otherwise, set the <a href="#widl-StreamConsumeResult-eof">eof</a> attribute of <code>result</code> set to false.
-						</li>
-						<li>
-							Set the <a href="#widl-StreamConsumeResult-eof">size</a> attribute of <code>result</code> to the size of the read data in bytes.
-						</li>
-						<li>
-							Unset the <a>read pending flag</a> and run <code>Resolve(readPromise, result)</code> as specified in the promises spec.
-						</li>
-					</ol>
-          <dl class="parameters">
-            <dt>![Clamp] unsigned long long size</dt>
-            <dd>Number of bytes to read and ignore.</dd>
-          </dl>
-				</dd>
-
-				<dt>Promise pipe((Stream or Stream[]) destinations, optional [Clamp] unsigned long long size)</dt>
-				<dd>
-					<p>
-						This method transfers data from the <a>Stream</a> to another Stream.
-						This method takes a <code>destinations</code> and optionally a <code>size</code>.
-						Another read(), skip() or pipe() call must not be made until the returned Promise is resolved or rejected.
-						Resolution of the returned Promise doesn't necessarily mean that the data transferred to the destination Stream has been successfully read from the Stream.
-						The user agent must run the steps below:
-
+						This method must run the steps below:
 						<ol>
+							<li><a>Abort wait</a></li>
+
+							<li>Set <a>waitPromise</a> to a new <a>Promise</a></li>
+							<li>Return <a>waitPromise</a>, and then continue to process the steps in this algorithm</li>
+							<li>Wait until <a>pendingWriteQueue</a> is empty and <a>bytesRequested</a> is not 0</li>
 							<li>
-								If the <a>Stream</a> has been neutered, throw an "<code><a>InvalidStateError</a></code>" [[!DOM4]] exception and terminate these steps.
-							</li>
-							<li>
-								If the <a>read pending flag</a> is set, throw an "<code><a>InvalidStateError</a></code>" [[!DOM4]] exception and terminate these steps.
-							</li>
-							<li>
-								If <code>size</code> is specified but is 0, throw a "<code><a>SyntaxError</a></code>" [[!DOM4]] exception and terminate these steps.
-							</li>
-							<li>
-								If <code>destinations</code> is a <a>Stream</a>, let <code>destinations</code> instead be an array consisting of just that <a>Stream</a>.
-							</li>
-							<li>
-								Set the <a>read pending flag</a>.
-							</li>
-							<li>
-								Let <code>readPromise</code> be a new promise.
-							</li>
-							<li>
-								Return the pipe() method with <code>readPromise</code>, but continue to process the steps in this algorithm.
-							</li>
-							<li>
-								If <code>size</code> is specified, <a href="#read-from-stream">read data from the stream</a> until <code>size</code> bytes are read.
-							</li>
-							<li>
-								Otherwise, <a href="#read-from-stream">read data from the Stream</a> until <a href="#eof-reached">EOF is reached</a>.
-							</li>
-							<li>
-								As read data becomes available, <a href="#write-to-stream">write newly read data to <code>destinations</code></a>.
-							</li>
-							<li>
-								If any error has occurred during reading or writing to <code>destinations</code>, neuter the <a>Stream</a>, let <code>exception</code> be an "<code><a>InvalidStateError</a></code>" exception and run <code>Reject(<code>readPromise</code>, <code>exception</code>)</code> as specified in the promises spec and terminate these steps.
-							</li>
-							<li>
-								Once read and write are both completed for all destination streams, run the following algorithm:
+								Queue a task to run the steps below:
 								<ol>
-									<li>
-										Let <code>result</code> be a newly created <a>StreamConsumeResult</a> object.
-									</li>
-									<li>
-										If <a href="#eof-reached">EOF is reached</a>, set <a href="#widl-StreamConsumeResult-eof">eof</a> attribute of <code>result</code> to true.
-									</li>
-									<li>
-										Otherwise, set <a href="#widl-StreamConsumeResult-eof">eof</a> attribute of <code>result</code> set to false.
-									</li>
-									<li>
-										Set <a href="#widl-StreamConsumeResult-size">size</a> attribute of <code>result</code> to the total size of the read data.
-									</li>
-									<li>
-										Unset the <a>read pending flag</a> and run <code>Resolve(<code>readPromise</code>, <code>result</code>)</code> as specified in the promises spec.
-									</li>
+									<li>If <a>waitPromise</a> is <code>null</code>, terminate these steps</li>
+									<li>Let <var>detachedWaitPromise</var> be <a>waitPromise</a></li>
+									<li>Set <a>waitPromise</a> to <code>null</code></li>
+									<li>Fulfill <var>detachedWaitPromise</var> with <a>bytesRequested</a></li>
 								</ol>
 							</li>
 						</ol>
-            <dl class="parameters">
-              <dt>!(Stream or Stream[]) destination</dt>
-              <dd>Destination <a>Stream</a>.</dd>
-              <dt>optional [Clamp] unsigned long long size</dt>
-              <dd>Number of bytes to transfer.</dd>
-            </dl>
+					</p>
+				</dd>
+
+				<dt>void writeClose()</dt>
+				<dd>
+					<p>
+						This method tells the WritableByteStream that no more data will be written to it.
+						Once writeClose() has been called on a WritableByteStream, no further method calls can be made on the WritableByteStream.
+					</p>
+
+					<p>
+						This method must write the EOF to <a>dataSink</a>.
 					</p>
 				</dd>
 			</dl>
 		</section>
 
-		<section class="section" id="streamConsumeResult-interface">
-			<h2>StreamConsumeResult Interface</h2>
-			<dl class="idl" title="interface StreamConsumeResult">
-				<dt>readonly attribute boolean eof</dt>
-				<dd>specifies if the given read resulted in an EOF for the <a>Stream</a></dd>
-				<dt>readonly attribute any data</dt>
-				<dd>The contents of the read request</dd>
-				<dt>readonly attribute unsigned long long size</dt>
-				<dd>The size, in bytes, of the data read</dd>
+		<section class="section">
+			<h2>Data sink model</h2>
+
+			<p>
+				The data sink is the underlying mechanism in which a <a>WritableByteStream</a> interacts with and stores its data.
+			</p>
+
+			<p>
+				A data sink to which the <a>WritableByteStream</a> interface writes bytes can be anything which:
+				<ol>
+					<li>Accepts bytes</li>
+					<li>
+						Can notify <a>WritableByteStream</a> of how much data the data sink can newly accept.
+						When and how to generate such notifications is up to data sinks.
+						Data sinks must be able to accept data more than it notified <a>WritableByteStream</a> of.
+					</li>
+				</ol>
+			</p>
+		</section>
+
+		<section class="section" id='interactingWithDataSink'>
+			<h2>Interacting with the data sink</h2>
+
+			<p>
+				This section defines the internal mechanisms for how the WritableByteStream interacts with the data sink. This section specifies both the internal properties as well as the algorithms for interaction with the data sink.
+			</p>
+
+			<p>
+				A WritableByteStream has an associated integer variable <dfn>bytesRequested</dfn> which holds the number of bytes that can be written to the <a>dataSink</a>.
+				This variable is initialized to 0 on construction.
+			</p>
+
+			<p>
+				An associated <a>Promise</a> <dfn>waitPromise</dfn> which is used by the <code>awaitSpaceAvailable()</code> method.
+				This variable is initialized to null on construction.
+			</p>
+
+			<p>
+				To <dfn>abort wait</dfn>, run the steps below:
+				<ol>
+					<li>If <a>waitPromise</a> is <code>null</code>, terminate these steps</li>
+					<li>Let <var>detachedWaitPromise</var> be <a>waitPromise</a></li>
+					<li>Set <a>waitPromise</a> to <code>null</code></li>
+					<li>Reject <var>detachedWaitPromise</var> with an "<code><a>AbortError</a></code>"</li>
+				</ol>
+			</p>
+
+			<p>
+				A struct type <dfn>pendingWrite</dfn> which has the following members:
+				<ul>
+					<li>A <a>Promise</a> <var>writePromise</var></li>
+					<li>An integer <var>size</var></li>
+					<li>An integer <var>bytesAcknowledged</var></li>
+				</ul>
+			</p>
+			<p>
+				An associated queue <dfn>pendingWriteQueue</dfn> which holds <a>pendingWrite</a>s.
+				This queue is initialized to an empty queue on construction.
+			</p>
+
+			<p>
+				To <dfn>process pendingWriteQueue</dfn>, repeat the steps below:
+				<ol>
+					<li>If <a>pendingWriteQueue</a> is empty, break from this loop</li>
+					<li>Let <var>headTuple</var> be the head element of <a>pendingWriteQueue</a></li>
+					<li>Let <var>bytesToAcknowledge</var> be min((<var>size</var> of <var>headTuple</var>) - (<var>bytesAcknowledged<var> of <var>headTuple</var>), <a>bytesRequested</a>)</li>
+					<li>Set <a>bytesRequested</a> to <a>bytesRequested</a> - <var>bytesToAcknowledge</var></li>
+					<li>Set <var>bytesAcknowledged</var> of <var>headTuple</var> to (<var>bytesAcknowledged</var> of <var>head</var>) + <var>bytesToAcknowledge</var></li>
+					<li>
+						If <var>bytesAcknowledged</var> of <var>headTuple</var> equals to <var>size</var> of <var>headTuple</var>, run the steps below:
+						<ol>
+							<li>Pop <var>headTuple</var> form <a>pendingWriteQueue</a></li>
+							<li>If <var>writePromise</var> of <var>headTuple</var> is not <code>null</code>, fulfill it with <var>size</var> of <var>headTuple</var></li>
+						</ol>
+				</ol>
+			</p>
+
+			<p>
+				When <a>dataSink</a> requests <var>bytesNewlyRequested</var> more bytes, queue a task which runs the steps below:
+				<ol>
+					<li>Set <a>bytesRequested</a> to <a>bytesRequested</a> + <var>bytesNewlyRequested</var></li>
+					<li><a>Process pendingWriteQueue</a></li>
+				</ol>
+			</p>
+		</section>
+	</section>
+
+	<section class="section" id="readableByteStream">
+
+	<h2>ReadableByteSteam Interface</h2>
+		<p>
+			The ReadableByteStream interface defines a protocol for APIs which produce a byte stream. This protocol includes:
+			<ol>
+				<li>How to receive a read request from the reader and output bytes</li>
+				<li>How to transfer data in bulk to another <a>WritableByteStream</a> (by using the <code>pipe()</code> method)</li>
+				<li>How to mirror data to multiple destinations (by using the <code>fork()</code>)</li>
+			</ol>
+
+			By returning a <a>Promise</a> and delaying fulfillment of it, the ReadableByteStream realizes asynchronous data consumption.
+		</p>
+
+		<p>
+				Interfaces introduced in this section provide simple and convenient ways to consume data.
+				They connect arbitrary byte stream producer and byte stream consuming JavaScript code using Promises and method invocations.
+		</p>
+
+		<p>
+			A ReadableByteStream has a one-to-one mapping with an associated data source, and has defined semantics for <a href='#interactingWithDataSource'>interacting with the data source internally</a>. A data source, however, can have a one-to-many relationship with ReadableByteStream, in cases where <code>fork()</code> is used.
+		</p>
+
+	    <section class="section" id="readableByteStreamInterface">
+			<h3>ReadableByteStream interface</h3>
+
+
+			<dl class="idl" title="interface ReadableByteStream">
+				<dt>readonly attribute DOMString type</dt>
+				<dd>
+					Returns the ASCII-encoded string in lower case representing the media type of the <code>Stream</code>,
+					expressed as an RFC2046 MIME type [[!RFC2046]].
+					Conforming user agents SHOULD return the MIME type of the <code>ReadableByteStream</code>, if it is known.
+					If conforming user agents cannot determine the media type of the <code>ReadableByteStream</code>, they MUST return the empty string.
+					A string is a valid MIME type if it matches the media-type token defined in section 3.7 "Media Types" of RFC 2616 [[!HTTP11]].
+				</dd>
+
+				<dt>attribute ByteStreamReadType readType</dt>
+				<dd>
+					<p>
+						Specifies what data type will be returned by a <code>read()</code> and <code>readExact()</code> method call.
+						This attribute can be set to any of the supported types in <a>ByteStreamReadType</a>.
+						The default value for this attribute is "<code>arraybuffer</code>".
+					</p>
+				</dd>
+
+				<dt>attribute DOMString readEncoding</dt>
+				<dd>
+					<p>
+						Specifies a <a>DOMString</a> that represents the label of an encoding [[!EncodingDetermination]].
+						If set, it will be used as part of the encoding determination used when processing a <code>read()</code> method call.
+					</p>
+
+					<section class="note">
+						This parameter is not designed to be specified as an argument of <code>read()</code> since it's not likely to be changed frequently.
+					</section>
+				</dd>
+
+				<dt>attribute unsigned long long pullAmount</dt>
+				<dd>
+					<p>
+						This attribute provides ReadableByteStream with a hint of how many bytes the reader can consume currently.
+						Each implementation of ReadableByteStream must initialize the value of pullAmount on construction.
+					</p>
+
+					<p>
+						When this attribute is set, <a>retrieve bytes</a>.
+					</p>
+
+					<section class="note">
+						This flow control functionality is provided as a separated attribute rather than as an argument of the read() method based on the assumption that this value is not changed frequently.
+					</section>
+					<section class="note">
+						It's possible that the number of bytes received by <code>read()</code> is more than the pullAmount value.
+					</section>
+				</dd>
+
+				<dt>Promise&amp;lt;ByteStreamReadResult&gt; readExact()</dt>
+				<dd>
+					<p>
+						This method reads data from the ReadableByteStream.
+						The returned Promise is fulfilled only when bytes of the specified size is read or the EOF is reached.
+						The size of data read by this method is exactly the same as the specified size unless an EOF was reached, in which case there will be less bytes, which were the remaining bytes until the EOF.
+					</p>
+
+					<p>
+						This method must run the steps below:
+						<ol>
+							<li>If <a href="#widl-ReadableByteStream-readType">readType</a> is "<code>text</code>" throw a "<code><a>SyntaxError</a></code>"</li>
+
+							<li>If <a>readPending</a> is set, throw an "<code><a>InvalidStateError</a></code>"</li>
+							<li>Set <a>readPending</a></li>
+
+							<li>Let <var>latchedType</var> be the current value of <a href="#widl-ReadableByteStream-readType">readType</a></li>
+							<li>Let <var>latchedEncoding</var> be the current value of <a href="#widl-ReadableByteStream-readEncoding">readEncoding</a></li>
+
+							<li>Set <a>readExactPullAmount</a> to <var>size</var></li>
+							<li>Set <a>numBytesBeingReturned</a> to 0</li>
+
+							<li><a>Retrieve bytes</a></li>
+
+							<li>Let <var>readPromise</var> be a new <a>Promise</a></li>
+							<li>Return <var>readPromise</var>, and then continue to process the steps in this algorithm</li>
+
+							<li>Wait until the number of bytes in <a>readDataBuffer</a> becomes equal to or greater than <var>size</var> or <a>eofReached</a> is set</li>
+
+							<li>
+								Queue a task which runs the steps below:
+								<ol>
+									<li>Let <var>numBytesReadable</var> be the number of bytes in <a>readDataBuffer</a></li>
+									<li>Let <var>bytesToOutput</var> be min(<var>size</var>, <var>numBytesReadable</var>)</li>
+									<li>Set <a>numBytesBeingReturned</a> to <var>bytesToOutput</var></li>
+									<li>Pop <var>bytesToOutput</var> bytes from <a>readDataBuffer</a>, and then let <var>readBytes</var> be the popped bytes</li>
+
+									<li>Set <a>readExactPullAmount</a> to 0</li>
+
+									<li>Unset <a>readPending</a></li>
+
+									<li>Let <var>result</var> be a new <a>ByteStreamReadResult</a></li>
+									<li>
+										<dl class="switch">
+											<dt>If <var>latchedType</var> is "<code>none</code>"</dt>
+											<dd>Set <a href="#widl-ByteStreamReadResult-data">data</a> of <var>result</var> to <code>undefined</code></dd>
+											<dt>Otherwise</dt>
+											<dd>Set <a href="#widl-ByteStreamReadResult-data">data</a> of <var>result</var> to an object of the type specified by <var>latchedType</var> which represents <var>readBytes</var></dd>
+										</dl>
+									</li>
+									<li>Set <a href="#widl-ByteStreamReadResult-eof">eof</a> of <var>result</var> to <code>true</code> if <a>readDataBuffer</a> is empty and <a>eofReached</a> is set</li>
+									<li>Set <a href="#widl-ByteStreamReadResult-size">size</a> of <var>result</var> to <var>bytesToOutput</var></li>
+									<li>Fulfill <var>readPromise</var> with <var>result</var></li>
+								</ol>
+							</li>
+						</ol>
+					</p>
+
+					<dl class="parameters">
+						<dt>[Clamp] unsigned long long size</dt>
+						<dd>Number of bytes to read.</dd>
+					</dl>
+
+					<section class="note">
+						This method is useful if
+						<ol>
+							<li>You don't want to get notified of new data unless bytes of the specified number become available.</li>
+							<li>You don't want to get your data fragmented into multiple parts, thus avoiding the need to buffer and combine chunks yourself.</li>
+						</ol>
+					</section>
+				</dd>
+
+				<dt>Promise&amp;lt;ByteStreamReadResult&gt; read()</dt>
+				<dd>
+					<p>
+						This method reads data from the ReadableByteStream.
+						The speed of reading can be roughly adjusted by using <a href="#widl-ByteStreamReadResult-pullAmount">pullAmount</a>.
+						pullAmount doesn't necessarily limit the size of data being read by this method.
+					</p>
+
+					<p>
+						This method must run the steps below:
+
+						<ol>
+							<li>If <a>readPending</a> is set, throw an "<code><a>InvalidStateError</a></code>"</li>
+							<li>Set <a>readPending</a></li>
+
+							<li>Let <var>latchedType</var> be the current value of <a href="#widl-ReadableByteStream-readType">readType</a> attribute</li>
+							<li>Let <var>latchedEncoding</var> be the current value of <a href="#widl-ReadableByteStream-readEncoding">readEncoding</a> attribute</li>
+
+							<li>Set <a>numBytesBeingReturned</a> to 0</li>
+
+							<li><a>Retrieve bytes</a></li>
+
+							<li>Let <var>readPromise</var> be a new <a>Promise</a></li>
+							<li>Return <var>readPromise</var>, and then continue to process the steps in this algorithm</li>
+
+							<li>
+								<dl class="switch">
+									<dt>If <var>latchedType</var> is "<code>text</code>"</dt>
+									<dd>
+										<ol>
+											<li>
+												Wait until bytes in <a>readDataBuffer</a> can be converted into a non-empty <a>DOMString</a> when decoded using <var>latchedEncoding</var> or <a>eofReached</a> is set
+											</li>
+											<li>
+												Queue a task which runs the rest of this algorithm
+											</li>
+											<li>
+												Pop non-zero number of bytes from <a>readDataBuffer</a> which can be fully converted into a non-empty <a>DOMString</a> when decoded using <var>latchedEncoding</var>, and then let <var>readBytes</var> be the result of the conversion.
+												If <a>eofReached</a> is set and there are no such bytes, reject <var>readPromise</var> and terminate these steps.
+											</li>
+											<li>
+												Let <var>readData</var> be the result of decoding <var>readBytes</var> using <var>latchedEncoding</var>.
+												If this throws an <var>exception</var>, reject <var>readPromise</var> with <var>exception</var>.
+											</li>
+										</ol>
+									</dd>
+									<dt>Otherwise</dt>
+									<dd>
+										<ol>
+											<li>Wait until <a>readDataBuffer</a> becomes non-empty or <a>eofReached</a> is set</li>
+											<li>
+												Queue a task which runs the rest of this algorithm
+											</li>
+											<li>
+												Pop non-zero number of bytes from <a>readDataBuffer</a>, and then let <var>readBytes</var> be the popped bytes
+												<section class="note">
+													Implementations may choose to pop only part of bytes readable if it helps reducing memory copy.
+												</section>
+											</li>
+											<li>
+												<dl class="switch">
+													<dt>If <var>latchedType</var> is "<code>none</code>"</dt>
+													<dd>Let <var>readData</var> be <code>undefined</code></dd>
+													<dt>Otherwise</dt>
+													<dd>Let <var>readData</var> be an object of the type specified by <var>latchedType</var> which represents <var>readBytes</var></dd>
+												</dl>
+											</li>
+										</ol>
+									</dd>
+								</dl>
+							</li>
+							<li>Let <var>bytesConsumed</var> be the size of <var>readBytes</var></li>
+
+							<li>Let <var>result</var> be a new <a>ByteStreamReadResult</a>.</li>
+							<li>Set <a href="#widl-ByteStreamReadResult-data">data</a> of <var>result</var> to <var>readData</var></li>
+							<li>Set <a href="#widl-ByteStreamReadResult-eof">eof</a> of <var>result</var> to <code>true</code> if <a>eofReached</a> is set and <a>readDataBuffer</a> is empty</li>
+							<li>Set <a href="#widl-ByteStreamReadResult-size">size</a> of <var>result</var> to <var>bytesConsumed</var>.</li>
+
+							<li>Set <a>numBytesBeingReturned</a> to <var>bytesConsumed</var></li>
+
+							<li>Unset <a>readPending</a></li>
+
+							<li>Fulfill <var>readPromise</var> with <var>result</var></li>
+						</ol>
+					</p>
+
+					<section class="note">
+						This method is useful if
+						<ol>
+							<li>You don't care in what size and as how many fragments the data will be received</li>
+							<li>You want to limit the number of bytes read for flow control</li>
+						</ol>
+					</section>
+				</dd>
+
+				<dt>Promise&amp;lt;ByteStreamReadResult&gt; pipe()</dt>
+				<dd>
+					<p>
+						This method bulk transfers bytes from the ReadableByteStream to another <a>WritableByteStream</a>.
+					</p>
+
+					<section class="note">
+						Fulfillment of the returned Promise doesn't necessarily mean that the data transferred to <var>destination</var> has been successfully read from it.
+					</section>
+
+					<section class="note">
+						TODO: Rewrite this to update numBytesBeingReturned as bytesAcknowledged of pendingWrites are updated
+					</section>
+
+					<p>
+						This method must run the steps below:
+
+						<ol>
+							<li>If <a>readPending</a> is set, throw an "<code><a>InvalidStateError</a></code>"</li>
+							<li>Set <a>readPending</a></li>
+
+							<li><a>Abort wait</a> <var>destination</var></a>
+
+							<li>Set <a>numBytesBeingReturned</a> to 0</li>
+
+							<li><a>Retrieve bytes</a></li>
+
+							<li>Let <var>pipePromise</var> be a new <a>Promise</a></li>
+							<li>Return <var>pipePromise</var>, and then continue to process the steps in this algorithm</li>
+
+							<li>Let <var>totalBytesTransferred</var> be 0</li>
+							<li>
+								Repeat the steps below:
+								<ul>
+									<li>
+										Whenever <a>readDataBuffer</a> is not empty or <a>eofReached</a> is set,
+										<dl class="switch">
+											<dt>If this happened in the event loop</dt>
+											<dd>Run the steps below</dd>
+											<dt>Otherwise</dt>
+											<dd>Queue a task which runs the steps below</dd>
+										</dl>
+										<ol>
+											<li>Let <var>numBytesReadable</var> be the number of bytes in <a>readDataBuffer</a></li>
+											<li>
+												<dl class="switch">
+													<dt>If <var>size</var> is specified</dt>
+													<dd>Let <var>bytesToTransfer</var> be min(<var>size</var> - <var>totalBytesTransferred</var>, <var>numBytesReadable</var>)</dd>
+													<dt>Otherwise</dt>
+													<dd>Let <var>bytesToTransfer</var> be <var>numBytesReadable</var></dd>
+												</dl>
+											</li>
+											<li>Set <a>numBytesBeingReturned</a> to <a>numBytesBeingReturned</a> + <var>bytesToTransfer</var></li>
+											<li>Pop <var>bytesToTransfer</var> bytes from <a>readDataBuffer</a>, and then write it to <a>dataSink</a> of <var>destination</var></li>
+
+											<li>Let <var>tuple</var> be a new <a>pendingWrite</a></li>
+											<li>Set <var>writePromise</var> of <var>tuple</var> to <code>null</code></li>
+											<li>Set <var>size</var> of <var>tuple</var> to <var>bytesToTransfer</var></li>
+											<li>Push <var>tuple</var> to <a>pendingWriteQueue</a> of <var>destination</var></li>
+
+											<li>Set <var>totalBytesTransferred</var> to <var>totalBytesTransferred</var> + <var>bytesToTransfer</var></li>
+
+											<li>
+												<dl class="switch">
+													<dt>If <a>eofReached</a> is set</dt>
+													<dd>Break from this loop</dd>
+													<dt>If <var>size</var> is specified and <var>totalBytesTransferred</var> equals to <var>size</var></dt>
+													<dd>Break from this loop</dd>
+												</dl>
+											</li>
+										</ol>
+									</li>
+									<li>
+										Whenever <a>pendingWriteQueue</a> of <var>destination</var> is empty and <a>bytesRequested</a> of <var>destination</var> is not 0,
+										<dl class="switch">
+											<dt>If this happened in the event loop</dt>
+											<dd>Run the steps below</dd>
+											<dt>Otherwise</dt>
+											<dd>Queue a task which runs the steps below</dd>
+										</dl>
+										<ol>
+											<li>Let <var>bytesRequested</var> be <a>bytesRequested</a> of <var>destination</var></li>
+											<li>
+												<dl class="switch">
+													<dt>If <var>size</var> is specified</dt>
+													<dd>
+														Set <a>pipePullAmount</a> to min(<var>size</var> - <var>totalBytesTransferred</var>, <var>bytesRequested</var>)
+														<section class="note">
+															If <a href="#widl-ReadableByteStream-pullAmount">pullAmount</a> is set to 0, pipe() transfers data in pull style.
+															I.e. only bytes of the same number as the number of bytes writable to <var>destination</var> are retrieved from the data source.
+														</section>
+														<section class="note">
+															Setting <a href="#widl-ReadableByteStream-pullAmount">pullAmount</a> to a small value doesn't have an effect of throttling the pace of pipe().
+														</section>
+													</dd>
+													<dt>Otherwise</dt>
+													<dd>Set <a>pipePullAmount</a> to <var>bytesRequested</var></dd>
+												</dl>
+											</li>
+											<li>Set <a>numBytesBeingReturned</a> to 0</li>
+											<li><a>Retrieve bytes</a></li>
+										</ol>
+									</li>
+								</ul>
+							</li>
+
+							<li>Set <a>pipePullAmount</a> to 0</li>
+
+							<li>Unset <a>readPending</a></li>
+
+							<li>Let <var>result</var> be a new <a>ByteStreamReadResult</a></li>
+							<li>Set <a href="#widl-ByteStreamReadResult-data">data</a> of <var>result</var> to <var>readData</var> to <code>undefined</code>.
+							<li>Set <a href="#widl-ByteStreamReadResult-eof">eof</a> of <var>result</var> to <code>true</code> if <a>the EOF is reached</a></li>
+							<li>Set <a href="#widl-ByteStreamReadResult-size">size</a> of <var>result</var> to <var>totalBytesTransferred</var></li>
+							<li>
+								Fulfill <var>readPromise</var> with <var>result</var>
+								<section class="note">
+									At this point, <a>numBytesBeingReturned</a> is not yet reset
+								</section>
+							</li>
+						</ol>
+					</p>
+
+					<dl class="parameters">
+						<dt>WritableByteStream destination</dt>
+						<dd>Destination <a>WritableByteStream</a>.</dd>
+						<dt>optional [Clamp] unsigned long long size</dt>
+						<dd>Number of bytes to transfer.</dd>
+					</dl>
+				</dd>
+
+				<dt>ReadableByteStream fork()</dt>
+				<dd>
+					<p>
+						This method creates a new ReadableByteStream which refers to the same <a>dataSource</a> as the current ReadableByteStream.
+						Data sources are range reference counted so that a range in a data source is freed only when all the ReadableByteStreams sharing the data source finish consuming it.
+					</p>
+
+					<p>
+						This method must run the steps below:
+						<ol>
+							<li>Let <var>branch</var> be a new ReadableByteStream which refers to <a>dataSource</a> and has the same <a>numBytesRequested</a> value, <a>readDataBuffer</a> contents and <a>eofReached</a> value as the current ReadableByteStream.</li>
+							<li>If <a>numBytesRequested</a> is not 0, up to <a>numBytesRequested</a> bytes arriving in the future must be forwarded to <var>branch</var>.</li>
+							<li>Return <var>branch</var>.</li>
+						</ol>
+					</p>
+				</dd>
+
+				<dt>void readClose()</dt>
+				<dd>
+					<p>
+						This method tells the ReadableByteStream that no more data will be read from it.
+					</p>
+				</dd>
 			</dl>
 		</section>
 
-		<section class="section" id="streamReadType-interface">
-			<h2>StreamReadType Interface</h2>
-			<dl class="idl" title="enum StreamReadType">
-				<dt>blob</dt>
-				<dd>Read operations should return data as a Blob</dd>
-				<dt>arraybuffer</dt>
-				<dd>Read operations should return data as an ArrayBuffer</dd>
-				<dt>text</dt>
-				<dd>Read operations should return data as a DOMString</dd>
+		<section class="section" id='readableByteStreamDataSource'>
+			<h3>Data source model</h3>
+
+			<p>
+				A data source produces the bytes to be consumed via the <a>ReadableByteStream</a> interface instances. The data source model is not directly surfaced in the API, and is described here to provide details on how internal operations such as <a href="#widl-ReadableByteStream-fork-ReadableByteStream">fork()</a> can be handled.
+			</p>
+
+			<p>
+				A <dfn>data source</dfn> from which <a>ReadableByteStream</a> retrieves bytes can be anything that:
+				<ol>
+					<li>Produces bytes</li>
+					<li>
+						Receives retrieval requests for generation of bytes from a <a>ReadableByteStream</a> and replies to it with the newly produced bytes.
+						Interpretation of the request is up to data sources.
+						Data sources may respond to retrieval requests with data larger than requested.
+						Data sources may produce bytes and send to <a>ReadableByteStream</a> unsolicitedly without receiving any retrieval request.
+					</li>
+				</ol>
+			</p>
+
+			<p>
+				To allow multiple consumers, we use a wrapper <dfn>data source wrapper</dfn> for range reference counting on produced bytes.
+				A <a>data source wrapper</a> has the following functionalities:
+				<ul>
+					<li>has a <var>queue</var> to which newly produced bytes are pushed</li>
+					<li>has a sorted map <dfn>cursorMap</dfn> whose key is reader ID and value is integer called cursor</li>
+					<li>can issue reader IDs which are unique to the <a>data source wrapper</a> instance when requested</li>
+					<li>pops bytes from <var>queue</var> when the smallest cursor in <a>cursorMap</a> by the difference of the new smallest cursor and the old smallest cursor</li>
+					<li>when there's not sufficient bytes in <var>queue</var> to respond to coming retrieval request, retrieves bytes from the wrapped data source</li>
+				</ul>
+			</p>
+
+		    <p>
+				When <a href="#widl-ReadableByteStream-fork-ReadableByteStream">fork()</a> is called, a new reader is registered to the original <a>ReadableByteStream</a>'s data source and the new <a>ReadableByteStream</a> uses read() method to fetch data from it.
+		    </p>
+	    </section>
+	
+	    <section class="section" id="interactingWithDataSource">
+	    <h2>Interacting with the data source</h2>
+
+	    <section class="note">
+				This interface is designed to work even if operations on <a>dataSource</a> are asynchronous.
+				If <a>dataSource</a> is synchronously accessible, some of the algorithms can be simplified.
+			</section>
+
+			<p>
+				A ReadableByteStream has an associated <a>data source</a> referred by <dfn>dataSource</dfn> from which the ReadableByteStream retrieves bytes.
+				The data source model is explained in <a href="#h2_data_source">this section</a>.
+				A data source can be shared by multiple ReadableByteStream instances when <code>fork()</code> is used.
+				A ReadableByteStream is registered with a data source on construction and given a reader ID.
+				The <a>dataSource</a> of a ReadableByteStream refers to its data source, and <dfn>readerId</dfn> of a ReadableByteStream refers to its reader ID.
+			</p>
+
+			<p>
+				A ReadableByteStream has the following internal mechanisms:
+			</p>
+
+			<p>
+				An associated flag <dfn>readPending</dfn> which prevents multiple read operations from being run.
+				This flag is set to false on construction.
+			</p>
+
+			<p>
+				An associated integer variable <dfn>readExactPullAmount</dfn> which temporarily overrides <a href="#widl-ReadableByteStream-pullAmount">pullAmount</a> if necessary for a <code>readExact()</code> method call.
+				This variable is initialized to 0 on construction.
+			</p>
+			<p>
+				An associated integer variable <dfn>pipePullAmount</dfn> which temporarily overrides <a href="#widl-ReadableByteStream-pullAmount">pullAmount</a> if necessary for a <code>pipe()</code> method call.
+				This variable is initialized to 0 on construction.
+			</p>
+
+			<p>
+				An associated integer variable <dfn>numBytesRequested</dfn> which holds the number of bytes being retrieved from the <a>dataSource</a>.
+				This variable is initialized to 0 on construction.
+			</p>
+			<p>
+				An associated integer variable <dfn>numBytesBeingReturned</dfn> which holds the number of bytes consumed on the last read operation.
+				This variable is initialized to 0 on construction.
+
+				<section class="note">
+					numBytesBeingReturned delays replenishment of pullAmount until the next read()/pipe() operation is made.
+				</section>
+			</p>
+
+			<p>
+				An associated queue <dfn>readDataBuffer</dfn> which holds the bytes retrieved from <a>dataSource</a>.
+				This queue is initialized to an empty queue on construction.
+				<section class="note">
+					Retrieved bytes can be queued in <a>readDataBuffer</a> in any form.
+					For example, if bytes were retrieved as <a>ArrayBufferView</a> fragments, it's ok to store them as-is to avoid unnecessary copy.
+					If the object representing retrieved bytes is a DOMString, that should be accompanied with the encoding to use to decode it.
+				</section>
+			</p>
+
+			<p>
+				An associated flag <dfn>eofReached</dfn> which indicates that the EOF was received from the <a>dataSource</a>.
+			</p>
+
+			<p>
+				To <dfn>retrieve bytes</dfn>, run the steps below:
+				<ol>
+					<li>Let <var>numBytesReadable</var> be the number of bytes in the <a>readDataBuffer</a></li>
+					<li>Let <var>numBytesToRetrieve</var> be max(max(<a href="#widl-ReadableByteStream-pullAmount">pullAmount</a>, <a>readExactPullAmount</a>, <a>pipePullAmount</a>) - (<a>numBytesRequested</a> + <var>numBytesReadable</var> + <a>numBytesBeingReturned</a>), 0)</li>
+					<li>Set <a>numBytesRequested</a> to <a>numBytesRequested</a> + <var>numBytesToRetrieve</var></li>
+					<li>Send a request to the <a>dataSource</a> to return <var>numBytesToRetrieve</var> bytes to the ReadableByteStream</li>
+				</ol>
+			</p>
+
+			<p>
+				When bytes are received from <a>dataSource</a>, queue a task which runs the steps below:
+				<ol>
+					<li>Let <var>bytesReceived</var> be the received bytes</li>
+					<li>Let <var>numBytesReceived</var> be the size of <var>bytesReceived</var></li>
+					<li>Set <a>numBytesRequested</a> to <a>numBytesRequested</a> - <var>numBytesReceived</var></li>
+					<li>Push <var>bytesReceived</var> to <a>readDataBuffer</a></li>
+				</ol>
+			</p>
+
+			<p>
+				When the EOF is received from <a>dataSource</a>, queue a task which sets <a>eofReached</a>.
+			</p>
+
+	    </section>
+	</section>
+
+	<section class="section">
+		<h2>ByteStreamReadResult Interface</h2>
+
+		<p>
+			This interface represents the result of methods on <a>ReadableByteStream</a>.
+		</p>
+
+		<dl class="idl" title="interface ByteStreamReadResult">
+			<dt>readonly attribute boolean eof</dt>
+			<dd>Set if the operation resulted in an EOF</dd>
+			<dt>readonly attribute any data</dt>
+			<dd>The contents read converted into an object of the specified type</dd>
+			<dt>readonly attribute unsigned long long size</dt>
+			<dd>The size, in bytes, of the data read</dd>
+		</dl>
+	</section>
+
+	<section class="section">
+		<h2>ByteStreamReadType enum</h2>
+
+		<p>
+			Data can be read as various data types from <a>ReadableByteStream</a>.
+			This enum defines <a>DOMString</a> values to specify the data types.
+		</p>
+
+		<dl class="idl" title="enum ByteStreamReadType">
+			<dt>blob</dt>
+			<dd>Read operations should return data as a <a>Blob</a></dd>
+			<dt>arraybuffer</dt>
+			<dd>Read operations should return data as an <a>ArrayBuffer</a></dd>
+			<dt>text</dt>
+			<dd>Read operations should return data as a <a>DOMString</a></dd>
+			<dt>none</dt>
+			<dd>
+				Read operations should return nothing.
+				Useful for seeking data by skipping some amount of data.
+				User agents may implement some optimization for "<code>none</code>" type read for example omitting internal data transfer.
+			</dd>
+		</dl>
+	</section>
+
+	<section class="section" id="streams">
+		<h2>ByteStream</h2>
+
+		<p>
+			This section introduces a simple implementation of the <a>WritableByteStream</a> and <a>ReadableByteStream</a> named <code>ByteStream</code>, as well as accompanying interfaces required as part of the <a>ByteStream</a> implementation.
+			This includes a constructor to build a <a>ByteStream</a> object and the type attribute.
+		</p>
+
+		<section class="section" id="stream-interface">
+			<h2>ByteStream Interface</h2>
+
+			<p>
+				This interface represents a sequence of bytes which can be read only once over time and to which we can push data.
+			</p>
+
+			<p>
+				A ByteStream has an associated <dfn>bufferedDataQueue</dfn>.
+				The buffer can be stored in memory or backed by slower devices such as a disk.
+			</p>
+
+			<p>
+				The ByteStream inherits the <a>WritableByteStream</a> interface.
+				Its <a>dataSink</a> is <a>bufferedDataQueue</a> wrapped with a <a>data source wrapper</a>.
+			</p>
+
+			<p>
+				The ByteStream inherits the <a>ReadableByteStream</a> interface.
+				Its <a>dataSource</a> is also <a>bufferedDataQueue</a>.
+			</p>
+
+			<p>
+				<a>bufferedDataQueue</a> just forwards retrieval requests coming from the <a>data source wrapper</a> to the <a>WritableByteStream</a> as a notification of the number of newly acceptable bytes with the same amount.
+			</p>
+
+			<dl class="idl" title="interface ByteStream : ReadableByteStream, WritableByteStream">
+				<dt>Constructor()</dt>
+				<dd>
+					Constructs a <a>ByteStream</a> and sets the <a href="#widl-ByteStream-type">type</a> to the specified value.
+
+					<dl class="parameters">
+						<dt>in unsigned long long pullAmount</dt>
+						<dd>
+							Specifies the initial value of <a href="#widl-ReadableByteStream-pullAmount">pullAmount</a>.
+						</dd>
+						<dt>in optional DOMString type</dt>
+						<dd>
+							Specifies the MIME type [[!RFC2046]] of the <a>ByteStream</a>.
+						</dd>
+					</dl>
+				</dd>
 			</dl>
 		</section>
 
 		<section class="section" id="error-uris_for_streams">
 			<h3>URIs for Stream</h3>
 			<p>
-				To reference a <a>Stream</a>, <a href="http://dev.w3.org/2006/webapi/FileAPI/#url">the same URI used</a> for <code>Blobs</code> and <code>Files</code> in
+				To reference a <a>ByteStream</a>, <a href="http://dev.w3.org/2006/webapi/FileAPI/#url">the same URI used</a> for <code>Blobs</code> and <code>Files</code> in
 				<a href="http://dev.w3.org/2006/webapi/FileAPI/#url">6.7. A URI for Blob and File reference</a> of
 				the File API specification should be used. [[!FILE-API]]
-				The definitions of <strong>Origin</strong>, <strong>Lifetime</strong>, <strong>Referencing</strong>, and <strong>Dereferencing</strong> of a <code>Blob</code> should be applied to a <a>Stream</a>.
+				The definitions of <strong>Origin</strong>, <strong>Lifetime</strong>, <strong>Referencing</strong>, and <strong>Dereferencing</strong> of a <code>Blob</code> should be applied to a <a>ByteStream</a>.
 			</p>
 
 			<section class="section" id="creating-revoking-streamuri">
 				<h4>Creating and Revoking a Stream URI</h4>
 				<p>
-					A <dfn id="stream-uri">Stream URI</dfn> is a <code>Blob URI</code> that is referencing a <a>Stream</a>.
+					A <dfn id="stream-uri">Stream URI</dfn> is a <code>Blob URI</code> that is referencing a <a>ReadableByteStream</a>.
 					These URIs are created and revoked using methods exposed on the URL object,
 					as defined in <a href="http://dev.w3.org/2006/webapi/FileAPI/#creating-revoking">6.7.5. Creating and Revoking a Blob URI</a>
 					of the File API specification. [[!FILE-API]]
@@ -730,26 +1190,26 @@ writeData();</pre>
 					should both be extended as follows:
 				</p>
 				<dl class="idl" title="interface URL">
-					<dt>static DOMString? createObjectURL(in (Blob or Stream) object)</dt>
+					<dt>static DOMString? createObjectURL(in (Blob or ReadableByteStream) object)</dt>
 					<dd>
 						<p>
 							The extension onto <code>createObjectURL</code> should have the following steps added.
 						</p>
-            <p>
-							Returns a unique Blob URL each time it is called on a valid <code>object</code> argument, which is a non-null <a>Stream</a> in scope of the global object's URL property from which this static method is called. This method must act as follows:
+						<p>
+							Returns a unique Blob URL each time it is called on a valid <code>object</code> argument, which is a non-null <a>ReadableByteStream</a> in scope of the global object's URL property from which this static method is called. This method must act as follows:
 							<ol>
 								<li>
-									If called with a <code>Stream</code> argument that is NOT valid, then user agents must return null.
+									If called with a <a>ReadableByteStream</a> argument that is NOT valid, then user agents must return null.
 								</li>
 								<li>
-									If called with a valid <code>Stream</code> argument,
+									If called with a valid <a>ReadableByteStream</a> argument,
 									user agents must run the following sub-steps:
 									<ol>
 										<li>
-											If the <a>read pending flag</a> of the <a>Stream</a> is set, return null.
+											If <a>readPending</a> of the <a>ReadableByteStream</a> is set, return null.
 										</li>
 										<li>
-											Set the <a>read pending flag</a> of the <a>Stream</a>.
+											Set <a>readPending</a> of the <a>ReadableByteStream</a>.
 										</li>
 										<li>
 											Return a unique <code>Blob URI</code> that can be used to dereference the <code>stream</code> argument.
@@ -763,26 +1223,26 @@ writeData();</pre>
 						</p>
 					</dd>
 
-					<dt>static DOMString? createFor(in (Blob or Stream) object)</dt>
+					<dt>static DOMString? createFor(in (Blob or ReadableByteStream) object)</dt>
 					<dd>
 						<p>
 							The extension onto <code>createFor</code> should have the following steps added.
 						</p>
 						<p>
-							Returns a unique Blob URL each time it is called on a valid <code>object</code> argument, which is a non-null <a>Stream</a> in scope of the global object's URL property from which this static method is called. Blob URLs created with this method are said to be auto-revoking since user-agents are responsible for the revocation of Blob URLs created with this method, subject to the lifetime stipulation for Blob URLs. This method must act as follows:
+							Returns a unique Blob URL each time it is called on a valid <code>object</code> argument, which is a non-null <a>ReadableByteStream</a> in scope of the global object's URL property from which this static method is called. Blob URLs created with this method are said to be auto-revoking since user-agents are responsible for the revocation of Blob URLs created with this method, subject to the lifetime stipulation for Blob URLs. This method must act as follows:
 							<ol>
 								<li>
-									If called with a <code>Stream</code> argument that is NOT valid, then user agents must return null.
+									If called with a <a>ReadableByteStream</a> argument that is NOT valid, then user agents must return null.
 								</li>
 								<li>
-									If called with a valid <code>Stream</code> argument,
+									If called with a valid <a>ReadableByteStream</a> argument,
 									user agents must run the following sub-steps:
 									<ol>
 										<li>
-											If the <a>read pending flag</a> of the <a>Stream</a> is set, return null.
+											If <a>readPending</a> of the <a>ReadableByteStream</a> is set, return null.
 										</li>
 										<li>
-											Set the <a>read pending flag</a> of the <a>Stream</a>.
+											Set <a>readPending</a> of the <a>ReadableByteStream</a>.
 										</li>
 										<li>
 											Return a unique <code>Blob URI</code> that can be used to dereference the <code>stream</code> argument.
@@ -806,15 +1266,15 @@ writeData();</pre>
 						</p>
 						<ol>
 							<li>
-								If the URL refers to a <code>Blob</code> or <code>Stream</code> that is both
+								If the URL refers to a <a>Blob</a> or <a>ReadableByteStream</a> that is both
 								valid and in the same origin of the global object’s <code>URL</code> property on which this static method was called,
 								user agents MUST return a 404 response code when the URL is dereferenced.
 							</li>
 							<li>
-								If the URL refers to a <code>Blob</code> or <code>Stream</code> that is <strong>not</strong> valid
+								If the URL refers to a <a>Blob</a> or <a>ReadableByteStream</a> that is <strong>not</strong> valid
 								or if the value provided for the URL argument is not a <code>Blob URI</code>
-								or if the URL argument refers to a <code>Blob</code> or <code>Stream</code> that is <strong>not</strong> in the same origin
-								as the global object’s <code>URL</code> property, this method call does nothing.
+								or if the URL argument refers to a <a>Blob</a> or <a>ReadableByteStream</a> that is <strong>not</strong> in the same origin
+								as the global object’s<code>URL</code> property, this method call does nothing.
 								User agents MAY display a message on their error console.
 							</li>
 						</ol>
@@ -834,12 +1294,13 @@ writeData();</pre>
 			<h2>Stream Consumers</h2>
 			<p>This section outlines APIs which can consume a Stream object</p>
 			<ul>
-				<li>WebAudio</li>
-				<li>MediaSourceExtensions</li>
-				<li>WebCrypt</li>
+				<li>Web Audio</li>
+				<li>Media Source Extensions</li>
+				<li>Web Cryptography API</li>
 				<li>TextEncoder</li>
 				<li>TextDecoder</li>
 				<li>WebSockets</li>
+				<li>RTCPeerConnection</li>
 			</ul>
 		</section>
 
@@ -850,13 +1311,14 @@ writeData();</pre>
 				<li>XMLHttpRequest</li>
 				<li>FileReader</li>
 				<li>Media Capture</li>
-				<li>Media Recording API</li>
-				<li>IndexedDB</li>
-				<li>WebCrypt</li>
+				<li>MediaStream Recording API</li>
+				<li>Indexed Database</li>
+				<li>Web Cryptography API</li>
 				<li>TextEncoder</li>
 				<li>TextDecoder</li>
 				<li>WebSockets</li>
 				<li>EventSource</li>
+				<li>RTCPeerConnection</li>
 			</ul>
 		</section>
 	</section>
@@ -864,20 +1326,20 @@ writeData();</pre>
 	<section class="section" id="security">
 		<h2>Security Considerations</h2>
 		<p>
-			A <a>Stream</a> should have the same security considerations as a <code>Blob</code>.
+			A <a>ReadableByteStream</a> should have the same security considerations as a <code>Blob</code>.
 			This is outlined in <a href="http://dev.w3.org/2006/webapi/FileAPI/#security-discussion">6.8. Security Considerations</a>
 			of the File API specification. [[!FILE-API]]
-			Because a <a>Stream</a> uses a <code>Blob URI</code>, cross origin requests on a <a>Stream</a> will not be supported.
+			Because a <a>ReadableByteStream</a> uses a <code>Blob URI</code>, cross origin requests on a <a>ReadableByteStream</a> will not be supported.
 		</p>
 	</section>
 
 	<section class="section" id="XMLHttpRequest">
 		<h2>Extension of XMLHttpRequest</h2>
 		<p>
-			This specification proposes an extension to <code>XMLHttpRequest</code> [[!XMLHTTPREQUEST2]] to add support for <a>Stream</a>. This section is temporary and is meant to provide a recommendation for how <a>Stream</a> should be incorporated into <code>XMLHttpRequest</code>.
-			This will extend <code>XMLHttpRequest</code> to allow for receiving and uploading of a <a>Stream</a>.
+			This specification proposes an extension to <code>XMLHttpRequest</code> [[!XMLHTTPREQUEST2]] to add support for <a>ByteStream</a>. This section is temporary and is meant to provide a recommendation for how <a>ByteStream</a> should be incorporated into <code>XMLHttpRequest</code>.
+			This will extend <code>XMLHttpRequest</code> to allow for receiving and uploading of a <a>ByteStream</a>.
 			One such scenario is providing access to data during <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#dom-xmlhttprequest-readystate"><code>readyState</code></a> 3 (LOADING).
-			The sections below document in detail what extensions must be done to <code>XMLHttpRequest</code> to support <a>Stream</a>.
+			The sections below document in detail what extensions must be done to <code>XMLHttpRequest</code> to support <a>ByteStream</a>.
 		</p>
 
 		<section class="section" title="addition-of-stream-response-entity">
@@ -887,16 +1349,16 @@ writeData();</pre>
 				in XMLHttpRequest specification [[!XMLHTTPREQUEST2]] should have the following additions:
 			</p>
 			<p>
-				The <dfn id="stream-response-entity">stream response entity body</dfn> is either a <a>Stream</a> representing the <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html#response-entity-body">response entity body</a> or null.
+				The <dfn id="stream-response-entity">stream response entity body</dfn> is either a <a>ByteStream</a> representing the <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html#response-entity-body">response entity body</a> or null.
 				If the <a href="#stream-response-entity">stream response entity body</a> is null, let it be the return value of the following algorithm:
 			</p>
 			<ol>
 				<li>
 					If the <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html#response-entity-body">response entity body</a> is null,
-					return an empty <a>Stream</a> object.
+					return an empty <a>ByteStream</a> object.
 				</li>
 				<li>
-					Return a <a>Stream</a> object representing the <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html#response-entity-body">response entity body</a>.
+					Return a <a>ByteStream</a> object representing the <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html#response-entity-body">response entity body</a>.
 				</li>
 			</ol>
 		</section>
@@ -926,7 +1388,7 @@ enum XMLHttpRequestResponseType {
 			<p>
 				The algorithm of the <code>response</code> attribute should be modified to handle the new <code>responseType</code> value "<code>stream</code>".
 				A Stream is binary data obtained sequentially over time.
-				Given this, a <a>Stream</a> should be accessible in <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html#dom-xmlhttprequest-readystate"><code>readyState</code></a> 3 (LOADING).
+				Given this, a <a>ByteStream</a> should be accessible in <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html#dom-xmlhttprequest-readystate"><code>readyState</code></a> 3 (LOADING).
 			</p>
 			<p>
 				<a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#the-response-attribute">The section named "The response attribute"</a> in XMLHttpRequest specification [[!XMLHTTPREQUEST2]] should now read:
@@ -969,18 +1431,17 @@ enum XMLHttpRequestResponseType {
 				in XMLHttpRequest specification [[!XMLHTTPREQUEST2]] should have the following additions:
 			</p>
 			<dl class="switch">
-				<dt><a>Stream</a></dt>
+				<dt><a>ReadableByteStream</a></dt>
 				<dd>
 					<p>
-						If the object's <a href="#widl-Stream-type">type</a> attribute is not the empty string let <var>mime type</var> be its value.
+						If the object's <a href="#widl-ByteStream-type">type</a> attribute is not the empty string let <var>mime type</var> be its value.
 					</p>
 					<p>
-						Set the <a>read pending flag</a> for the stream.
+						Set <a>readPending</a> of the <a>ReadableByteStream</a>.
 					</p>
 					<p>
 						Let the <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html#request-entity-body">request entity body</a> be the raw data represented by <var>data</var>.
 					</p>
-					<p>Once the read is completed for the request, call <a href="#widl-Stream-close-void">close()</a> on the stream</p>
 				</dd>
 			</dl>
 		</section>
@@ -990,7 +1451,7 @@ enum XMLHttpRequestResponseType {
 		<h2>Terminology</h2>
 
 		<p>
-			<dfn>ArrayBufferView</dfn> is defined in <a href="http://www.khronos.org/registry/typedarray/specs/latest/">Typed Array specification</a>.
+			<dfn>ArrayBuffer</dfn> and <dfn>ArrayBufferView</dfn> are defined in <a href="http://www.khronos.org/registry/typedarray/specs/latest/">Typed Array specification</a>.
 		</p>
 
 		<p>
@@ -1006,6 +1467,11 @@ enum XMLHttpRequestResponseType {
 		</p>
 
 		<p>
+			<dfn>XMLHttpRequest</dfn> is defined in [[!XMLHTTPREQUEST2]].
+		</p>
+
+		<p>
+			<dfn>AbortError</dfn> is defined in <a href="https://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#aborterror">DOM4 specification</a>.
 			<dfn>InvalidStateError</dfn> is defined in <a href="https://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#invalidstateerror">DOM4 specification</a>.
 			<dfn>SyntaxError</dfn> is defined in <a href="https://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#syntaxerror">DOM4 specification</a>.
 		</p>
@@ -1014,7 +1480,7 @@ enum XMLHttpRequestResponseType {
 	<section class="section" id="requirements">
 		<h2>Requirements and Use Cases</h2>
 		<p>
-			The <a>Stream</a> type allows for completion of several end-to-end experiences. This section covers what the requirements are for this API, and
+			The <a>ByteStream</a> type allows for completion of several end-to-end experiences. This section covers what the requirements are for this API, and
 			illustrates some use cases.
 		</p>
 		<ul>
@@ -1026,14 +1492,14 @@ enum XMLHttpRequestResponseType {
 				</p>
 			</li>
 			<li>
-				Begin processing the data of a <a>Stream</a> as it is being read via <code>XMLHttpRequest</code>
+				Begin processing the data of a <a>ByteStream</a> as it is being read via <code>XMLHttpRequest</code>
 				<p>
 					If a file format is understood, then an application can make sense of the data as it being made available. For example, a given
 					file may be very large and the application wants to begin processing the data immediately, rather than having to wait for full download of the file.
 				</p>
 			</li>
 			<li>
-				Upload of dynamic runtime data using <a>Stream</a> and <code>XMLHttpRequest</code>
+				Upload of dynamic runtime data using <a>ByteStream</a> and <code>XMLHttpRequest</code>
 				<p>
 					There are situations where an application may have data to upload once the application is processing. This could involve processing
 					of data an application wants to upload as it is being created. One such case is the upload of GPS coordinates within an application. The
@@ -1041,7 +1507,7 @@ enum XMLHttpRequestResponseType {
 				</p>
 			</li>
 			<li>
-				Media streaming scenarios using <a>Stream</a> and <code>XMLHttpRequest</code>
+				Media streaming scenarios using <a>ByteStream</a> and <code>XMLHttpRequest</code>
 				<p>
 					Media streaming scenarios require the ability to quickly receive data over the network and connect it to a media element. An application can successfully accomplish this by receiving a Stream in <code>readyState</code> LOADING and assign it to a media element. This helps avoid the application from having to buffer the data prior to assigning it to a media element.
 				</p>
@@ -1059,11 +1525,18 @@ enum XMLHttpRequestResponseType {
 			Austin William Wright,
 			Aymeric Vitte,
 			Domenic Denicola,
+			Elliott Sprehn,
 			Isaac Schlueter,
 			Jonas Sicking,
 			Kenneth Russell,
+			Kinuko Yasuda,
+			Michael Davidson,
+			Taiju Tsuiki,
 			Yusuke Suzuki,
-			Adrian Bateman
+			Yutaka Hirano,
+			Adrian Bateman,
+			Harris Syed,
+			Lindsay Verola
 			for their contributions to this specification.
 		</p>
 	</section>
