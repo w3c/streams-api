@@ -784,6 +784,10 @@ poll();</pre>
 						</ol>
 					</p>
 
+					<p>
+						<img src="fulfilling.png" alt="How new data is automatically fetched">
+					</p>
+
 					<section class="note">
 						This method is useful if
 						<ol>
@@ -1045,6 +1049,10 @@ poll();</pre>
 			</p>
 
 			<p>
+				<img src="readdatabuffer.png" alt="Read data buffer related variables">
+			</p>
+
+			<p>
 				An associated flag <dfn>eofReached</dfn> which indicates that the EOF was received from the <a>dataSource</a>.
 			</p>
 
@@ -1066,6 +1074,10 @@ poll();</pre>
 					<li>Set <a>numBytesRequested</a> to <a>numBytesRequested</a> - <var>numBytesReceived</var></li>
 					<li>Push <var>bytesReceived</var> to <a>readDataBuffer</a></li>
 				</ol>
+			</p>
+
+			<p>
+				<img src="increasing_pullamount.png" alt="When pullAmount is increased, new data will be fetched">
 			</p>
 
 			<p>
