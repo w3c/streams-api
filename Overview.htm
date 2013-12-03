@@ -436,14 +436,14 @@ poll();</pre>
 
 							<li>Set <a>waitPromise</a> to a new <a>Promise</a></li>
 							<li>Return <a>waitPromise</a>, and then continue to process the steps in this algorithm</li>
-							<li>Wait until <a>pendingWriteQueue</a> is empty and <a>bytesRequested</a> is not 0</li>
+							<li>Wait until <a>pendingWriteQueue</a> is empty and <a>numBytesRequested</a> is not 0</li>
 							<li>
 								Queue a task to run the steps below:
 								<ol>
 									<li>If <a>waitPromise</a> is <code>null</code>, terminate these steps</li>
 									<li>Let <var>detachedWaitPromise</var> be <a>waitPromise</a></li>
 									<li>Set <a>waitPromise</a> to <code>null</code></li>
-									<li>Fulfill <var>detachedWaitPromise</var> with <a>bytesRequested</a></li>
+									<li>Fulfill <var>detachedWaitPromise</var> with <a>numBytesRequested</a></li>
 								</ol>
 							</li>
 						</ol>
@@ -468,7 +468,7 @@ poll();</pre>
 			<h2>Data sink model</h2>
 
 			<p>
-				The data sink is the underlying mechanism in which a <a>WritableByteStream</a> interacts with and stores its data.
+				The data sink is the underlying mechanism which a <a>WritableByteStream</a> interacts with and stores its data in.
 			</p>
 
 			<p>
@@ -492,7 +492,7 @@ poll();</pre>
 			</p>
 
 			<p>
-				A WritableByteStream has an associated integer variable <dfn>bytesRequested</dfn> which holds the number of bytes that can be written to the <a>dataSink</a>.
+				A WritableByteStream has an associated integer variable <dfn>numBytesRequested</dfn> which holds the number of bytes that can be written to the <a>dataSink</a>.
 				This variable is initialized to 0 on construction.
 			</p>
 
@@ -529,8 +529,8 @@ poll();</pre>
 				<ol>
 					<li>If <a>pendingWriteQueue</a> is empty, break from this loop</li>
 					<li>Let <var>headTuple</var> be the head element of <a>pendingWriteQueue</a></li>
-					<li>Let <var>bytesToAcknowledge</var> be min((<var>size</var> of <var>headTuple</var>) - (<var>bytesAcknowledged<var> of <var>headTuple</var>), <a>bytesRequested</a>)</li>
-					<li>Set <a>bytesRequested</a> to <a>bytesRequested</a> - <var>bytesToAcknowledge</var></li>
+					<li>Let <var>bytesToAcknowledge</var> be min((<var>size</var> of <var>headTuple</var>) - (<var>bytesAcknowledged<var> of <var>headTuple</var>), <a>numBytesRequested</a>)</li>
+					<li>Set <a>numBytesRequested</a> to <a>numBytesRequested</a> - <var>bytesToAcknowledge</var></li>
 					<li>Set <var>bytesAcknowledged</var> of <var>headTuple</var> to (<var>bytesAcknowledged</var> of <var>head</var>) + <var>bytesToAcknowledge</var></li>
 					<li>
 						If <var>bytesAcknowledged</var> of <var>headTuple</var> equals to <var>size</var> of <var>headTuple</var>, run the steps below:
@@ -544,7 +544,7 @@ poll();</pre>
 			<p>
 				When <a>dataSink</a> requests <var>bytesNewlyRequested</var> more bytes, queue a task which runs the steps below:
 				<ol>
-					<li>Set <a>bytesRequested</a> to <a>bytesRequested</a> + <var>bytesNewlyRequested</var></li>
+					<li>Set <a>numBytesRequested</a> to <a>numBytesRequested</a> + <var>bytesNewlyRequested</var></li>
 					<li><a>Process pendingWriteQueue</a></li>
 				</ol>
 			</p>
@@ -870,7 +870,7 @@ poll();</pre>
 										</ol>
 									</li>
 									<li>
-										Whenever <a>pendingWriteQueue</a> of <var>destination</var> is empty and <a>bytesRequested</a> of <var>destination</var> is not 0,
+										Whenever <a>pendingWriteQueue</a> of <var>destination</var> is empty and <a>numBytesRequested</a> of <var>destination</var> is not 0,
 										<dl class="switch">
 											<dt>If this happened in the event loop</dt>
 											<dd>Run the steps below</dd>
@@ -878,12 +878,12 @@ poll();</pre>
 											<dd>Queue a task which runs the steps below</dd>
 										</dl>
 										<ol>
-											<li>Let <var>bytesRequested</var> be <a>bytesRequested</a> of <var>destination</var></li>
+											<li>Let <var>numBytesRequested</var> be <a>numBytesRequested</a> of <var>destination</var></li>
 											<li>
 												<dl class="switch">
 													<dt>If <var>size</var> is specified</dt>
 													<dd>
-														Set <a>pipePullAmount</a> to min(<var>size</var> - <var>totalBytesTransferred</var>, <var>bytesRequested</var>)
+														Set <a>pipePullAmount</a> to min(<var>size</var> - <var>totalBytesTransferred</var>, <var>numBytesRequested</var>)
 														<section class="note">
 															If <a href="#widl-ReadableByteStream-pullAmount">pullAmount</a> is set to 0, pipe() transfers data in pull style.
 															I.e. only bytes of the same number as the number of bytes writable to <var>destination</var> are retrieved from the data source.
@@ -893,7 +893,7 @@ poll();</pre>
 														</section>
 													</dd>
 													<dt>Otherwise</dt>
-													<dd>Set <a>pipePullAmount</a> to <var>bytesRequested</var></dd>
+													<dd>Set <a>pipePullAmount</a> to <var>numBytesRequested</var></dd>
 												</dl>
 											</li>
 											<li>Set <a>numBytesBeingReturned</a> to 0</li>
