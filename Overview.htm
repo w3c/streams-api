@@ -3,7 +3,7 @@
 <html>
 
 <head>
-	<title>Streams API (Preview version)</title>
+	<title>Streams API</title>
 	<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
 
 	<!-- <script class=remove src="http://dev.w3.org/2009/dap/ReSpec.js/js/respec.js"></script> -->
@@ -535,7 +535,7 @@ poll();</pre>
 					<li>
 						If <var>bytesAcknowledged</var> of <var>headTuple</var> equals to <var>size</var> of <var>headTuple</var>, run the steps below:
 						<ol>
-							<li>Pop <var>headTuple</var> form <a>pendingWriteQueue</a></li>
+							<li>Pop <var>headTuple</var> from <a>pendingWriteQueue</a></li>
 							<li>If <var>writePromise</var> of <var>headTuple</var> is not <code>null</code>, fulfill it with <var>size</var> of <var>headTuple</var></li>
 						</ol>
 				</ol>
@@ -785,7 +785,7 @@ poll();</pre>
 					</p>
 
 					<p>
-						<img src="fulfilling.png" alt="How new data is automatically fetched">
+						<img src="images/fulfilling.png" alt="How new data is automatically fetched">
 					</p>
 
 					<section class="note">
@@ -1049,7 +1049,7 @@ poll();</pre>
 			</p>
 
 			<p>
-				<img src="readdatabuffer.png" alt="Read data buffer related variables">
+				<img src="images/readdatabuffer.png" alt="Read data buffer related variables">
 			</p>
 
 			<p>
@@ -1077,7 +1077,7 @@ poll();</pre>
 			</p>
 
 			<p>
-				<img src="increasing_pullamount.png" alt="When pullAmount is increased, new data will be fetched">
+				<img src="images/increasing_pullamount.png" alt="When pullAmount is increased, new data will be fetched">
 			</p>
 
 			<p>
@@ -1547,7 +1547,7 @@ enum XMLHttpRequestResponseType {
 			Jonas Sicking,
 			Kenneth Russell,
 			Kinuko Yasuda,
-			Lindsay Verola
+			Lindsay Verola,
 			Michael Davidson,
 			Taiju Tsuiki,
 			Yusuke Suzuki,
