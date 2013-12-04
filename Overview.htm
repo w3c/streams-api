@@ -436,14 +436,14 @@ poll();</pre>
 
 							<li>Set <a>waitPromise</a> to a new <a>Promise</a></li>
 							<li>Return <a>waitPromise</a>, and then continue to process the steps in this algorithm</li>
-							<li>Wait until <a>pendingWriteQueue</a> is empty and <a>numBytesRequested</a> is not 0</li>
+							<li>Wait until <a>pendingWriteQueue</a> is empty and <a>numBytesSpaceAvailable</a> is not 0</li>
 							<li>
 								Queue a task to run the steps below:
 								<ol>
 									<li>If <a>waitPromise</a> is <code>null</code>, terminate these steps</li>
 									<li>Let <var>detachedWaitPromise</var> be <a>waitPromise</a></li>
 									<li>Set <a>waitPromise</a> to <code>null</code></li>
-									<li>Fulfill <var>detachedWaitPromise</var> with <a>numBytesRequested</a></li>
+									<li>Fulfill <var>detachedWaitPromise</var> with <a>numBytesSpaceAvailable</a></li>
 								</ol>
 							</li>
 						</ol>
@@ -492,7 +492,7 @@ poll();</pre>
 			</p>
 
 			<p>
-				A WritableByteStream has an associated integer variable <dfn>numBytesRequested</dfn> which holds the number of bytes that can be written to the <a>dataSink</a>.
+				A WritableByteStream has an associated integer variable <dfn>numBytesSpaceAvailable</dfn> which holds the number of bytes that can be written to the <a>dataSink</a>.
 				This variable is initialized to 0 on construction.
 			</p>
 
@@ -878,12 +878,12 @@ poll();</pre>
 											<dd>Queue a task which runs the steps below</dd>
 										</dl>
 										<ol>
-											<li>Let <var>numBytesRequested</var> be <a>numBytesRequested</a> of <var>destination</var></li>
+											<li>Let <var>destNumBytesRequested</var> be <a>numBytesRequested</a> of <var>destination</var></li>
 											<li>
 												<dl class="switch">
 													<dt>If <var>size</var> is specified</dt>
 													<dd>
-														Set <a>pipePullAmount</a> to min(<var>size</var> - <var>totalBytesTransferred</var>, <var>numBytesRequested</var>)
+														Set <a>pipePullAmount</a> to min(<var>size</var> - <var>totalBytesTransferred</var>, <var>destNumBytesRequested</var>)
 														<section class="note">
 															If <a href="#widl-ReadableByteStream-pullAmount">pullAmount</a> is set to 0, pipe() transfers data in pull style.
 															I.e. only bytes of the same number as the number of bytes writable to <var>destination</var> are retrieved from the data source.
@@ -893,7 +893,7 @@ poll();</pre>
 														</section>
 													</dd>
 													<dt>Otherwise</dt>
-													<dd>Set <a>pipePullAmount</a> to <var>numBytesRequested</var></dd>
+													<dd>Set <a>pipePullAmount</a> to <var>destNumBytesRequested</var></dd>
 												</dl>
 											</li>
 											<li>Set <a>numBytesBeingReturned</a> to 0</li>
