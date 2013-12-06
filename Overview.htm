@@ -171,10 +171,15 @@ var respecConfig = {
 		</p>
 
 		<p>
-			The <a>WritableByteStream</a> interface defines a general protocol for <a href="#consumers">data consuming APIs</a> to communicate with data producing code. In these cases, the data consuming API, such as a decoder, provides a <a>WritableByteStream</a> for other applications to write to, enabling the decoder to begin decoding data as it becomes available. The data is written to the internal data sink of a data consuming API using:
+			The <a>WritableByteStream</a> interface defines a general protocol for <a href="#consumers">data consuming APIs</a> to communicate with data producing code.
+			In these cases, the data consuming API, such as a decoder, provides a <a>WritableByteStream</a> for other applications to write to, enabling the decoder to begin decoding data as it becomes available.
+			The data is written to the internal data sink of a data consuming API using:
 			<ul>
 				<li>The <code>write()</code> method for writing bytes to the data sink as a <a>ArrayBufferView</a>, <a>DOMString</a> or <a>Blob</a></li>
-				<li>The <code>awaitSpaceAvailable()</code> method for allowing a data-producer to write to the data sink only when the data sink specifies it is now available to consume more data. This is useful for cases where an app may want to avoid backpressure and filling the internal buffer.</li>
+				<li>
+					The <code>awaitSpaceAvailable()</code> method for allowing a data-producer to write to the data sink only when the data sink specifies it is now available to consume more data.
+					This is useful for cases where an app may want to avoid backpressure and filling the internal buffer.
+				</li>
 			</ul>
 			Actual transfer of bytes to the data sink may happen either synchronously or asynchronously.
 			<a>WritableByteStream</a> hides the details of actual communication with the data sink while allowing for an efficient transfer of bytes.
@@ -190,7 +195,7 @@ var respecConfig = {
 				<li>The <code>pipe()</code> method for transferring data in bulk from the data source into the data sink of a <a>WritableByteStream</a> from another API</li>
 			</ul>
 			Actual transfer of bytes from the data source may happen either synchronously or asynchronously.
-			<a>ReadableByteStream</a> hides the details of actual communication with the data source while allowing for an efficient transfer of bytes.
+			The <a>ReadableByteStream</a> hides the details of actual communication with the data source while allowing for an efficient transfer of bytes.
 		</p>
 
 		<p>
@@ -312,7 +317,8 @@ document.getElementById('audioTag').src = streamURL;
 writeData();</pre>
 
 		<p>
-			A producer can also do work only when pulled by using <code>awaitSpaceAvailable()</code>, which will inform the producer when to produce data. This is useful when high-performance is necessary.
+			A producer can also do work only when pulled by using <code>awaitSpaceAvailable()</code>, which will inform the producer when to produce data.
+			This is useful when high-performance is necessary.
 		</p>
 
 		<pre class="example">function poll() {
@@ -330,7 +336,8 @@ poll();</pre>
 	<section class="section" id="writableByteStream">
 		<h2>WritableByteStream Interface</h2>
 		<p>
-			The WritableByteStream interface defines a protocol for APIs which consume byte streams. The protocol includes:
+			The WritableByteStream interface defines a protocol for APIs which consume byte streams.
+			The protocol includes:
 			<ol>
 				<li>How to receive the byte stream</li>
 				<li>How to notify the writer of completion of writing</li>
@@ -494,7 +501,8 @@ poll();</pre>
 			<h2>Interacting with the data sink</h2>
 
 			<p>
-				This section defines the internal mechanisms for how the WritableByteStream interacts with the data sink. This section specifies both the internal properties as well as the algorithms for interaction with the data sink.
+				This section defines the internal mechanisms for how the WritableByteStream interacts with the data sink.
+				This section specifies both the internal properties as well as the algorithms for interaction with the data sink.
 			</p>
 
 			<p>
@@ -576,7 +584,8 @@ poll();</pre>
 		</p>
 
 		<p>
-			A ReadableByteStream has a one-to-one mapping with an associated data source, and has defined semantics for <a href='#interactingWithDataSource'>interacting with the data source internally</a>. A data source, however, can have a one-to-many relationship with ReadableByteStream, in cases where <code>fork()</code> is used.
+			A ReadableByteStream has a one-to-one mapping with an associated data source, and has defined semantics for <a href='#interactingWithDataSource'>interacting with the data source internally</a>.
+			A data source, however, can have a one-to-many relationship with ReadableByteStream, in cases where <code>fork()</code> is used.
 		</p>
 
 		<section class="section" id="readableByteStreamInterface">
@@ -964,7 +973,8 @@ poll();</pre>
 			<h3>Data source model</h3>
 
 			<p>
-				A data source produces the bytes to be consumed via the <a>ReadableByteStream</a> interface instances. The data source model is not directly surfaced in the API, and is described here to provide details on how internal operations such as <a href="#widl-ReadableByteStream-fork-ReadableByteStream">fork()</a> can be handled.
+				A data source produces the bytes to be consumed via the <a>ReadableByteStream</a> interface instances.
+				The data source model is not directly surfaced in the API, and is described here to provide details on how internal operations such as <a href="#widl-ReadableByteStream-fork-ReadableByteStream">fork()</a> can be handled.
 			</p>
 
 			<p>
@@ -992,15 +1002,15 @@ poll();</pre>
 				</ul>
 			</p>
 
-		    <p>
+			<p>
 				When <a href="#widl-ReadableByteStream-fork-ReadableByteStream">fork()</a> is called, a new reader is registered to the original <a>ReadableByteStream</a>'s data source and the new <a>ReadableByteStream</a> uses read() method to fetch data from it.
-		    </p>
-	    </section>
-	
-	    <section class="section" id="interactingWithDataSource">
-	    <h2>Interacting with the data source</h2>
+			</p>
+		</section>
 
-	    <section class="note">
+		<section class="section" id="interactingWithDataSource">
+			<h2>Interacting with the data source</h2>
+
+			<section class="note">
 				This interface is designed to work even if operations on <a>dataSource</a> are asynchronous.
 				If <a>dataSource</a> is synchronously accessible, some of the algorithms can be simplified.
 			</section>
@@ -1249,7 +1259,9 @@ poll();</pre>
 							The extension onto <code>createFor</code> should have the following steps added.
 						</p>
 						<p>
-							Returns a unique Blob URL each time it is called on a valid <code>object</code> argument, which is a non-null <a>ReadableByteStream</a> in scope of the global object's URL property from which this static method is called. Blob URLs created with this method are said to be auto-revoking since user-agents are responsible for the revocation of Blob URLs created with this method, subject to the lifetime stipulation for Blob URLs. This method must act as follows:
+							Returns a unique Blob URL each time it is called on a valid <code>object</code> argument, which is a non-null <a>ReadableByteStream</a> in scope of the global object's URL property from which this static method is called.
+							Blob URLs created with this method are said to be auto-revoking since user-agents are responsible for the revocation of Blob URLs created with this method, subject to the lifetime stipulation for Blob URLs.
+							This method must act as follows:
 							<ol>
 								<li>
 									If called with a <a>ReadableByteStream</a> argument that is NOT valid, then user agents must return null.
@@ -1307,7 +1319,8 @@ poll();</pre>
 	<section class="section" id="producers-consumers">
 		<h2>Stream Consumers and Producers</h2>
 		<p>
-			Byte streams can be both produced and consumed by various APIs. APIs which create streams are identified as producers, and ones which read and act on a byte stream are known as consumers. This section identifies some of the APIs where Streams may be produced and consumed.
+			Byte streams can be both produced and consumed by various APIs. APIs which create streams are identified as producers, and ones which read and act on a byte stream are known as consumers.
+			This section identifies some of the APIs where Streams may be produced and consumed.
 			<section class="note">The list of producers and consumers below is not an exhaustive list. It is placed here as informative for the time being.</section>
 		</p>
 		<section class="section" id="consumers">
@@ -1357,7 +1370,8 @@ poll();</pre>
 	<section class="section" id="XMLHttpRequest">
 		<h2>Extension of XMLHttpRequest</h2>
 		<p>
-			This specification proposes an extension to <code>XMLHttpRequest</code> [[!XMLHTTPREQUEST2]] to add support for <a>ByteStream</a>. This section is temporary and is meant to provide a recommendation for how <a>ByteStream</a> should be incorporated into <code>XMLHttpRequest</code>.
+			This specification proposes an extension to <code>XMLHttpRequest</code> [[!XMLHTTPREQUEST2]] to add support for <a>ByteStream</a>.
+			This section is temporary and is meant to provide a recommendation for how <a>ByteStream</a> should be incorporated into <code>XMLHttpRequest</code>.
 			This will extend <code>XMLHttpRequest</code> to allow for receiving and uploading of a <a>ByteStream</a>.
 			One such scenario is providing access to data during <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#dom-xmlhttprequest-readystate"><code>readyState</code></a> 3 (LOADING).
 			The sections below document in detail what extensions must be done to <code>XMLHttpRequest</code> to support <a>ByteStream</a>.
@@ -1530,7 +1544,9 @@ enum XMLHttpRequestResponseType {
 			<li>
 				Media streaming scenarios using <a>ByteStream</a> and <code>XMLHttpRequest</code>
 				<p>
-					Media streaming scenarios require the ability to quickly receive data over the network and connect it to a media element. An application can successfully accomplish this by receiving a Stream in <code>readyState</code> LOADING and assign it to a media element. This helps avoid the application from having to buffer the data prior to assigning it to a media element.
+					Media streaming scenarios require the ability to quickly receive data over the network and connect it to a media element.
+					An application can successfully accomplish this by receiving a Stream in <code>readyState</code> LOADING and assign it to a media element.
+					This helps avoid the application from having to buffer the data prior to assigning it to a media element.
 				</p>
 			</li>
 		</ul>
