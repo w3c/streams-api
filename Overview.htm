@@ -371,6 +371,12 @@ poll();</pre>
 						This method writes the specified <var>data</var> to the WritableByteStream.
 					</p>
 
+					<section class="note">
+						<p>
+							write() returns a Promise to make it easy for byte stream producing code to react to backpressure.
+						</p>
+					</section>
+
 					<p>
 						This method must run the steps below:
 						<ol>
@@ -529,8 +535,8 @@ poll();</pre>
 				<ol>
 					<li>If <a>pendingWriteQueue</a> is empty, break from this loop</li>
 					<li>Let <var>headTuple</var> be the head element of <a>pendingWriteQueue</a></li>
-					<li>Let <var>bytesToAcknowledge</var> be min((<var>size</var> of <var>headTuple</var>) - (<var>bytesAcknowledged<var> of <var>headTuple</var>), <a>numBytesRequested</a>)</li>
-					<li>Set <a>numBytesRequested</a> to <a>numBytesRequested</a> - <var>bytesToAcknowledge</var></li>
+					<li>Let <var>bytesToAcknowledge</var> be min((<var>size</var> of <var>headTuple</var>) - (<var>bytesAcknowledged<var> of <var>headTuple</var>), <a>numBytesSpaceAvailable</a>)</li>
+					<li>Set <a>numBytesSpaceAvailable</a> to <a>numBytesSpaceAvailable</a> - <var>bytesToAcknowledge</var></li>
 					<li>Set <var>bytesAcknowledged</var> of <var>headTuple</var> to (<var>bytesAcknowledged</var> of <var>head</var>) + <var>bytesToAcknowledge</var></li>
 					<li>
 						If <var>bytesAcknowledged</var> of <var>headTuple</var> equals to <var>size</var> of <var>headTuple</var>, run the steps below:
@@ -542,9 +548,9 @@ poll();</pre>
 			</p>
 
 			<p>
-				When <a>dataSink</a> requests <var>bytesNewlyRequested</var> more bytes, queue a task which runs the steps below:
+				When <a>dataSink</a> requests <var>numBytesNewlyRequested</var> more bytes, queue a task which runs the steps below:
 				<ol>
-					<li>Set <a>numBytesRequested</a> to <a>numBytesRequested</a> + <var>bytesNewlyRequested</var></li>
+					<li>Set <a>numBytesSpaceAvailable</a> to <a>numBytesSpaceAvailable</a> + <var>numBytesNewlyRequested</var></li>
 					<li><a>Process pendingWriteQueue</a></li>
 				</ol>
 			</p>
