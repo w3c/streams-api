@@ -348,7 +348,8 @@ poll();</pre>
 		</p>
 
 		<p>
-			A WritableByteStream has an associated data sink identified by <dfn>dataSink</dfn>, which notifies the WritableByteStream of the number of bytes the data sink can newly accept.
+			The actual data consumer behind the WritableByteStream is called a data sink and is identified by <dfn>dataSink</dfn>.
+			A data sink consumes byte streams and notifies the WritableByteStream of the number of bytes the data sink can newly accept.
 		</p>
 
 		<p>
