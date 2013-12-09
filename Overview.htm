@@ -464,7 +464,7 @@ poll();</pre>
 					</p>
 				</dd>
 
-				<dt>void writeClose()</dt>
+				<dt>Promise&amp;lt;undefined&gt; writeClose()</dt>
 				<dd>
 					<p>
 						This method tells the WritableByteStream that no more data will be written to it.
@@ -472,7 +472,14 @@ poll();</pre>
 					</p>
 
 					<p>
-						This method must write the EOF to <a>dataSink</a>.
+						This method must run the steps below:
+						<ol>
+							<li>Let <var>closePromise</var> be a new <a>Promise</a></li>
+							<li>Return <var>closePromise</var>, and then continue the process the steps in this algorithm</li>
+							<li>Write the EOF to <a>dataSink</a></li>
+							<li>Wait until <a>dataSink</a> acknowledges the EOF</li>
+							<li>Fulfill <var>closePromise</var> with <code>undefined</code></li>
+						</ol>
 					</p>
 				</dd>
 			</dl>
@@ -488,11 +495,14 @@ poll();</pre>
 			<p>
 				A data sink to which the <a>WritableByteStream</a> interface writes bytes can be anything which:
 				<ol>
-					<li>Accepts bytes</li>
+					<li>Accepts bytes and the EOF</li>
 					<li>
-						Can notify <a>WritableByteStream</a> of how much data the data sink can newly accept.
+						Notifies <a>WritableByteStream</a> of how much data the data sink can newly accept.
 						When and how to generate such notifications is up to data sinks.
 						Data sinks must be able to accept data more than it notified <a>WritableByteStream</a> of.
+					</li>
+					<li>
+						Notifies <a>WritableByteStream</a> of acknowledgement of the EOF.
 					</li>
 				</ol>
 			</p>
