@@ -976,20 +976,24 @@ poll();</pre>
 
 			<p>
 				A data source produces the bytes to be consumed via the <a>ReadableByteStream</a> interface instances.
+				A <a>ReadableByteStream</a> retrieves bytes from an associated data source.
 				The data source model is not directly surfaced in the API, and is described here to provide details on how internal operations such as <a href="#widl-ReadableByteStream-fork-ReadableByteStream">fork()</a> can be handled.
 			</p>
 
 			<p>
-				A <dfn>data source</dfn> from which <a>ReadableByteStream</a> retrieves bytes can be anything that:
-				<ol>
-					<li>Produces bytes</li>
+				A <dfn>data source</dfn> can be anything that:
+				<ul>
 					<li>
-						Receives retrieval requests for generation of bytes from a <a>ReadableByteStream</a> and replies to it with the newly produced bytes.
+						Produces bytes. Newly produced bytes will be delivered to the associated <a>ReadableByteStream</a>.
+					</li>
+					<li>
+						Accepts requests for production of bytes from a <a>ReadableByteStream</a>. A byte production request consists of an integer indicating the number of bytes to produce in addition to already requested ones.
 						Interpretation of the request is up to data sources.
 						Data sources may respond to retrieval requests with data larger than requested.
+						Requests and delivery of bytes don't need to 1-to-1 correspond.
 						Data sources may produce bytes and send to <a>ReadableByteStream</a> unsolicitedly without receiving any retrieval request.
 					</li>
-				</ol>
+				</ul>
 			</p>
 
 			<p>
