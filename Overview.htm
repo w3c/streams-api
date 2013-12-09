@@ -551,7 +551,7 @@ poll();</pre>
 						If <var>pendingWrite.numBytesAcknowledged</var> equals to <var>pendingWrite.size</var>, run the steps below:
 						<ol>
 							<li>Pop <var>pendingWrite</var> from <a>pendingWriteQueue</a></li>
-							<li>If <var>pendingWrite.promise</var> is not <code>null</code>, fulfill it with <var>size</var> of <var>headTuple</var></li>
+							<li>If <var>pendingWrite.promise</var> is not <code>null</code>, fulfill it with <var>pendingWrite.size</var></li>
 						</ol>
 				</ol>
 			</p>
