@@ -502,18 +502,18 @@ poll();</pre>
 			<h2>Interacting with the data sink</h2>
 
 			<p>
-				This section defines the internal mechanisms for how the WritableByteStream interacts with the data sink.
-				This section specifies both the internal properties as well as the algorithms for interaction with the data sink.
+				This section defines the internal mechanisms for how the WritableByteStream interacts with <a>dataSink</a>.
+				This section specifies both the internal properties as well as the algorithms.
 			</p>
 
 			<p>
-				A WritableByteStream has an associated integer variable <dfn>numBytesSpaceAvailable</dfn> which holds the number of bytes that can be written to the <a>dataSink</a>.
+				A WritableByteStream has an associated integer variable <dfn>numBytesSpaceAvailable</dfn> which holds the number of bytes that <a>dataSink</a> requested but not yet written to it.
 				This variable is initialized to 0 on construction.
 			</p>
 
 			<p>
 				A WritableByteStream has an associated <a>Promise</a> <dfn>waitPromise</dfn> which is used by the <code>awaitSpaceAvailable()</code> method.
-				This variable is initialized to null on construction.
+				This variable is initialized to <code>null</code> on construction.
 			</p>
 
 			<p>
