@@ -930,11 +930,11 @@ poll();</pre>
 							<li>Unset <a>readPending</a></li>
 
 							<li>Let <var>result</var> be a new <a>ByteStreamReadResult</a></li>
-							<li>Set <a href="#widl-ByteStreamReadResult-data">data</a> of <var>result</var> to <var>readData</var> to <code>undefined</code>.
-							<li>Set <a href="#widl-ByteStreamReadResult-eof">eof</a> of <var>result</var> to <code>true</code> if <a>the EOF is reached</a></li>
-							<li>Set <a href="#widl-ByteStreamReadResult-size">size</a> of <var>result</var> to <var>totalBytesTransferred</var></li>
+							<li>Set <var>result</var>.<a href="#widl-ByteStreamReadResult-data">data</a> to <var>readData</var> to <code>undefined</code>.
+							<li>Set <var>result</var>.<a href="#widl-ByteStreamReadResult-eof">eof</a> to <code>true</code> if <a>eofReached</a></li>
+							<li>Set <var>result</var>.<a href="#widl-ByteStreamReadResult-size">size</a> to <var>totalBytesTransferred</var></li>
 							<li>
-								Fulfill <var>readPromise</var> with <var>result</var>
+								Fulfill <var>pipePromise</var> with <var>result</var>
 								<section class="note">
 									At this point, <a>numBytesBeingReturned</a> is not yet reset
 								</section>
