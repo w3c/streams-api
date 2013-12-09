@@ -698,9 +698,9 @@ poll();</pre>
 									<li>
 										<dl class="switch">
 											<dt>If <var>latchedType</var> is "<code>none</code>"</dt>
-											<dd>Set <a href="#widl-ByteStreamReadResult-data">data</a> of <var>result</var> to <code>undefined</code></dd>
+											<dd>Set <var>result</var>.<a href="#widl-ByteStreamReadResult-data">data</a> to <code>undefined</code></dd>
 											<dt>Otherwise</dt>
-											<dd>Set <a href="#widl-ByteStreamReadResult-data">data</a> of <var>result</var> to an object of the type specified by <var>latchedType</var> which represents <var>readBytes</var></dd>
+											<dd>Set <var>result</var>.<a href="#widl-ByteStreamReadResult-data">data</a> to an object of the type specified by <var>latchedType</var> which represents <var>readBytes</var></dd>
 										</dl>
 									</li>
 									<li>Set <a href="#widl-ByteStreamReadResult-eof">eof</a> of <var>result</var> to <code>true</code> if <a>readDataBuffer</a> is empty and <a>eofReached</a> is set</li>
