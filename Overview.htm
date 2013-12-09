@@ -350,6 +350,7 @@ poll();</pre>
 		<p>
 			The actual data consumer behind the WritableByteStream is called a data sink and is identified by <dfn>dataSink</dfn>.
 			A data sink consumes byte streams and notifies the WritableByteStream of the number of bytes the data sink can newly accept.
+			For each data sink, it's defined how to calculate <a>cost</a> of each object which the data sink can consume.
 		</p>
 
 		<p>
@@ -392,24 +393,7 @@ poll();</pre>
 
 							<li><a>Abort wait</a></li>
 
-							<li>
-								<dl class="switch">
-									<dt>If <var>data</var> is a <a>Blob</a> or an <a>ArrayBufferView</a></dt>
-									<dd>
-										<ol>
-											<li>Let <var>bytesToWrite</var> be the bytes represented by <var>data</var></li>
-										</ol>
-									</dd>
-									<dt>Otherwise</dt>
-									<dd>
-										<ol>
-											<li>If <var>data</var> is not a <a>DOMString</a>, let <var>data</var> be a DOMString representing <var>data</var></li>
-											<li>Let <var>bytesToWrite</var> be the result of encoding <var>data</var> using <var>latchedEncoding</var></li>
-										</ol>
-									</dd>
-								</dl>
-							</li>
-							<li>Let <var>amountToWrite</var> be the size of <var>bytesToWrite</var></li>
+							<li>Let <var>amountToWrite</var> be the <a>cost</a> of <var>data</var></li>
 
 							<li>Let <var>writePromise</var> be a new <a>Promise</a></li>
 
@@ -422,7 +406,20 @@ poll();</pre>
 
 							<li>Return <var>writePromise</var>, and then continue to process the steps in this algorithm</li>
 
-							<li>Write <var>bytesToWrite</var> to <a>dataSink</a></li>
+							<li>
+								<dl class="switch">
+									<dt>If <var>data</var> is a <a>DOMString</a></dt>
+									<dd>
+										Write <var>data</var> to <a>dataSink</a> together with <var>latchedEncoding</var> as <var>encoding</var> parameter.
+										Interpretation of <var>latchedEncoding</var> is up to <a>dataSink</a>.
+									</dd>
+									<dt>Otherwise</dt>
+									<dd>
+										Write <var>data</var> to <a>dataSink</a>.
+									</dd>
+								</dl>
+								Write <var>bytesToWrite</var> to <a>dataSink</a>
+							</li>
 						</ol>
 					</p>
 
@@ -495,7 +492,12 @@ poll();</pre>
 			<p>
 				A data sink to which the <a>WritableByteStream</a> interface writes bytes can be anything which:
 				<ol>
-					<li>Accepts bytes and the EOF</li>
+					<li>
+						Accepts data possibly together with a <a>DOMString</a> parameter named <var>encoding</var> indicating in what encoding the data must be interpreted.
+					</li>
+					<li>
+						Accepts the EOF signal
+					</li>
 					<li>
 						Notifies <a>WritableByteStream</a> of how much data the data sink can newly accept.
 						When and how to generate such notifications is up to data sinks.
@@ -503,6 +505,9 @@ poll();</pre>
 					</li>
 					<li>
 						Notifies <a>WritableByteStream</a> of acknowledgement of the EOF.
+					</li>
+					<li>
+						How to calculate an integer value <dfn>cost</dfn> of each object which the data sink can consume.
 					</li>
 				</ol>
 			</p>
