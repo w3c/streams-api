@@ -799,9 +799,9 @@ poll();</pre>
 							<li>Let <var>bytesConsumed</var> be the size of <var>readBytes</var></li>
 
 							<li>Let <var>result</var> be a new <a>ByteStreamReadResult</a>.</li>
-							<li>Set <a href="#widl-ByteStreamReadResult-data">data</a> of <var>result</var> to <var>readData</var></li>
-							<li>Set <a href="#widl-ByteStreamReadResult-eof">eof</a> of <var>result</var> to <code>true</code> if <a>eofReached</a> is set and <a>readDataBuffer</a> is empty</li>
-							<li>Set <a href="#widl-ByteStreamReadResult-size">size</a> of <var>result</var> to <var>bytesConsumed</var>.</li>
+							<li>Set <var>result</var>.<a href="#widl-ByteStreamReadResult-data">data</a> to <var>readData</var></li>
+							<li>Set <var>result</var>.<a href="#widl-ByteStreamReadResult-eof">eof</a> to <code>true</code> if <a>eofReached</a> is set and <a>readDataBuffer</a> is empty</li>
+							<li>Set <var>result</var>.<a href="#widl-ByteStreamReadResult-size">size</a> to <var>bytesConsumed</var>.</li>
 
 							<li>Set <a>numBytesBeingReturned</a> to <var>bytesConsumed</var></li>
 
