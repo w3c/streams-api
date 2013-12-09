@@ -414,8 +414,8 @@ poll();</pre>
 							<li>Let <var>writePromise</var> be a new <a>Promise</a></li>
 
 							<li>Let <var>tuple</var> be a new <a>pendingWrite</a></li>
-							<li>Set <var>writePromise</var> of <var>tuple</var> to <var>writePromise</var></li>
-							<li>Set <var>size</var> of <var>tuple</var> to <var>numBytesToWrite</var></li>
+							<li>Set <var>tuple.promise</var> to <var>writePromise</var></li>
+							<li>Set <var>tuple.size</var> to <var>numBytesToWrite</var></li>
 							<li>Push <var>tuple</var> to <a>pendingWriteQueue</a></li>
 
 							<li><a>Process pendingWriteQueue</a></li>
@@ -527,15 +527,15 @@ poll();</pre>
 			</p>
 
 			<p>
-				A struct type <dfn>pendingWrite</dfn> which has the following members:
+				A struct type <dfn>PendingWriteDescriptor</dfn> which has the following members:
 				<ul>
-					<li>A <a>Promise</a> <var>writePromise</var></li>
+					<li>A <a>Promise</a> <var>promise</var></li>
 					<li>An integer <var>size</var></li>
-					<li>An integer <var>bytesAcknowledged</var></li>
+					<li>An integer <var>numBytesAcknowledged</var></li>
 				</ul>
 			</p>
 			<p>
-				An associated queue <dfn>pendingWriteQueue</dfn> which holds <a>pendingWrite</a>s.
+				An associated queue <dfn>pendingWriteQueue</dfn> which holds <a>PendingWriteDescriptor</a>s.
 				This queue is initialized to an empty queue on construction.
 			</p>
 
@@ -543,15 +543,15 @@ poll();</pre>
 				To <dfn>process pendingWriteQueue</dfn>, repeat the steps below:
 				<ol>
 					<li>If <a>pendingWriteQueue</a> is empty, break from this loop</li>
-					<li>Let <var>headTuple</var> be the head element of <a>pendingWriteQueue</a></li>
-					<li>Let <var>bytesToAcknowledge</var> be min((<var>size</var> of <var>headTuple</var>) - (<var>bytesAcknowledged<var> of <var>headTuple</var>), <a>numBytesSpaceAvailable</a>)</li>
-					<li>Set <a>numBytesSpaceAvailable</a> to <a>numBytesSpaceAvailable</a> - <var>bytesToAcknowledge</var></li>
-					<li>Set <var>bytesAcknowledged</var> of <var>headTuple</var> to (<var>bytesAcknowledged</var> of <var>head</var>) + <var>bytesToAcknowledge</var></li>
+					<li>Let <var>pendingWrite</var> be the head element of <a>pendingWriteQueue</a></li>
+					<li>Let <var>numBytesToAcknowledge</var> be min(<var>pendingWrite.size</var> - (<var>pendingWrite.numBytesAcknowledged</var>), <a>numBytesSpaceAvailable</a>)</li>
+					<li>Set <a>numBytesSpaceAvailable</a> to <a>numBytesSpaceAvailable</a> - <var>numBytesToAcknowledge</var></li>
+					<li>Set <var>pendingWrite.numBytesAcknowledged</var> to (<var>pendingWrite.numBytesAcknowledged</var>) + <var>numBytesToAcknowledge</var></li>
 					<li>
-						If <var>bytesAcknowledged</var> of <var>headTuple</var> equals to <var>size</var> of <var>headTuple</var>, run the steps below:
+						If <var>pendingWrite.numBytesAcknowledged</var> equals to <var>pendingWrite.size</var>, run the steps below:
 						<ol>
-							<li>Pop <var>headTuple</var> from <a>pendingWriteQueue</a></li>
-							<li>If <var>writePromise</var> of <var>headTuple</var> is not <code>null</code>, fulfill it with <var>size</var> of <var>headTuple</var></li>
+							<li>Pop <var>pendingWrite</var> from <a>pendingWriteQueue</a></li>
+							<li>If <var>pendingWrite.promise</var> is not <code>null</code>, fulfill it with <var>size</var> of <var>headTuple</var></li>
 						</ol>
 				</ol>
 			</p>
@@ -824,7 +824,7 @@ poll();</pre>
 					</section>
 
 					<section class="note">
-						TODO: Rewrite this to update numBytesBeingReturned as bytesAcknowledged of pendingWrites are updated
+						TODO: Rewrite this to update numBytesBeingReturned as numBytesAcknowledged of <a>PendingWriteDescriptor</a>s are updated
 					</section>
 
 					<p>
@@ -868,9 +868,9 @@ poll();</pre>
 											<li>Set <a>numBytesBeingReturned</a> to <a>numBytesBeingReturned</a> + <var>numBytesToTransfer</var></li>
 											<li>Pop <var>numBytesToTransfer</var> bytes from <a>readDataBuffer</a>, and then write it to <a>dataSink</a> of <var>destination</var></li>
 
-											<li>Let <var>tuple</var> be a new <a>pendingWrite</a></li>
-											<li>Set <var>writePromise</var> of <var>tuple</var> to <code>null</code></li>
-											<li>Set <var>size</var> of <var>tuple</var> to <var>numBytesToTransfer</var></li>
+											<li>Let <var>tuple</var> be a new <a>PendingWriteDescriptor</a></li>
+											<li>Set <var>tuple.promise</var> to <code>null</code></li>
+											<li>Set <var>tuple.size</var> to <var>numBytesToTransfer</var></li>
 											<li>Push <var>tuple</var> to <a>pendingWriteQueue</a> of <var>destination</var></li>
 
 											<li>Set <var>totalBytesTransferred</var> to <var>totalBytesTransferred</var> + <var>numBytesToTransfer</var></li>
