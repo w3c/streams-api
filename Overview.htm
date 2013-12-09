@@ -980,10 +980,21 @@ poll();</pre>
 					</p>
 				</dd>
 
-				<dt>void readClose()</dt>
+				<dt>Promise&amp;lt;undefined&gt; readClose()</dt>
 				<dd>
 					<p>
-						This method tells the ReadableByteStream that no more data will be read from it.
+						This method tells the ReadableByteStream that no more data will be read from it without indication of any error.
+					</p>
+
+					<p>
+						This method must run the steps below:
+						<ol>
+							<li>Let <var>closePromise</var> be a new <a>Promise</a></li>
+							<li>Return <var>closePromise</var>, and then continue the process the steps in this algorithm</li>
+							<li>Notify <a>dataSource</a> of readClosure</li>
+							<li>Wait until <a>dataSource</a> acknowledges the readClosure</li>
+							<li>Fulfill <var>closePromise</var> with <code>undefined</code></li>
+						</ol>
 					</p>
 				</dd>
 			</dl>
@@ -1010,6 +1021,9 @@ poll();</pre>
 						Data sources may respond to retrieval requests with data larger than requested.
 						Requests and delivery of bytes don't need to 1-to-1 correspond.
 						Data sources may produce bytes and send to <a>ReadableByteStream</a> unsolicitedly without receiving any retrieval request.
+					</li>
+					<li>
+						Accepts and acknowledges readClosure signal which means the associated <a>ReadableByteStream</a> has completed consuming bytes from this data source without indication of any error.
 					</li>
 				</ul>
 			</p>
