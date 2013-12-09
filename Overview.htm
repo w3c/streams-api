@@ -527,15 +527,16 @@ poll();</pre>
 			</p>
 
 			<p>
-				A struct type <dfn>PendingWriteDescriptor</dfn> which has the following members:
+				A struct type <dfn>PendingWriteDescriptor</dfn> has the following members:
 				<ul>
 					<li>A <a>Promise</a> <var>promise</var></li>
 					<li>An integer <var>size</var></li>
 					<li>An integer <var>numBytesAcknowledged</var></li>
 				</ul>
 			</p>
+
 			<p>
-				An associated queue <dfn>pendingWriteQueue</dfn> which holds <a>PendingWriteDescriptor</a>s.
+				A WritableByteStream has an associated queue <dfn>pendingWriteQueue</dfn> which holds <a>PendingWriteDescriptor</a>s.
 				This queue is initialized to an empty queue on construction.
 			</p>
 
