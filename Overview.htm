@@ -413,10 +413,10 @@ poll();</pre>
 
 							<li>Let <var>writePromise</var> be a new <a>Promise</a></li>
 
-							<li>Let <var>tuple</var> be a new <a>pendingWrite</a></li>
-							<li>Set <var>tuple.promise</var> to <var>writePromise</var></li>
-							<li>Set <var>tuple.size</var> to <var>numBytesToWrite</var></li>
-							<li>Push <var>tuple</var> to <a>pendingWriteQueue</a></li>
+							<li>Let <var>pendingWrite</var> be a new <a>PendingWriteDescriptor</a></li>
+							<li>Set <var>pendingWrite.promise</var> to <var>writePromise</var></li>
+							<li>Set <var>pendingWrite.size</var> to <var>numBytesToWrite</var></li>
+							<li>Push <var>pendingWrite</var> to <a>pendingWriteQueue</a></li>
 
 							<li><a>Process pendingWriteQueue</a></li>
 
@@ -869,10 +869,10 @@ poll();</pre>
 											<li>Set <a>numBytesBeingReturned</a> to <a>numBytesBeingReturned</a> + <var>numBytesToTransfer</var></li>
 											<li>Pop <var>numBytesToTransfer</var> bytes from <a>readDataBuffer</a>, and then write it to <a>dataSink</a> of <var>destination</var></li>
 
-											<li>Let <var>tuple</var> be a new <a>PendingWriteDescriptor</a></li>
-											<li>Set <var>tuple.promise</var> to <code>null</code></li>
-											<li>Set <var>tuple.size</var> to <var>numBytesToTransfer</var></li>
-											<li>Push <var>tuple</var> to <a>pendingWriteQueue</a> of <var>destination</var></li>
+											<li>Let <var>pendingWrite</var> be a new <a>PendingWriteDescriptor</a></li>
+											<li>Set <var>pendingWrite.promise</var> to <code>null</code></li>
+											<li>Set <var>pendingWrite.size</var> to <var>numBytesToTransfer</var></li>
+											<li>Push <var>pendingWrite</var> to <a>pendingWriteQueue</a> of <var>destination</var></li>
 
 											<li>Set <var>totalBytesTransferred</var> to <var>totalBytesTransferred</var> + <var>numBytesToTransfer</var></li>
 
