@@ -1030,6 +1030,27 @@ poll();</pre>
 						</ol>
 					</p>
 				</dd>
+
+				<dt>Promise&amp;lt;undefined&gt; readAbort(any reason)</dt>
+				<dd>
+					<p>
+						This method tells the ReadableByteStream that no more data will be read from it with indication of error.
+						The details of the error will be given by <var>reason</var> argument.
+						The interpretation of <var>reason</var> is up to <a>dataSource</a>.
+						Once readAbort() has been called on a ReadableByteStream, no further method calls can be made on the ReadableByteStream.
+					</p>
+
+					<p>
+						This method must run the steps below:
+						<ol>
+							<li>Let <var>abortPromise</var> be a new <a>Promise</a></li>
+							<li>Return <var>abortPromise</var>, and then continue the process the steps in this algorithm</li>
+							<li><a>Read-abort</a> <a>dataSource</a> with <var>reason</var></li>
+							<li>Wait until <a>dataSource</a> acknowledges the read-abort</li>
+							<li>Fulfill <var>abortPromise</var> with <code>undefined</code></li>
+						</ol>
+					</p>
+				</dd>
 			</dl>
 		</section>
 
@@ -1057,6 +1078,9 @@ poll();</pre>
 					</li>
 					<li>
 						Accepts and acknowledges readClosure signal which means the associated <a>ReadableByteStream</a> has completed consuming bytes from this data source without indication of any error.
+					</li>
+					<li>
+						Accepts and acknowledges read-abort signal which means the associated <a>ReadableByteStream</a> has completed consuming bytes from this data source with indication of any error.
 					</li>
 				</ul>
 			</p>
