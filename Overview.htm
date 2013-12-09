@@ -857,7 +857,12 @@ poll();</pre>
 											<dd>Queue a task which runs the steps below</dd>
 										</dl>
 										<ol>
-											<li>Let <var>numBytesReadable</var> be the number of bytes in <a>readDataBuffer</a></li>
+											<li>
+												Let <var>numBytesReadable</var> be the number of bytes in <a>readDataBuffer</a>
+												<section class="note">
+													It's fine to process only part of the bytes, and process the rest in the next task.
+												</section>
+											</li>
 											<li>
 												<dl class="switch">
 													<dt>If <var>size</var> is specified</dt>
@@ -887,7 +892,7 @@ poll();</pre>
 										</ol>
 									</li>
 									<li>
-										Whenever <a>pendingWriteQueue</a> of <var>destination</var> is empty and <a>numBytesRequested</a> of <var>destination</var> is not 0,
+										Whenever <a>pendingWriteQueue</a> of <var>destination</var> is empty and <a>numBytesSpaceAvailable</a> of <var>destination</var> is not 0,
 										<dl class="switch">
 											<dt>If this happened in the event loop</dt>
 											<dd>Run the steps below</dd>
@@ -895,12 +900,12 @@ poll();</pre>
 											<dd>Queue a task which runs the steps below</dd>
 										</dl>
 										<ol>
-											<li>Let <var>destNumBytesRequested</var> be <a>numBytesRequested</a> of <var>destination</var></li>
+											<li>Let <var>destNumBytesSpaceAvailable</var> be <a>numBytesSpaceAvailable</a> of <var>destination</var></li>
 											<li>
 												<dl class="switch">
 													<dt>If <var>size</var> is specified</dt>
 													<dd>
-														Set <a>pipePullAmount</a> to min(<var>size</var> - <var>totalBytesTransferred</var>, <var>destNumBytesRequested</var>)
+														Set <a>pipePullAmount</a> to min(<var>size</var> - <var>totalBytesTransferred</var>, <var>destNumBytesSpaceAvailable</var>)
 														<section class="note">
 															If <a href="#widl-ReadableByteStream-pullAmount">pullAmount</a> is set to 0, pipe() transfers data in pull style.
 															I.e. only bytes of the same number as the number of bytes writable to <var>destination</var> are retrieved from the data source.
@@ -910,7 +915,7 @@ poll();</pre>
 														</section>
 													</dd>
 													<dt>Otherwise</dt>
-													<dd>Set <a>pipePullAmount</a> to <var>destNumBytesRequested</var></dd>
+													<dd>Set <a>pipePullAmount</a> to <var>destNumBytesSpaceAvailable</var></dd>
 												</dl>
 											</li>
 											<li>Set <a>numBytesBeingReturned</a> to 0</li>
