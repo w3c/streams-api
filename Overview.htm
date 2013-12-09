@@ -480,6 +480,27 @@ poll();</pre>
 						</ol>
 					</p>
 				</dd>
+
+				<dt>Promise&amp;lt;undefined&gt; writeAbort(any reason)</dt>
+				<dd>
+					<p>
+						This method tells the WritableByteStream that no more data will be written to it with indication of error.
+						The details of the error will be given by <var>reason</var> argument.
+						The interpretation of <var>reason</var> is up to <a>dataSink</a>.
+						Once writeAbort() has been called on a WritableByteStream, no further method calls can be made on the WritableByteStream.
+					</p>
+
+					<p>
+						This method must run the steps below:
+						<ol>
+							<li>Let <var>abortPromise</var> be a new <a>Promise</a></li>
+							<li>Return <var>abortPromise</var>, and then continue the process the steps in this algorithm</li>
+							<li><a>Write-abort</a> <a>dataSink</a> with <var>reason</var></li>
+							<li>Wait until <a>dataSink</a> acknowledges the write-abort</li>
+							<li>Fulfill <var>abortPromise</var> with <code>undefined</code></li>
+						</ol>
+					</p>
+				</dd>
 			</dl>
 		</section>
 
@@ -500,12 +521,18 @@ poll();</pre>
 						Accepts the EOF signal
 					</li>
 					<li>
+						Accepts the write-abort signal with an object parameter named reason.
+					</li>
+					<li>
 						Notifies <a>WritableByteStream</a> of how much data the data sink can newly accept.
 						When and how to generate such notifications is up to data sinks.
 						Data sinks must be able to accept data more than it notified <a>WritableByteStream</a> of.
 					</li>
 					<li>
-						Notifies <a>WritableByteStream</a> of acknowledgement of the EOF.
+						Notifies <a>WritableByteStream</a> of acknowledgement of the EOF signal.
+					</li>
+					<li>
+						Notifies <a>WritableByteStream</a> of acknowledgement of the write-abort signal.
 					</li>
 					<li>
 						How to calculate an integer value <dfn>cost</dfn> of each object which the data sink can consume.
