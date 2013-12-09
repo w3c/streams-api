@@ -443,7 +443,7 @@ poll();</pre>
 					<p>
 						This method must run the steps below:
 						<ol>
-							<li><a>Abort wait</a></li>
+							<li><a>Abort waiting</a></li>
 
 							<li>Set <a>waitPromise</a> to a new <a>Promise</a></li>
 							<li>Return <a>waitPromise</a>, and then continue to process the steps in this algorithm</li>
@@ -532,7 +532,7 @@ poll();</pre>
 			</p>
 
 			<p>
-				To <dfn>abort wait</dfn>, run the steps below:
+				To <dfn>abort waiting</dfn>, run the steps below:
 				<ol>
 					<li>If <a>waitPromise</a> is <code>null</code>, terminate these steps</li>
 					<li>Let <var>detachedWaitPromise</var> be <a>waitPromise</a></li>
@@ -850,7 +850,7 @@ poll();</pre>
 							<li>If <a>readPending</a> is set, throw an "<code><a>InvalidStateError</a></code>"</li>
 							<li>Set <a>readPending</a></li>
 
-							<li><a>Abort wait</a> <var>destination</var></a>
+							<li>Run <a>abort waiting</a> algorithm on <var>destination</var></a>
 
 							<li>Set <a>amountBeingReturned</a> to 0</li>
 
