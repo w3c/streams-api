@@ -393,7 +393,7 @@ poll();</pre>
 
 							<li><a>Abort wait</a></li>
 
-							<li>Let <var>amountToWrite</var> be the <a>cost</a> of <var>data</var></li>
+							<li>If <var>cost</var> argument is specified, let <var>amountToWrite</var> be <var>cost</var> argument. Otherwise, let <var>amountToWrite</var> be the <a>cost</a> of <var>data</var></li>
 
 							<li>Let <var>writePromise</var> be a new <a>Promise</a></li>
 
@@ -418,7 +418,6 @@ poll();</pre>
 										Write <var>data</var> to <a>dataSink</a>.
 									</dd>
 								</dl>
-								Write <var>bytesToWrite</var> to <a>dataSink</a>
 							</li>
 						</ol>
 					</p>
@@ -430,6 +429,8 @@ poll();</pre>
 					<dl class="parameters">
 						<dt>any data</dt>
 						<dd>Data to write.</dd>
+						<dt>optional [Clamp] unsigned long long cost</dt>
+						<dd>Overrides <a>cost</a> of data.</dd>
 					</dl>
 				</dd>
 
