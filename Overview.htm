@@ -331,6 +331,30 @@ writeData();</pre>
 }
 
 poll();</pre>
+
+		<p>
+			When X bytes are loaded and passed to the Promise, the ReadableByteStream marks X bytes used in pullAmount.
+			The next <code>read()</code> call automatically clears the mask to request the producer to produce X more bytes.
+			If precise flow control is needed, you update pullAmount before the next <code>read()</code>.
+			In the example below, the producer is requested to produce 16 bytes, and then in the fulfill callback, pullAmount is set to the remaining number of bytes not to request more.
+		</p>
+
+		<pre class="example">stream.pullAmount = 16;
+function read() {
+  stream.read().then(
+    function (result) {
+      process(result);
+      stream.pullAmount -= result.size;
+      if (stream.pullAmount == 0) {
+        // Done
+      } else if (stream.eof) {
+        // Done
+      } else {
+        read();
+      }
+    }
+  );
+}</pre>
 	</section>
 
 	<section class="section" id="writableByteStream">
