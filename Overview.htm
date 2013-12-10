@@ -1172,15 +1172,17 @@ poll();</pre>
 		</p>
 
 		<dl class="idl" title="enum ByteStreamReadType">
+			<dt>as-is</dt>
+			<dd>Default. <code>read()</code> and <code>readExact()</code> return produced data as-is</dd>
 			<dt>blob</dt>
-			<dd>Read operations should return data as a <a>Blob</a></dd>
+			<dd><code>read()</code> and <code>readExact()</code> attempt to convert produced data into a <a>Blob</a>, and then return it</dd>
 			<dt>arraybuffer</dt>
-			<dd>Read operations should return data as an <a>ArrayBuffer</a></dd>
+			<dd><code>read()</code> and <code>readExact()</code> attempt to convert produced data into an <a>ArrayBuffer</a>, and then return it</dd>
 			<dt>text</dt>
-			<dd>Read operations should return data as a <a>DOMString</a></dd>
+			<dd><code>read()</code> and <code>readExact()</code> attempt to convert produced data into a <a>DOMString</a>, and then return it</dd>
 			<dt>none</dt>
 			<dd>
-				Read operations should return nothing.
+				<code>read()</code> and <code>readExact()</code> return nothing.
 				Useful for seeking data by skipping some amount of data.
 				User agents may implement some optimization for "<code>none</code>" type read for example omitting internal data transfer.
 			</dd>
