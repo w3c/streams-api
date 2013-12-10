@@ -190,7 +190,7 @@ var respecConfig = {
 			This interface represents the potential for an infinite amount of bytes which are obtained over time and read once.
 			Data consuming code reads data from the data source inside a data producing API using:
 			<ul>
-				<li>The <code>read()</code> and <code>readExact()</code> methods for reading bytes from the data source as a <a>ArrayBufferView</a>, <a>DOMString</a> or <a>Blob</a></li>
+				<li>The <code>read()</code> and <code>readUpTo()</code> methods for reading bytes from the data source as a <a>ArrayBufferView</a>, <a>DOMString</a> or <a>Blob</a></li>
 				<li>The <code>pullAmount</code> attribute to pace data retrieval from the data source</li>
 				<li>The <code>pipe()</code> method for transferring data in bulk from the data source into the data sink of a <a>WritableByteStream</a> from another API</li>
 			</ul>
@@ -645,7 +645,7 @@ function read() {
 				<dt>attribute ByteStreamReadType readType</dt>
 				<dd>
 					<p>
-						Specifies what data type will be returned by a <code>read()</code> and <code>readExact()</code> method call.
+						Specifies what data type will be returned by a <code>read()</code> and <code>readUpTo()</code> method call.
 						This attribute can be set to any of the supported types in <a>ByteStreamReadType</a>.
 						The default value for this attribute is "<code>arraybuffer</code>".
 					</p>
@@ -682,12 +682,13 @@ function read() {
 					</section>
 				</dd>
 
-				<dt>Promise&amp;lt;ByteStreamReadResult&gt; readExact()</dt>
+				<dt>Promise&amp;lt;ByteStreamReadResult&gt; readUpTo()</dt>
 				<dd>
 					<p>
 						This method reads data from the ReadableByteStream.
-						The returned Promise is fulfilled only when bytes of the specified size is read or the EOF is reached.
-						The size of data read by this method is exactly the same as the specified size unless an EOF was reached, in which case there will be less bytes, which were the remaining bytes until the EOF.
+						The returned <a>Promise</a> is fulfilled only when the total cost of produced data becomes equal to or greater than the specified <a>cost</a> or the EOF is reached.
+						The cost of data returned by this method is the same or less than the specified <var>size</var> argument.
+						The cost of data returned by this method can be less than <var>size</var> when data cannot be fully converted into the type specified by <code>readType</code> or an EOF was reached.
 					</p>
 
 					<p>
@@ -701,7 +702,7 @@ function read() {
 							<li>Let <var>latchedType</var> be the current value of <a href="#widl-ReadableByteStream-readType">readType</a></li>
 							<li>Let <var>latchedEncoding</var> be the current value of <a href="#widl-ReadableByteStream-readEncoding">readEncoding</a></li>
 
-							<li>Set <a>readExactPullAmount</a> to <var>size</var></li>
+							<li>Set <a>readUpToPullAmount</a> to <var>size</var></li>
 							<li>Set <a>amountBeingReturned</a> to 0</li>
 
 							<li><a>Retrieve data</a></li>
@@ -709,31 +710,42 @@ function read() {
 							<li>Let <var>readPromise</var> be a new <a>Promise</a></li>
 							<li>Return <var>readPromise</var>, and then continue to process the steps in this algorithm</li>
 
-							<li>Wait until the number of bytes in <a>readDataBuffer</a> becomes equal to or greater than <var>size</var> or <a>eofReached</a> is set</li>
+							<li>Wait until the total cost of data in <a>readDataBuffer</a> becomes equal to or greater than <var>size</var> or <a>eofReached</a> is set</li>
 
 							<li>
 								Queue a task which runs the steps below:
 								<ol>
-									<li>Let <var>readableAmount</var> be the number of bytes in <a>readDataBuffer</a></li>
-									<li>Let <var>amountToReturn</var> be min(<var>size</var>, <var>readableAmount</var>)</li>
-									<li>Set <a>amountBeingReturned</a> to <var>amountToReturn</var></li>
-									<li>Pop <var>amountToReturn</var> bytes from <a>readDataBuffer</a>, and then let <var>readBytes</var> be the popped bytes</li>
-
-									<li>Set <a>readExactPullAmount</a> to 0</li>
-
-									<li>Unset <a>readPending</a></li>
+									<li>Let <var>readableAmount</var> be the total cost of data in <a>readDataBuffer</a></li>
+									<li>Let <var>maxAmountToConsume</var> be min(<var>size</var>, <var>readableAmount</var>)</li>
 
 									<li>Let <var>result</var> be a new <a>ByteStreamReadResult</a></li>
 									<li>
 										<dl class="switch">
 											<dt>If <var>latchedType</var> is "<code>none</code>"</dt>
-											<dd>Set <var>result</var>.<a href="#widl-ByteStreamReadResult-data">data</a> to <code>undefined</code></dd>
+											<dd>
+												<ol>
+													<li>Set <var>result</var>.<a href="#widl-ByteStreamReadResult-data">data</a> to <code>undefined</code></li>
+													<li>Pop data from <a>readDataBuffer</a> as much as possible but up to <var>maxAmountToConsume</var></li>
+												</ol>
+											</dd>
 											<dt>Otherwise</dt>
-											<dd>Set <var>result</var>.<a href="#widl-ByteStreamReadResult-data">data</a> to an object of the type specified by <var>latchedType</var> which represents <var>readBytes</var></dd>
+											<dd>
+												<ol>
+													<li>Set <var>result</var>.<a href="#widl-ByteStreamReadResult-data">data</a> to an object of the type specified by <var>latchedType</var> that can be created by consuming as much data as possible from <a>readDataBuffer</a> but up to <var>maxAmountToConsume</var></li>
+													<li>Pop the consumed data from <a>readDataBuffer</a></li>
+											</dd>
 										</dl>
 									</li>
+									<li>Let <var>amountConsumed</var> be the total cost of data consumed in the last step</li>
+									<li>Set <a href="#widl-ByteStreamReadResult-amountConsumed">amountConsumed</a> of <var>result</var> to <var>amountConsumed</var></li>
 									<li>Set <a href="#widl-ByteStreamReadResult-eof">eof</a> of <var>result</var> to <code>true</code> if <a>readDataBuffer</a> is empty and <a>eofReached</a> is set</li>
-									<li>Set <a href="#widl-ByteStreamReadResult-amountConsumed">amountConsumed</a> of <var>result</var> to <var>amountToReturn</var></li>
+
+									<li>Set <a>amountBeingReturned</a> to <var>amountConsumed</var></li>
+
+									<li>Set <a>readUpToPullAmount</a> to 0</li>
+
+									<li>Unset <a>readPending</a></li>
+
 									<li>Fulfill <var>readPromise</var> with <var>result</var></li>
 								</ol>
 							</li>
@@ -742,7 +754,7 @@ function read() {
 
 					<dl class="parameters">
 						<dt>[Clamp] unsigned long long size</dt>
-						<dd>Number of bytes to read.</dd>
+						<dd>Max number of bytes to read.</dd>
 					</dl>
 
 					<section class="note">
@@ -1100,7 +1112,7 @@ function read() {
 			</p>
 
 			<p>
-				An associated integer variable <dfn>readExactPullAmount</dfn> which temporarily overrides <a href="#widl-ReadableByteStream-pullAmount">pullAmount</a> if necessary for a <code>readExact()</code> method call.
+				An associated integer variable <dfn>readUpToPullAmount</dfn> which temporarily overrides <a href="#widl-ReadableByteStream-pullAmount">pullAmount</a> if necessary for a <code>readUpTo()</code> method call.
 				This variable is initialized to 0 on construction.
 			</p>
 			<p>
@@ -1143,7 +1155,7 @@ function read() {
 				To <dfn>retrieve data</dfn>, run the steps below:
 				<ol>
 					<li>Let <var>readableAmount</var> be the number of bytes in the <a>readDataBuffer</a></li>
-					<li>Let <var>amountToRetrieve</var> be max(max(<a href="#widl-ReadableByteStream-pullAmount">pullAmount</a>, <a>readExactPullAmount</a>, <a>pipePullAmount</a>) - (<a>amountRequested</a> + <var>readableAmount</var> + <a>amountBeingReturned</a>), 0)</li>
+					<li>Let <var>amountToRetrieve</var> be max(max(<a href="#widl-ReadableByteStream-pullAmount">pullAmount</a>, <a>readUpToPullAmount</a>, <a>pipePullAmount</a>) - (<a>amountRequested</a> + <var>readableAmount</var> + <a>amountBeingReturned</a>), 0)</li>
 					<li>Set <a>amountRequested</a> to <a>amountRequested</a> + <var>amountToRetrieve</var></li>
 					<li>Send a request to the <a>dataSource</a> to return <var>amountToRetrieve</var> bytes to the ReadableByteStream</li>
 				</ol>
@@ -1197,16 +1209,16 @@ function read() {
 
 		<dl class="idl" title="enum ByteStreamReadType">
 			<dt>as-is</dt>
-			<dd>Default. <code>read()</code> and <code>readExact()</code> return produced data as-is</dd>
+			<dd>Default. <code>read()</code> and <code>readUpTo()</code> return produced data as-is</dd>
 			<dt>blob</dt>
-			<dd><code>read()</code> and <code>readExact()</code> attempt to convert produced data into a <a>Blob</a>, and then return it</dd>
+			<dd><code>read()</code> and <code>readUpTo()</code> attempt to convert produced data into a <a>Blob</a>, and then return it</dd>
 			<dt>arraybuffer</dt>
-			<dd><code>read()</code> and <code>readExact()</code> attempt to convert produced data into an <a>ArrayBuffer</a>, and then return it</dd>
+			<dd><code>read()</code> and <code>readUpTo()</code> attempt to convert produced data into an <a>ArrayBuffer</a>, and then return it</dd>
 			<dt>text</dt>
-			<dd><code>read()</code> and <code>readExact()</code> attempt to convert produced data into a <a>DOMString</a>, and then return it</dd>
+			<dd><code>read()</code> and <code>readUpTo()</code> attempt to convert produced data into a <a>DOMString</a>, and then return it</dd>
 			<dt>none</dt>
 			<dd>
-				<code>read()</code> and <code>readExact()</code> return nothing.
+				<code>read()</code> and <code>readUpTo()</code> return nothing.
 				Useful for seeking data by skipping some amount of data.
 				User agents may implement some optimization for "<code>none</code>" type read for example omitting internal data transfer.
 			</dd>
