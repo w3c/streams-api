@@ -1054,10 +1054,12 @@ function read() {
 				A <dfn>data source</dfn> can be anything that:
 				<ul>
 					<li>
-						Produces bytes. Newly produced bytes will be delivered to the associated <a>ReadableByteStream</a>.
+						Produces bytes.
+						Newly produced bytes will be delivered to the associated <a>ReadableByteStream</a>.
 					</li>
 					<li>
-						Accepts requests for production of bytes from a <a>ReadableByteStream</a>. A byte production request consists of an integer indicating the number of bytes to produce in addition to already requested ones.
+						Accepts requests for production of bytes from a <a>ReadableByteStream</a>.
+						A byte production request consists of an integer indicating the number of bytes to produce in addition to already requested ones.
 						Interpretation of the request is up to data sources.
 						Data sources may respond to retrieval requests with data larger than requested.
 						Requests and delivery of bytes don't need to 1-to-1 correspond.
