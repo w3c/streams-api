@@ -146,25 +146,27 @@ var respecConfig = {
 				An enum <a>StreamReadType</a> which represents data types as which data can be read from a <a>ReadableStream</a>.
 			</li>
 			<li>
-				A list of notable byte stream <a href="#producers">producers</a> and <a href="#consumers">consumers</a> for which we can apply either or both of <a>ReadableStream</a> and <a>WritableStream</a> model.
+				A list of notable data <a href="#producers">producers</a> and <a href="#consumers">consumers</a> for which we can apply either or both of <a>ReadableStream</a> and <a>WritableStream</a> model.
 			</li>
 			<li>
 				Extensions to <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#the-xmlhttprequest-interface">XMLHttpRequest</a> [[!XMLHTTPREQUEST2]] to add support for uploading data via <a>WritableStream</a> and downloading a response as a <a>ReadableStream</a>.
 			</li>
 			<li>
-				Extensions to <a href="http://dev.w3.org/2006/webapi/FileAPI/#dfn-createObjectURL">URL.createObjectURL</a> and
-				<a href="http://dev.w3.org/2006/webapi/FileAPI/#dfn-revokeObjectURL">URL.revokeObjectURL</a> to add support for <a>ReadableStream</a>.
+				Extensions to <a href="http://dev.w3.org/2006/webapi/FileAPI/#dfn-createObjectURL">URL.createObjectURL</a> and <a href="http://dev.w3.org/2006/webapi/FileAPI/#dfn-revokeObjectURL">URL.revokeObjectURL</a> to add support for <a>ReadableStream</a>.
 			</li>
 		</ul>
 
 		<p>
 			This API is designed to be used in conjunction with other APIs and elements on the web platform, notably:
-			<a href="http://dev.w3.org/2006/webapi/FileAPI">File</a> [[!FILE-API]],
-			<a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2">XMLHttpRequest</a>
-			(e.g. with an overloaded <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#the-send-method"><code>send()</code></a> method
-			and <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#the-responsetype-attribute"><code>response</code></a> object for <a>ReadableStream</a> objects) [[!XMLHTTPREQUEST2]],
-			<a href="http://dev.w3.org/html5/postmsg/#dom-window-postmessage"><code>postMessage</code></a>, and
-			Web Workers [[!WEBWORKERS]].
+			<ul>
+				<li><a href="http://dev.w3.org/2006/webapi/FileAPI">FileAPI</a> [[!FILE-API]]</li>
+				<li>
+					<a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2">XMLHttpRequest</a>.
+					E.g. with an overloaded <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#the-send-method"><code>send()</code></a> method and <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#the-responsetype-attribute"><code>response</code></a> object for <a>ReadableStream</a> objects) [[!XMLHTTPREQUEST2]].
+				</li>
+				<li><a href="http://dev.w3.org/html5/postmsg/#dom-window-postmessage"><code>postMessage</code></a></li>
+				<li>Web Workers [[!WEBWORKERS]]</li>
+			</ul>
 		</p>
 	</section>
 
@@ -173,63 +175,72 @@ var respecConfig = {
 
 		<p>
 			Web applications should have the ability to acquire, manipulate, and pass data in a wide variety of forms, including as a sequence of data made available over time.
-			This specification defines the basic representation for byte streams, and programmatic ways to read and write streams of data and errors raised on those operations.
+			This specification defines the basic representation for streams of data, and programmatic ways to read and write streams of data and errors raised on those operations.
 		</p>
 
 		<p>
 			The <a>WritableStream</a> interface defines a general protocol for <a href="#consumers">data consuming APIs</a> to communicate with data producing code.
 			In these cases, the data consuming API, such as a decoder, provides a <a>WritableStream</a> for other applications to write to, enabling the decoder to begin decoding data as it becomes available.
-			The data is written to the internal data sink of a data consuming API using:
+			The data is written to the internal data sink inside the data consuming API using:
 			<ul>
-				<li>The <code>write()</code> method for writing bytes to the data sink as a <a>ArrayBufferView</a>, <a>DOMString</a> or <a>Blob</a></li>
 				<li>
-					The <code>awaitSpaceAvailable()</code> method for allowing a data-producer to write to the data sink only when the data sink specifies it is now available to consume more data.
-					This is useful for cases where an app may want to avoid backpressure and filling the internal buffer.
+					The <code>write()</code> method which writes the given data to the data sink
+				</li>
+				<li>
+					The <code>awaitSpaceAvailable()</code> method which allows a data producing code to write data to the data consuming API only when its data sink is available to consume more data.
+					This is useful for cases where an app may want to avoid filling the internal buffer.
 				</li>
 			</ul>
-			Actual transfer of bytes to the data sink may happen either synchronously or asynchronously.
-			<a>WritableStream</a> hides the details of actual communication with the data sink while allowing for an efficient transfer of bytes.
+			Actual transfer of data to the data sink may happen either synchronously or asynchronously.
+			<a>WritableStream</a> hides the details of actual communication with the data sink while allowing for an efficient transfer of data.
 		</p>
 
 		<p>
 			The <a>ReadableStream</a> interface defines a general protocol for <a href="#producers">data producing APIs</a> to communicate with data consuming code.
-			This interface represents the potential for an infinite amount of bytes which are obtained over time and read once.
-			Data consuming code reads data from the data source inside a data producing API using:
+			This interface represents the potential for an infinite amount of data which are obtained over time and read once.
+			Data consuming code reads data from the internal data source inside the data producing API using:
 			<ul>
-				<li>The <code>read()</code> and <code>readUpTo()</code> methods for reading bytes from the data source as a <a>ArrayBufferView</a>, <a>DOMString</a> or <a>Blob</a></li>
-				<li>The <code>pullAmount</code> attribute to pace data retrieval from the data source</li>
-				<li>The <code>pipe()</code> method for transferring data in bulk from the data source into the data sink of a <a>WritableStream</a> from another API</li>
+				<li>
+					The <code>read()</code> and <code>readUpTo()</code> methods which reads data from the data source
+				</li>
+				<li>
+					The <code>pullAmount</code> attribute which paces data retrieval from the data source
+				</li>
+				<li>
+					The <code>pipe()</code> method which transfers data in bulk from the data source into the data sink of another API which implements <a>WritableStream</a>
+				</li>
 			</ul>
-			Actual transfer of bytes from the data source may happen either synchronously or asynchronously.
-			The <a>ReadableStream</a> hides the details of actual communication with the data source while allowing for an efficient transfer of bytes.
+			Actual transfer of data from the data source may happen either synchronously or asynchronously.
+			The <a>ReadableStream</a> hides the details of actual communication with the data source while allowing for an efficient transfer of data.
 		</p>
 
 		<p>
-			With the combination of the following features, this interface suite responds to various simple and complex needs of byte stream handling.
+			With the combination of the following features, this interface suite responds to various simple and complex needs of data stream handling.
 			<ul>
-				<li>Delayed notification of completion by using <a>Promise</a>s</li>
+				<li>Delayed notification of completion by using <a>Promise</a>s. See below for more details.</li>
 				<li>Explicit back pressure management by propagating room for consumption back to producers</li>
-				<li><a>WritableStream</a> always accepts incoming data synchronously</li>
+				<li><a>WritableStream</a> always accepts incoming data synchronously to bridge with legacy APIs that don't understand backpressure</li>
 			</ul>
 		</p>
 
 		<p>
 			The <a>ByteStream</a> is a simple implementation of both the <a>WritableStream</a> and <a>ReadableStream</a> interface.
-			A ByteStream has a single queue of bytes and it works as a data sink for the WritableStream interface and as a data source for the ReadableStream interface.
+			A ByteStream has a single queue of bytes which works as a data sink for the WritableStream interface and as a data source for the ReadableStream interface.
 		</p>
 
 		<p>
 			Read and write operations on these interfaces are implemented using <a>Promise</a>.
 			When an operation completes, the Promise returned by a method will be fulfilled, and then the fulfill callback set to the Promise will handle the result.
 			Error conditions that may arise during an operation will be handled by the reject callback set to the Promise.
-			An example will be illustrative.
 		</p>
 
 		<p>
-			In the example below, different code blocks handle progress, error, and success conditions.
-			The example demonstrates how to read a chunk of data from a <a>ReadableStream</a> using <code>read()</code>.
+			Examples below will be illustrative.
+		</p>
+
+		<p>
+			The example below demonstrates how to read a chunk of data from a <a>ReadableStream</a> using <code>read()</code>.
 			The <a>ReadableStream</a> may of come from a <a href="#producers">producer</a> such as <code>XMLHttpRequest</code>.
-			Additionally, it demonstrates how to read bytes from a <a>ReadableStream</a> until an EOF is encountered.
 		</p>
 
 		<pre class="example">
@@ -244,6 +255,10 @@ stream.read().then(
   function (error) {
     // Handle error
   });</pre>
+
+		<p>
+			The example below demonstrates how to read bytes from a <a>ReadableStream</a> until an EOF is encountered.
+		</p>
 
 		<pre class="example">// Read data from the ReadableStream repeatedly
 function readUntilEof() {
@@ -263,9 +278,9 @@ function readUntilEof() {
 readUntilEof();</pre>
 
 		<p>
-			In the example below, different code blocks handle progress, error, and success conditions.
 			The example below demonstrates how to obtain a <a>ReadableStream</a> from <a>XMLHttpRequest</a> to begin playing a large video in <code>readystate</code> LOADING.
 			The example takes the <a>ReadableStream</a> from a <a href="#producers">producer</a>, <a>XMLHttpRequest</a>, and gives it to a <a href="#consumers">consumer</a>, the video tag.
+			If the consumer implements the <a>WritableStream</a> interface, we could use <code>pipe()</code> to transfer data to it instead of URL.
 		</p>
 
 		<pre class="example">function handler() {
@@ -284,11 +299,6 @@ client.open("GET", "myvideo.h264");
 client.responseType = "stream";
 client.send();</pre>
 
-		<p>
-			In addition to the <a>ReadableStream</a> interface, this specification introduces an interface called <a>WritableStream</a> for data consuming APIs.
-			The <a>WritableStream</a> interface provides a <code>write()</code> method which allows applications to write data to a <a href="#consumers">data consuming API</a>.
-			<code>write()</code> supports writing bytes represented as a <a>Blob</a>, <a>ArrayBuffer</a>, or <a>DOMString</a>.
-		</p>
 		<p>
 			The example below demonstrates how to use <code>write()</code> to load a <a>ReadableStream</a> into the audio tag, whose data could be processed and built dynamically at read time.
 			ByteStream in the example is a class which implements both <a>WritableStream</a> and <a>ReadableStream</a>.
@@ -323,7 +333,8 @@ document.getElementById('audioTag').src = streamURL;
 writeData();</pre>
 
 		<p>
-			A producer can also do work only when pulled by using <code>awaitSpaceAvailable()</code>, which will inform the producer when to produce data.
+			A producer can also do work only when pulled by using <code>awaitSpaceAvailable()</code>.
+			This method informs the data producing code of that the data consuming API is ready to consume data.
 			This is useful when high-performance is necessary.
 		</p>
 
@@ -339,10 +350,11 @@ writeData();</pre>
 poll();</pre>
 
 		<p>
-			When X bytes are loaded and passed to the Promise, the ReadableStream marks X bytes used in pullAmount.
-			The next <code>read()</code> call automatically clears the mask to request the producer to produce X more bytes.
+			The example below demonstrates how the timing to pull new data is determined.
+			When data of cost X is loaded and passed to the Promise, the <a>ReadableStream</a> marks X bytes of pullAmount as used.
+			The next <code>read()</code> call automatically clears the mask to request the data source to produce X more data.
 			If precise flow control is needed, you update pullAmount before the next <code>read()</code>.
-			In the example below, the producer is requested to produce 16 bytes, and then in the fulfill callback, pullAmount is set to the remaining number of bytes not to request more.
+			In the example, the producer API is requested to produce 16 bytes, and then in the fulfill callback, pullAmount is set to the remaining number of bytes not to let the API produce more data.
 		</p>
 
 		<pre class="example">stream.pullAmount = 16;
