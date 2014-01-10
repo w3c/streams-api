@@ -119,7 +119,7 @@ var respecConfig = {
 
 	<section id="abstract">
 		<p>
-			This specification provides an API for representing a byte stream in web applications, as well as programmatically reading and writing it.
+			This specification provides an API for representing a stream of data in web applications, as well as programmatically reading and writing it.
 			This includes:
 		</p>
 		<ul>
@@ -130,10 +130,10 @@ var respecConfig = {
 				An interface named <a>ReadableStream</a> which defines a general protocol for data producing APIs to communicate with data consuming code.
 			</li>
 			<li>
-				An interface named <a>ByteStream</a> which inherits both WritableStream and ReadableStream and represents a byte sequence.
+				An interface named <a>ByteStream</a> which inherits both WritableStream and ReadableStream and represents a sequence of data.
 			</li>
 			<li>
-				A struct type named <a>ByteStreamReadResult</a> which represents the result of consuming operations such as <code>read()</code> and <code>pipe()</code>.
+				A struct type named <a>StreamReadResult</a> which represents the result of consuming operations such as <code>read()</code> and <code>pipe()</code>.
 				It holds a chunk of content read from a <a>ReadableStream</a>, the number of bytes consumed, and EOF signal.
 			</li>
 			<li>
@@ -746,7 +746,7 @@ function read() {
 					</section>
 				</dd>
 
-				<dt>Promise&amp;lt;ByteStreamReadResult&gt; readUpTo()</dt>
+				<dt>Promise&amp;lt;StreamReadResult&gt; readUpTo()</dt>
 				<dd>
 					<p>
 						This method reads data from the ReadableStream.
@@ -782,28 +782,28 @@ function read() {
 									<li>Let <var>readableAmount</var> be the total cost of data in <a>readDataBuffer</a></li>
 									<li>Let <var>maxAmountToConsume</var> be min(<var>size</var>, <var>readableAmount</var>)</li>
 
-									<li>Let <var>result</var> be a new <a>ByteStreamReadResult</a></li>
+									<li>Let <var>result</var> be a new <a>StreamReadResult</a></li>
 									<li>
 										<dl class="switch">
 											<dt>If <var>latchedType</var> is "<code>none</code>"</dt>
 											<dd>
 												<ol>
-													<li>Set <var>result</var>.<a href="#widl-ByteStreamReadResult-data">data</a> to <code>undefined</code></li>
+													<li>Set <var>result</var>.<a href="#widl-StreamReadResult-data">data</a> to <code>undefined</code></li>
 													<li>Pop data from <a>readDataBuffer</a> as much as possible but up to <var>maxAmountToConsume</var></li>
 												</ol>
 											</dd>
 											<dt>Otherwise</dt>
 											<dd>
 												<ol>
-													<li>Set <var>result</var>.<a href="#widl-ByteStreamReadResult-data">data</a> to an object of the type specified by <var>latchedType</var> that can be created by consuming as much data as possible from <a>readDataBuffer</a> but up to <var>maxAmountToConsume</var></li>
+													<li>Set <var>result</var>.<a href="#widl-StreamReadResult-data">data</a> to an object of the type specified by <var>latchedType</var> that can be created by consuming as much data as possible from <a>readDataBuffer</a> but up to <var>maxAmountToConsume</var></li>
 													<li>Pop the consumed data from <a>readDataBuffer</a></li>
 											</dd>
 										</dl>
 									</li>
 									<li>Let <var>amountConsumed</var> be the total cost of data consumed in the last step</li>
-									<li>Set <a href="#widl-ByteStreamReadResult-amountConsumed">amountConsumed</a> of <var>result</var> to <var>amountConsumed</var></li>
-									<li>Set <a href="#widl-ByteStreamReadResult-eof">eof</a> of <var>result</var> to <code>true</code> if <a>readDataBuffer</a> is empty and <a>eofReached</a> is set</li>
-									<li>Set <var>result</var>.<a href="#widl-ByteStreamReadResult-error">error</a> to <a>sourceErrorDetail</a></li>
+									<li>Set <a href="#widl-StreamReadResult-amountConsumed">amountConsumed</a> of <var>result</var> to <var>amountConsumed</var></li>
+									<li>Set <a href="#widl-StreamReadResult-eof">eof</a> of <var>result</var> to <code>true</code> if <a>readDataBuffer</a> is empty and <a>eofReached</a> is set</li>
+									<li>Set <var>result</var>.<a href="#widl-StreamReadResult-error">error</a> to <a>sourceErrorDetail</a></li>
 
 									<li>Set <a>amountBeingReturned</a> to <var>amountConsumed</var></li>
 
@@ -831,11 +831,11 @@ function read() {
 					</section>
 				</dd>
 
-				<dt>Promise&amp;lt;ByteStreamReadResult&gt; read()</dt>
+				<dt>Promise&amp;lt;StreamReadResult&gt; read()</dt>
 				<dd>
 					<p>
 						This method reads data from the ReadableStream.
-						The speed of reading can be roughly adjusted by using <a href="#widl-ByteStreamReadResult-pullAmount">pullAmount</a>.
+						The speed of reading can be roughly adjusted by using <a href="#widl-StreamReadResult-pullAmount">pullAmount</a>.
 						pullAmount doesn't necessarily limit the size of data being read by this method.
 					</p>
 
@@ -942,11 +942,11 @@ function read() {
 
 							<li>Queue a task which runs the rest of this algorithm</li>
 
-							<li>Let <var>result</var> be a new <a>ByteStreamReadResult</a>.</li>
-							<li>Set <var>result</var>.<a href="#widl-ByteStreamReadResult-data">data</a> to <var>readData</var></li>
-							<li>Set <var>result</var>.<a href="#widl-ByteStreamReadResult-eof">eof</a> to <code>true</code> if <a>eofReached</a> is set and <a>readDataBuffer</a> is empty</li>
-							<li>Set <var>result</var>.<a href="#widl-ByteStreamReadResult-amountConsumed">amountConsumed</a> to <var>amountConsumed</var></li>
-							<li>Set <var>result</var>.<a href="#widl-ByteStreamReadResult-error">error</a> to <a>sourceErrorDetail</a></li>
+							<li>Let <var>result</var> be a new <a>StreamReadResult</a>.</li>
+							<li>Set <var>result</var>.<a href="#widl-StreamReadResult-data">data</a> to <var>readData</var></li>
+							<li>Set <var>result</var>.<a href="#widl-StreamReadResult-eof">eof</a> to <code>true</code> if <a>eofReached</a> is set and <a>readDataBuffer</a> is empty</li>
+							<li>Set <var>result</var>.<a href="#widl-StreamReadResult-amountConsumed">amountConsumed</a> to <var>amountConsumed</var></li>
+							<li>Set <var>result</var>.<a href="#widl-StreamReadResult-error">error</a> to <a>sourceErrorDetail</a></li>
 
 							<li>Set <a>amountBeingReturned</a> to <var>amountConsumed</var></li>
 
@@ -969,7 +969,7 @@ function read() {
 					</section>
 				</dd>
 
-				<dt>Promise&amp;lt;ByteStreamReadResult&gt; pipe()</dt>
+				<dt>Promise&amp;lt;StreamReadResult&gt; pipe()</dt>
 				<dd>
 					<p>
 						This method bulk transfers bytes from the ReadableStream to another <a>WritableStream</a>.
@@ -1087,10 +1087,10 @@ function read() {
 
 							<li>Unset <a>readPending</a></li>
 
-							<li>Let <var>result</var> be a new <a>ByteStreamReadResult</a></li>
-							<li>Set <var>result</var>.<a href="#widl-ByteStreamReadResult-data">data</a> to <code>undefined</code>.
-							<li>Set <var>result</var>.<a href="#widl-ByteStreamReadResult-eof">eof</a> to <code>true</code> if <a>eofReached</a></li>
-							<li>Set <var>result</var>.<a href="#widl-ByteStreamReadResult-amountConsumed">amountConsumed</a> to <var>totalAmountTransferred</var></li>
+							<li>Let <var>result</var> be a new <a>StreamReadResult</a></li>
+							<li>Set <var>result</var>.<a href="#widl-StreamReadResult-data">data</a> to <code>undefined</code>.
+							<li>Set <var>result</var>.<a href="#widl-StreamReadResult-eof">eof</a> to <code>true</code> if <a>eofReached</a></li>
+							<li>Set <var>result</var>.<a href="#widl-StreamReadResult-amountConsumed">amountConsumed</a> to <var>totalAmountTransferred</var></li>
 							<li>
 								Fulfill <var>pipePromise</var> with <var>result</var>
 								<section class="note">
@@ -1300,13 +1300,13 @@ function read() {
 	</section>
 
 	<section class="section">
-		<h2>ByteStreamReadResult Interface</h2>
+		<h2>StreamReadResult Interface</h2>
 
 		<p>
 			This interface represents the result of methods on <a>ReadableStream</a>.
 		</p>
 
-		<dl class="idl" title="interface ByteStreamReadResult">
+		<dl class="idl" title="interface StreamReadResult">
 			<dt>readonly attribute boolean eof</dt>
 			<dd>Set if the operation resulted in an EOF</dd>
 			<dt>readonly attribute any data</dt>
@@ -1314,7 +1314,7 @@ function read() {
 			<dt>readonly attribute unsigned long long amountConsumed</dt>
 			<dd>The size, in bytes, of the data read</dd>
 			<dt>readonly attribute any error</dt>
-			<dd>Once any error occurred, set to the error detail object on all ByteStreamReadResults returned after the error</dd>
+			<dd>Once any error occurred, set to the error detail object on all StreamReadResults returned after the error</dd>
 		</dl>
 	</section>
 
