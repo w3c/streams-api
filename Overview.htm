@@ -124,30 +124,30 @@ var respecConfig = {
 		</p>
 		<ul>
 			<li>
-				An interface named <a>WritableByteStream</a> which defines a general protocol for data consuming APIs (<a href="#consumers">consumers</a>) to communicate with data producing code (<a href="#producers">producers</a>).
+				An interface named <a>WritableStream</a> which defines a general protocol for data consuming APIs (<a href="#consumers">consumers</a>) to communicate with data producing code (<a href="#producers">producers</a>).
 			</li>
 			<li>
-				An interface named <a>ReadableByteStream</a> which defines a general protocol for data producing APIs to communicate with data consuming code.
+				An interface named <a>ReadableStream</a> which defines a general protocol for data producing APIs to communicate with data consuming code.
 			</li>
 			<li>
-				An interface named <a>ByteStream</a> which inherits both WritableByteStream and ReadableByteStream and represents a byte sequence.
+				An interface named <a>ByteStream</a> which inherits both WritableStream and ReadableStream and represents a byte sequence.
 			</li>
 			<li>
 				A struct type named <a>ByteStreamReadResult</a> which represents the result of consuming operations such as <code>read()</code> and <code>pipe()</code>.
-				It holds a chunk of content read from a <a>ReadableByteStream</a>, the number of bytes consumed, and EOF signal.
+				It holds a chunk of content read from a <a>ReadableStream</a>, the number of bytes consumed, and EOF signal.
 			</li>
 			<li>
-				An enum <a>ByteStreamReadType</a> which represents data types as which data can be read from a <a>ReadableByteStream</a>.
+				An enum <a>ByteStreamReadType</a> which represents data types as which data can be read from a <a>ReadableStream</a>.
 			</li>
 			<li>
-				A list of notable byte stream <a href="#producers">producers</a> and <a href="#consumers">consumers</a> for which we can apply either or both of <a>ReadableByteStream</a> and <a>WritableByteStream</a> model.
+				A list of notable byte stream <a href="#producers">producers</a> and <a href="#consumers">consumers</a> for which we can apply either or both of <a>ReadableStream</a> and <a>WritableStream</a> model.
 			</li>
 			<li>
-				Extensions to <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#the-xmlhttprequest-interface">XMLHttpRequest</a> [[!XMLHTTPREQUEST2]] to add support for uploading data via <a>WritableByteStream</a> and downloading a response as a <a>ReadableByteStream</a>.
+				Extensions to <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#the-xmlhttprequest-interface">XMLHttpRequest</a> [[!XMLHTTPREQUEST2]] to add support for uploading data via <a>WritableStream</a> and downloading a response as a <a>ReadableStream</a>.
 			</li>
 			<li>
 				Extensions to <a href="http://dev.w3.org/2006/webapi/FileAPI/#dfn-createObjectURL">URL.createObjectURL</a> and
-				<a href="http://dev.w3.org/2006/webapi/FileAPI/#dfn-revokeObjectURL">URL.revokeObjectURL</a> to add support for <a>ReadableByteStream</a>.
+				<a href="http://dev.w3.org/2006/webapi/FileAPI/#dfn-revokeObjectURL">URL.revokeObjectURL</a> to add support for <a>ReadableStream</a>.
 			</li>
 		</ul>
 
@@ -156,7 +156,7 @@ var respecConfig = {
 			<a href="http://dev.w3.org/2006/webapi/FileAPI">File</a> [[!FILE-API]],
 			<a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2">XMLHttpRequest</a>
 			(e.g. with an overloaded <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#the-send-method"><code>send()</code></a> method
-			and <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#the-responsetype-attribute"><code>response</code></a> object for <a>ReadableByteStream</a> objects) [[!XMLHTTPREQUEST2]],
+			and <a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#the-responsetype-attribute"><code>response</code></a> object for <a>ReadableStream</a> objects) [[!XMLHTTPREQUEST2]],
 			<a href="http://dev.w3.org/html5/postmsg/#dom-window-postmessage"><code>postMessage</code></a>, and
 			Web Workers [[!WEBWORKERS]].
 		</p>
@@ -171,8 +171,8 @@ var respecConfig = {
 		</p>
 
 		<p>
-			The <a>WritableByteStream</a> interface defines a general protocol for <a href="#consumers">data consuming APIs</a> to communicate with data producing code.
-			In these cases, the data consuming API, such as a decoder, provides a <a>WritableByteStream</a> for other applications to write to, enabling the decoder to begin decoding data as it becomes available.
+			The <a>WritableStream</a> interface defines a general protocol for <a href="#consumers">data consuming APIs</a> to communicate with data producing code.
+			In these cases, the data consuming API, such as a decoder, provides a <a>WritableStream</a> for other applications to write to, enabling the decoder to begin decoding data as it becomes available.
 			The data is written to the internal data sink of a data consuming API using:
 			<ul>
 				<li>The <code>write()</code> method for writing bytes to the data sink as a <a>ArrayBufferView</a>, <a>DOMString</a> or <a>Blob</a></li>
@@ -182,20 +182,20 @@ var respecConfig = {
 				</li>
 			</ul>
 			Actual transfer of bytes to the data sink may happen either synchronously or asynchronously.
-			<a>WritableByteStream</a> hides the details of actual communication with the data sink while allowing for an efficient transfer of bytes.
+			<a>WritableStream</a> hides the details of actual communication with the data sink while allowing for an efficient transfer of bytes.
 		</p>
 
 		<p>
-			The <a>ReadableByteStream</a> interface defines a general protocol for <a href="#producers">data producing APIs</a> to communicate with data consuming code.
+			The <a>ReadableStream</a> interface defines a general protocol for <a href="#producers">data producing APIs</a> to communicate with data consuming code.
 			This interface represents the potential for an infinite amount of bytes which are obtained over time and read once.
 			Data consuming code reads data from the data source inside a data producing API using:
 			<ul>
 				<li>The <code>read()</code> and <code>readUpTo()</code> methods for reading bytes from the data source as a <a>ArrayBufferView</a>, <a>DOMString</a> or <a>Blob</a></li>
 				<li>The <code>pullAmount</code> attribute to pace data retrieval from the data source</li>
-				<li>The <code>pipe()</code> method for transferring data in bulk from the data source into the data sink of a <a>WritableByteStream</a> from another API</li>
+				<li>The <code>pipe()</code> method for transferring data in bulk from the data source into the data sink of a <a>WritableStream</a> from another API</li>
 			</ul>
 			Actual transfer of bytes from the data source may happen either synchronously or asynchronously.
-			The <a>ReadableByteStream</a> hides the details of actual communication with the data source while allowing for an efficient transfer of bytes.
+			The <a>ReadableStream</a> hides the details of actual communication with the data source while allowing for an efficient transfer of bytes.
 		</p>
 
 		<p>
@@ -203,13 +203,13 @@ var respecConfig = {
 			<ul>
 				<li>Delayed notification of completion by using <a>Promise</a>s</li>
 				<li>Explicit back pressure management by propagating room for consumption back to producers</li>
-				<li><a>WritableByteStream</a> always accepts incoming data synchronously</li>
+				<li><a>WritableStream</a> always accepts incoming data synchronously</li>
 			</ul>
 		</p>
 
 		<p>
-			The <a>ByteStream</a> is a simple implementation of both the <a>WritableByteStream</a> and <a>ReadableByteStream</a> interface.
-			A ByteStream has a single queue of bytes and it works as a data sink for the WritableByteStream interface and as a data source for the ReadableByteStream interface.
+			The <a>ByteStream</a> is a simple implementation of both the <a>WritableStream</a> and <a>ReadableStream</a> interface.
+			A ByteStream has a single queue of bytes and it works as a data sink for the WritableStream interface and as a data source for the ReadableStream interface.
 		</p>
 
 		<p>
@@ -221,9 +221,9 @@ var respecConfig = {
 
 		<p>
 			In the example below, different code blocks handle progress, error, and success conditions.
-			The example demonstrates how to read a chunk of data from a <a>ReadableByteStream</a> using <code>read()</code>.
-			The <a>ReadableByteStream</a> may of come from a <a href="#producers">producer</a> such as <code>XMLHttpRequest</code>.
-			Additionally, it demonstrates how to read bytes from a <a>ReadableByteStream</a> until an EOF is encountered.
+			The example demonstrates how to read a chunk of data from a <a>ReadableStream</a> using <code>read()</code>.
+			The <a>ReadableStream</a> may of come from a <a href="#producers">producer</a> such as <code>XMLHttpRequest</code>.
+			Additionally, it demonstrates how to read bytes from a <a>ReadableStream</a> until an EOF is encountered.
 		</p>
 
 		<pre class="example">
@@ -239,7 +239,7 @@ stream.read().then(
     // Handle error
   });</pre>
 
-		<pre class="example">// Read data from the ReadableByteStream repeatedly
+		<pre class="example">// Read data from the ReadableStream repeatedly
 function readUntilEof() {
   stream.read().then(
     function (result) {
@@ -258,8 +258,8 @@ readUntilEof();</pre>
 
 		<p>
 			In the example below, different code blocks handle progress, error, and success conditions.
-			The example below demonstrates how to obtain a <a>ReadableByteStream</a> from <a>XMLHttpRequest</a> to begin playing a large video in <code>readystate</code> LOADING.
-			The example takes the <a>ReadableByteStream</a> from a <a href="#producers">producer</a>, <a>XMLHttpRequest</a>, and gives it to a <a href="#consumers">consumer</a>, the video tag.
+			The example below demonstrates how to obtain a <a>ReadableStream</a> from <a>XMLHttpRequest</a> to begin playing a large video in <code>readystate</code> LOADING.
+			The example takes the <a>ReadableStream</a> from a <a href="#producers">producer</a>, <a>XMLHttpRequest</a>, and gives it to a <a href="#consumers">consumer</a>, the video tag.
 		</p>
 
 		<pre class="example">function handler() {
@@ -279,14 +279,14 @@ client.responseType = "stream";
 client.send();</pre>
 
 		<p>
-			In addition to the <a>ReadableByteStream</a> interface, this specification introduces an interface called <a>WritableByteStream</a> for data consuming APIs.
-			The <a>WritableByteStream</a> interface provides a <code>write()</code> method which allows applications to write data to a <a href="#consumers">data consuming API</a>.
+			In addition to the <a>ReadableStream</a> interface, this specification introduces an interface called <a>WritableStream</a> for data consuming APIs.
+			The <a>WritableStream</a> interface provides a <code>write()</code> method which allows applications to write data to a <a href="#consumers">data consuming API</a>.
 			<code>write()</code> supports writing bytes represented as a <a>Blob</a>, <a>ArrayBuffer</a>, or <a>DOMString</a>.
 		</p>
 		<p>
-			The example below demonstrates how to use <code>write()</code> to load a <a>ReadableByteStream</a> into the audio tag, whose data could be processed and built dynamically at read time.
-			ByteStream in the example is a class which implements both <a>WritableByteStream</a> and <a>ReadableByteStream</a>.
-			It accepts bytes generated by the code via <a>WritableByteStream</a> methods, and the written data will be consumed by the audio element via the object URL which is a part of <a>ReadableByteStream</a>'s functionality.
+			The example below demonstrates how to use <code>write()</code> to load a <a>ReadableStream</a> into the audio tag, whose data could be processed and built dynamically at read time.
+			ByteStream in the example is a class which implements both <a>WritableStream</a> and <a>ReadableStream</a>.
+			It accepts bytes generated by the code via <a>WritableStream</a> methods, and the written data will be consumed by the audio element via the object URL which is a part of <a>ReadableStream</a>'s functionality.
 		</p>
 
 		<pre class="example">var stream = new ByteStream("audio/mp3");
@@ -333,7 +333,7 @@ writeData();</pre>
 poll();</pre>
 
 		<p>
-			When X bytes are loaded and passed to the Promise, the ReadableByteStream marks X bytes used in pullAmount.
+			When X bytes are loaded and passed to the Promise, the ReadableStream marks X bytes used in pullAmount.
 			The next <code>read()</code> call automatically clears the mask to request the producer to produce X more bytes.
 			If precise flow control is needed, you update pullAmount before the next <code>read()</code>.
 			In the example below, the producer is requested to produce 16 bytes, and then in the fulfill callback, pullAmount is set to the remaining number of bytes not to request more.
@@ -358,9 +358,9 @@ function read() {
 	</section>
 
 	<section class="section" id="writableByteStream">
-		<h2>WritableByteStream Interface</h2>
+		<h2>WritableStream Interface</h2>
 		<p>
-			The WritableByteStream interface defines a protocol for APIs which consume byte streams.
+			The WritableStream interface defines a protocol for APIs which consume byte streams.
 			The protocol includes:
 			<ol>
 				<li>How to receive the byte stream</li>
@@ -368,23 +368,23 @@ function read() {
 				<li>How to notify the writer of how much data can be accepted currently</li>
 			</ol>
 
-			By returning a <a>Promise</a> and delaying fulfillment of it, the WritableByteStream realizes flow control.
+			By returning a <a>Promise</a> and delaying fulfillment of it, the WritableStream realizes flow control.
 		</p>
 
 		<p>
-			The actual data consumer behind the WritableByteStream is called a data sink and is identified by <dfn>dataSink</dfn>.
-			A data sink consumes byte streams and notifies the WritableByteStream of the number of bytes the data sink can newly accept.
+			The actual data consumer behind the WritableStream is called a data sink and is identified by <dfn>dataSink</dfn>.
+			A data sink consumes byte streams and notifies the WritableStream of the number of bytes the data sink can newly accept.
 			For each data sink, it's defined how to calculate <a>cost</a> of each object which the data sink can consume.
 		</p>
 
 		<p>
-			A WritableByteStream has a one-to-one mapping with the associated data sink, and has defined semantics for <a href='#interactingWithDataSink'>interacting with the data sink internally</a>.
+			A WritableStream has a one-to-one mapping with the associated data sink, and has defined semantics for <a href='#interactingWithDataSink'>interacting with the data sink internally</a>.
 		</p>
 
 		<section class="section">
-			<h3>WritableByteStream interface</h3>
+			<h3>WritableStream interface</h3>
 
-			<dl class="idl" title="interface WritableByteStream">
+			<dl class="idl" title="interface WritableStream">
 				<dt>attribute DOMString writeEncoding</dt>
 				<dd>
 					<p>
@@ -401,7 +401,7 @@ function read() {
 				<dt>Promise&amp;lt;unsigned long long&gt; write()</dt>
 				<dd>
 					<p>
-						This method writes the specified <var>data</var> to the WritableByteStream.
+						This method writes the specified <var>data</var> to the WritableStream.
 					</p>
 
 					<section class="note">
@@ -413,7 +413,7 @@ function read() {
 					<p>
 						This method must run the steps below:
 						<ol>
-							<li>Let <var>latchedEncoding</var> be the current value of <a href="#widl-WritableByteStream-writeEncoding">writeEncoding</a></li>
+							<li>Let <var>latchedEncoding</var> be the current value of <a href="#widl-WritableStream-writeEncoding">writeEncoding</a></li>
 
 							<li><a>Abort wait</a></li>
 
@@ -461,8 +461,8 @@ function read() {
 				<dt>Promise&amp;lt;unsigned long long&gt; awaitSpaceAvailable()</dt>
 				<dd>
 					<p>
-						This method waits until the WritableByteStream becomes able to accept any non-zero amount of data.
-						The returned <a>Promise</a> will be fulfilled with the number of bytes the WritableByteStream can accept.
+						This method waits until the WritableStream becomes able to accept any non-zero amount of data.
+						The returned <a>Promise</a> will be fulfilled with the number of bytes the WritableStream can accept.
 					</p>
 
 					<p>
@@ -489,8 +489,8 @@ function read() {
 				<dt>Promise&amp;lt;undefined&gt; writeClose()</dt>
 				<dd>
 					<p>
-						This method tells the WritableByteStream that no more data will be written to it.
-						Once writeClose() has been called on a WritableByteStream, no further method calls can be made on the WritableByteStream.
+						This method tells the WritableStream that no more data will be written to it.
+						Once writeClose() has been called on a WritableStream, no further method calls can be made on the WritableStream.
 					</p>
 
 					<p>
@@ -508,10 +508,10 @@ function read() {
 				<dt>Promise&amp;lt;undefined&gt; writeAbort(optional any reason)</dt>
 				<dd>
 					<p>
-						This method tells the WritableByteStream that no more data will be written to it with indication of error.
+						This method tells the WritableStream that no more data will be written to it with indication of error.
 						The details of the error will be given by <var>reason</var> argument.
 						The interpretation of <var>reason</var> is up to <a>dataSink</a>.
-						Once writeAbort() has been called on a WritableByteStream, no further method calls can be made on the WritableByteStream.
+						Once writeAbort() has been called on a WritableStream, no further method calls can be made on the WritableStream.
 					</p>
 
 					<p>
@@ -532,11 +532,11 @@ function read() {
 			<h2>Data sink model</h2>
 
 			<p>
-				The data sink is the underlying mechanism which a <a>WritableByteStream</a> interacts with and stores its data in.
+				The data sink is the underlying mechanism which a <a>WritableStream</a> interacts with and stores its data in.
 			</p>
 
 			<p>
-				A data sink to which the <a>WritableByteStream</a> interface writes bytes can be anything which:
+				A data sink to which the <a>WritableStream</a> interface writes bytes can be anything which:
 				<ol>
 					<li>
 						Accepts data possibly together with a <a>DOMString</a> parameter named <var>encoding</var> indicating in what encoding the data must be interpreted.
@@ -548,17 +548,17 @@ function read() {
 						Accepts the write-abort signal with an object parameter named reason.
 					</li>
 					<li>
-						Notifies <a>WritableByteStream</a> of how much data the data sink can newly accept.
+						Notifies <a>WritableStream</a> of how much data the data sink can newly accept.
 						When and how to generate such notifications is up to data sinks.
-						Data sinks must be able to accept data more than it notified <a>WritableByteStream</a> of.
+						Data sinks must be able to accept data more than it notified <a>WritableStream</a> of.
 					</li>
 					<li>
-						Notifies <a>WritableByteStream</a> of that the data sink is gone.
+						Notifies <a>WritableStream</a> of that the data sink is gone.
 						This signal may mean an error.
 						If it means an error, an object indicating the details of the error is attached.
 					</li>
 					<li>
-						Notifies <a>WritableByteStream</a> of acknowledgement of the write-abort signal with error detail object.
+						Notifies <a>WritableStream</a> of acknowledgement of the write-abort signal with error detail object.
 					</li>
 					<li>
 						How to calculate an integer value <dfn>cost</dfn> of each object which the data sink can consume.
@@ -571,17 +571,17 @@ function read() {
 			<h2>Interacting with the data sink</h2>
 
 			<p>
-				This section defines the internal mechanisms for how the WritableByteStream interacts with <a>dataSink</a>.
+				This section defines the internal mechanisms for how the WritableStream interacts with <a>dataSink</a>.
 				This section specifies both the internal properties as well as the algorithms.
 			</p>
 
 			<p>
-				A WritableByteStream has an associated integer variable <dfn>spaceAvailable</dfn> which holds the number of bytes that <a>dataSink</a> requested but not yet written to it.
+				A WritableStream has an associated integer variable <dfn>spaceAvailable</dfn> which holds the number of bytes that <a>dataSink</a> requested but not yet written to it.
 				This variable is initialized to 0 on construction.
 			</p>
 
 			<p>
-				A WritableByteStream has an associated <a>Promise</a> <dfn>waitPromise</dfn> which is used by the <code>awaitSpaceAvailable()</code> method.
+				A WritableStream has an associated <a>Promise</a> <dfn>waitPromise</dfn> which is used by the <code>awaitSpaceAvailable()</code> method.
 				This variable is initialized to <code>null</code> on construction.
 			</p>
 
@@ -605,7 +605,7 @@ function read() {
 			</p>
 
 			<p>
-				A WritableByteStream has an associated queue <dfn>pendingWriteQueue</dfn> which holds <a>PendingWriteDescriptor</a>s.
+				A WritableStream has an associated queue <dfn>pendingWriteQueue</dfn> which holds <a>PendingWriteDescriptor</a>s.
 				This queue is initialized to an empty queue on construction.
 			</p>
 
@@ -652,15 +652,15 @@ function read() {
 			</p>
 
 			<p>
-				A WritableByteStream has an associated flag <dfn>sinkGone</dfn> which is set when the data sink is gone.
+				A WritableStream has an associated flag <dfn>sinkGone</dfn> which is set when the data sink is gone.
 			</p>
 
 			<p>
-				A WritableByteStream has an associated object <dfn>sinkErrorDetail</dfn> which is initialized to null, and when the data sink is gone, set to the error detail object.
+				A WritableStream has an associated object <dfn>sinkErrorDetail</dfn> which is initialized to null, and when the data sink is gone, set to the error detail object.
 			</p>
 
 			<p>
-				When <a>dataSink</a> notifies the WritableByteStream of that the data sink is gone, queue a task which runs the steps below:
+				When <a>dataSink</a> notifies the WritableStream of that the data sink is gone, queue a task which runs the steps below:
 				<ol>
 					<li>Set <a>sinkGone</a></li>
 					<li>Set <a>sinkErrorDetail</a> to the error detail object</li>
@@ -671,16 +671,16 @@ function read() {
 	</section>
 
 	<section class="section" id="readableByteStream">
-		<h2>ReadableByteStream Interface</h2>
+		<h2>ReadableStream Interface</h2>
 		<p>
-			The ReadableByteStream interface defines a protocol for APIs which produce a byte stream. This protocol includes:
+			The ReadableStream interface defines a protocol for APIs which produce a byte stream. This protocol includes:
 			<ol>
 				<li>How to receive a read request from the reader and output bytes</li>
-				<li>How to transfer data in bulk to another <a>WritableByteStream</a> (by using the <code>pipe()</code> method)</li>
+				<li>How to transfer data in bulk to another <a>WritableStream</a> (by using the <code>pipe()</code> method)</li>
 				<li>How to mirror data to multiple destinations (by using the <code>fork()</code>)</li>
 			</ol>
 
-			By returning a <a>Promise</a> and delaying fulfillment of it, the ReadableByteStream realizes asynchronous data consumption.
+			By returning a <a>Promise</a> and delaying fulfillment of it, the ReadableStream realizes asynchronous data consumption.
 		</p>
 
 		<p>
@@ -689,20 +689,20 @@ function read() {
 		</p>
 
 		<p>
-			A ReadableByteStream has a one-to-one mapping with an associated data source, and has defined semantics for <a href='#interactingWithDataSource'>interacting with the data source internally</a>.
-			A data source, however, can have a one-to-many relationship with ReadableByteStream, in cases where <code>fork()</code> is used.
+			A ReadableStream has a one-to-one mapping with an associated data source, and has defined semantics for <a href='#interactingWithDataSource'>interacting with the data source internally</a>.
+			A data source, however, can have a one-to-many relationship with ReadableStream, in cases where <code>fork()</code> is used.
 		</p>
 
 		<section class="section" id="readableByteStreamInterface">
-			<h3>ReadableByteStream interface</h3>
+			<h3>ReadableStream interface</h3>
 
-			<dl class="idl" title="interface ReadableByteStream">
+			<dl class="idl" title="interface ReadableStream">
 				<dt>readonly attribute DOMString type</dt>
 				<dd>
 					Returns the ASCII-encoded string in lower case representing the media type of the <code>Stream</code>,
 					expressed as an RFC2046 MIME type [[!RFC2046]].
-					Conforming user agents SHOULD return the MIME type of the <code>ReadableByteStream</code>, if it is known.
-					If conforming user agents cannot determine the media type of the <code>ReadableByteStream</code>, they MUST return the empty string.
+					Conforming user agents SHOULD return the MIME type of the <code>ReadableStream</code>, if it is known.
+					If conforming user agents cannot determine the media type of the <code>ReadableStream</code>, they MUST return the empty string.
 					A string is a valid MIME type if it matches the media-type token defined in section 3.7 "Media Types" of RFC 2616 [[!HTTP11]].
 				</dd>
 
@@ -730,8 +730,8 @@ function read() {
 				<dt>attribute unsigned long long pullAmount</dt>
 				<dd>
 					<p>
-						This attribute provides ReadableByteStream with a hint of how much data the reader can consume currently.
-						Each implementation of ReadableByteStream must initialize the value of pullAmount on construction.
+						This attribute provides ReadableStream with a hint of how much data the reader can consume currently.
+						Each implementation of ReadableStream must initialize the value of pullAmount on construction.
 					</p>
 
 					<p>
@@ -749,7 +749,7 @@ function read() {
 				<dt>Promise&amp;lt;ByteStreamReadResult&gt; readUpTo()</dt>
 				<dd>
 					<p>
-						This method reads data from the ReadableByteStream.
+						This method reads data from the ReadableStream.
 						The returned <a>Promise</a> is fulfilled only when the total cost of produced data becomes equal to or greater than the specified <a>cost</a> or the EOF is reached.
 						The cost of data returned by this method is the same or less than the specified <var>size</var> argument.
 						The cost of data returned by this method can be less than <var>size</var> when data cannot be fully converted into the type specified by <code>readBinaryAs</code> or an EOF was reached.
@@ -758,13 +758,13 @@ function read() {
 					<p>
 						This method must run the steps below:
 						<ol>
-							<li>If <a href="#widl-ReadableByteStream-readBinaryAs">readBinaryAs</a> is "<code>text</code>" throw a "<code><a>SyntaxError</a></code>"</li>
+							<li>If <a href="#widl-ReadableStream-readBinaryAs">readBinaryAs</a> is "<code>text</code>" throw a "<code><a>SyntaxError</a></code>"</li>
 
 							<li>If <a>readPending</a> is set, throw an "<code><a>InvalidStateError</a></code>"</li>
 							<li>Set <a>readPending</a></li>
 
-							<li>Let <var>latchedType</var> be the current value of <a href="#widl-ReadableByteStream-readBinaryAs">readBinaryAs</a></li>
-							<li>Let <var>latchedEncoding</var> be the current value of <a href="#widl-ReadableByteStream-readEncoding">readEncoding</a></li>
+							<li>Let <var>latchedType</var> be the current value of <a href="#widl-ReadableStream-readBinaryAs">readBinaryAs</a></li>
+							<li>Let <var>latchedEncoding</var> be the current value of <a href="#widl-ReadableStream-readEncoding">readEncoding</a></li>
 
 							<li>Set <a>readUpToPullAmount</a> to <var>size</var></li>
 							<li>Set <a>amountBeingReturned</a> to 0</li>
@@ -834,7 +834,7 @@ function read() {
 				<dt>Promise&amp;lt;ByteStreamReadResult&gt; read()</dt>
 				<dd>
 					<p>
-						This method reads data from the ReadableByteStream.
+						This method reads data from the ReadableStream.
 						The speed of reading can be roughly adjusted by using <a href="#widl-ByteStreamReadResult-pullAmount">pullAmount</a>.
 						pullAmount doesn't necessarily limit the size of data being read by this method.
 					</p>
@@ -846,8 +846,8 @@ function read() {
 							<li>If <a>readPending</a> is set, throw an "<code><a>InvalidStateError</a></code>"</li>
 							<li>Set <a>readPending</a></li>
 
-							<li>Let <var>latchedType</var> be the current value of <a href="#widl-ReadableByteStream-readBinaryAs">readBinaryAs</a> attribute</li>
-							<li>Let <var>latchedEncoding</var> be the current value of <a href="#widl-ReadableByteStream-readEncoding">readEncoding</a> attribute</li>
+							<li>Let <var>latchedType</var> be the current value of <a href="#widl-ReadableStream-readBinaryAs">readBinaryAs</a> attribute</li>
+							<li>Let <var>latchedEncoding</var> be the current value of <a href="#widl-ReadableStream-readEncoding">readEncoding</a> attribute</li>
 
 							<li>Set <a>amountBeingReturned</a> to 0</li>
 
@@ -972,7 +972,7 @@ function read() {
 				<dt>Promise&amp;lt;ByteStreamReadResult&gt; pipe()</dt>
 				<dd>
 					<p>
-						This method bulk transfers bytes from the ReadableByteStream to another <a>WritableByteStream</a>.
+						This method bulk transfers bytes from the ReadableStream to another <a>WritableStream</a>.
 					</p>
 
 					<section class="note">
@@ -1065,11 +1065,11 @@ function read() {
 													<dd>
 														Set <a>pipePullAmount</a> to min(<var>size</var> - <var>totalAmountTransferred</var>, <var>destSpaceAvailable</var>)
 														<section class="note">
-															If <a href="#widl-ReadableByteStream-pullAmount">pullAmount</a> is set to 0, pipe() transfers data in pull style.
+															If <a href="#widl-ReadableStream-pullAmount">pullAmount</a> is set to 0, pipe() transfers data in pull style.
 															I.e. only bytes of the same number as the number of bytes writable to <var>destination</var> are retrieved from the data source.
 														</section>
 														<section class="note">
-															Setting <a href="#widl-ReadableByteStream-pullAmount">pullAmount</a> to a small value doesn't have an effect of throttling the pace of pipe().
+															Setting <a href="#widl-ReadableStream-pullAmount">pullAmount</a> to a small value doesn't have an effect of throttling the pace of pipe().
 														</section>
 													</dd>
 													<dt>Otherwise</dt>
@@ -1101,24 +1101,24 @@ function read() {
 					</p>
 
 					<dl class="parameters">
-						<dt>WritableByteStream destination</dt>
-						<dd>Destination <a>WritableByteStream</a>.</dd>
+						<dt>WritableStream destination</dt>
+						<dd>Destination <a>WritableStream</a>.</dd>
 						<dt>optional [Clamp] unsigned long long size</dt>
 						<dd>Number of bytes to transfer.</dd>
 					</dl>
 				</dd>
 
-				<dt>ReadableByteStream fork()</dt>
+				<dt>ReadableStream fork()</dt>
 				<dd>
 					<p>
-						This method creates a new ReadableByteStream which refers to the same <a>dataSource</a> as the current ReadableByteStream.
-						Data sources are range reference counted so that a range in a data source is freed only when all the ReadableByteStreams sharing the data source finish consuming it.
+						This method creates a new ReadableStream which refers to the same <a>dataSource</a> as the current ReadableStream.
+						Data sources are range reference counted so that a range in a data source is freed only when all the ReadableStreams sharing the data source finish consuming it.
 					</p>
 
 					<p>
 						This method must run the steps below:
 						<ol>
-							<li>Let <var>branch</var> be a new ReadableByteStream which refers to <a>dataSource</a> and has the same <a>amountRequested</a> value, <a>readDataBuffer</a> contents and <a>eofReached</a> value as the current ReadableByteStream.</li>
+							<li>Let <var>branch</var> be a new ReadableStream which refers to <a>dataSource</a> and has the same <a>amountRequested</a> value, <a>readDataBuffer</a> contents and <a>eofReached</a> value as the current ReadableStream.</li>
 							<li>If <a>amountRequested</a> is not 0, up to <a>amountRequested</a> bytes arriving in the future must be forwarded to <var>branch</var>.</li>
 							<li>Return <var>branch</var>.</li>
 						</ol>
@@ -1128,10 +1128,10 @@ function read() {
 				<dt>Promise&amp;lt;undefined&gt; readAbort(optional any reason)</dt>
 				<dd>
 					<p>
-						This method tells the ReadableByteStream that no more data will be read from it optionally with indication of error.
+						This method tells the ReadableStream that no more data will be read from it optionally with indication of error.
 						The details of the error will be given by <var>reason</var> argument.
 						The interpretation of <var>reason</var> is up to <a>dataSource</a>.
-						Once readAbort() has been called on a ReadableByteStream, no further method calls can be made on the ReadableByteStream.
+						Once readAbort() has been called on a ReadableStream, no further method calls can be made on the ReadableStream.
 					</p>
 
 					<p>
@@ -1152,9 +1152,9 @@ function read() {
 			<h3>Data source model</h3>
 
 			<p>
-				A data source produces the bytes to be consumed via the <a>ReadableByteStream</a> interface instances.
-				A <a>ReadableByteStream</a> retrieves bytes from an associated data source.
-				The data source model is not directly surfaced in the API, and is described here to provide details on how internal operations such as <a href="#widl-ReadableByteStream-fork-ReadableByteStream">fork()</a> can be handled.
+				A data source produces the bytes to be consumed via the <a>ReadableStream</a> interface instances.
+				A <a>ReadableStream</a> retrieves bytes from an associated data source.
+				The data source model is not directly surfaced in the API, and is described here to provide details on how internal operations such as <a href="#widl-ReadableStream-fork-ReadableStream">fork()</a> can be handled.
 			</p>
 
 			<p>
@@ -1162,23 +1162,23 @@ function read() {
 				<ul>
 					<li>
 						Produces bytes.
-						Newly produced bytes will be delivered to the associated <a>ReadableByteStream</a>.
+						Newly produced bytes will be delivered to the associated <a>ReadableStream</a>.
 					</li>
 					<li>
-						Notifies <a>ReadableByteStream</a> of the EOF signal.
+						Notifies <a>ReadableStream</a> of the EOF signal.
 						This signal may mean an error.
 						If it means an error, an object indicating the details of the error is attached.
 					</li>
 					<li>
-						Accepts requests for production of bytes from a <a>ReadableByteStream</a>.
+						Accepts requests for production of bytes from a <a>ReadableStream</a>.
 						A byte production request consists of an integer indicating the number of bytes to produce in addition to already requested ones.
 						Interpretation of the request is up to data sources.
 						Data sources may respond to retrieval requests with data larger than requested.
 						Requests and delivery of bytes don't need to 1-to-1 correspond.
-						Data sources may produce bytes and send to <a>ReadableByteStream</a> unsolicitedly without receiving any retrieval request.
+						Data sources may produce bytes and send to <a>ReadableStream</a> unsolicitedly without receiving any retrieval request.
 					</li>
 					<li>
-						Accepts and acknowledges read-abort signal which means the associated <a>ReadableByteStream</a> has completed consuming bytes from this data source optionally with indication of any error.
+						Accepts and acknowledges read-abort signal which means the associated <a>ReadableStream</a> has completed consuming bytes from this data source optionally with indication of any error.
 					</li>
 				</ul>
 			</p>
@@ -1196,7 +1196,7 @@ function read() {
 			</p>
 
 			<p>
-				When <a href="#widl-ReadableByteStream-fork-ReadableByteStream">fork()</a> is called, a new reader is registered to the original <a>ReadableByteStream</a>'s data source and the new <a>ReadableByteStream</a> uses read() method to fetch data from it.
+				When <a href="#widl-ReadableStream-fork-ReadableStream">fork()</a> is called, a new reader is registered to the original <a>ReadableStream</a>'s data source and the new <a>ReadableStream</a> uses read() method to fetch data from it.
 			</p>
 		</section>
 
@@ -1209,15 +1209,15 @@ function read() {
 			</section>
 
 			<p>
-				A ReadableByteStream has an associated <a>data source</a> referred by <dfn>dataSource</dfn> from which the ReadableByteStream retrieves bytes.
+				A ReadableStream has an associated <a>data source</a> referred by <dfn>dataSource</dfn> from which the ReadableStream retrieves bytes.
 				The data source model is explained in <a href="#h2_data_source">this section</a>.
-				A data source can be shared by multiple ReadableByteStream instances when <code>fork()</code> is used.
-				A ReadableByteStream is registered with a data source on construction and given a reader ID.
-				The <a>dataSource</a> of a ReadableByteStream refers to its data source, and <dfn>readerId</dfn> of a ReadableByteStream refers to its reader ID.
+				A data source can be shared by multiple ReadableStream instances when <code>fork()</code> is used.
+				A ReadableStream is registered with a data source on construction and given a reader ID.
+				The <a>dataSource</a> of a ReadableStream refers to its data source, and <dfn>readerId</dfn> of a ReadableStream refers to its reader ID.
 			</p>
 
 			<p>
-				A ReadableByteStream has the following internal mechanisms:
+				A ReadableStream has the following internal mechanisms:
 			</p>
 
 			<p>
@@ -1226,11 +1226,11 @@ function read() {
 			</p>
 
 			<p>
-				An associated integer variable <dfn>readUpToPullAmount</dfn> which temporarily overrides <a href="#widl-ReadableByteStream-pullAmount">pullAmount</a> if necessary for a <code>readUpTo()</code> method call.
+				An associated integer variable <dfn>readUpToPullAmount</dfn> which temporarily overrides <a href="#widl-ReadableStream-pullAmount">pullAmount</a> if necessary for a <code>readUpTo()</code> method call.
 				This variable is initialized to 0 on construction.
 			</p>
 			<p>
-				An associated integer variable <dfn>pipePullAmount</dfn> which temporarily overrides <a href="#widl-ReadableByteStream-pullAmount">pullAmount</a> if necessary for a <code>pipe()</code> method call.
+				An associated integer variable <dfn>pipePullAmount</dfn> which temporarily overrides <a href="#widl-ReadableStream-pullAmount">pullAmount</a> if necessary for a <code>pipe()</code> method call.
 				This variable is initialized to 0 on construction.
 			</p>
 
@@ -1273,9 +1273,9 @@ function read() {
 				To <dfn>retrieve data</dfn>, run the steps below:
 				<ol>
 					<li>Let <var>readableAmount</var> be the number of bytes in the <a>readDataBuffer</a></li>
-					<li>Let <var>amountToRetrieve</var> be max(max(<a href="#widl-ReadableByteStream-pullAmount">pullAmount</a>, <a>readUpToPullAmount</a>, <a>pipePullAmount</a>) - (<a>amountRequested</a> + <var>readableAmount</var> + <a>amountBeingReturned</a>), 0)</li>
+					<li>Let <var>amountToRetrieve</var> be max(max(<a href="#widl-ReadableStream-pullAmount">pullAmount</a>, <a>readUpToPullAmount</a>, <a>pipePullAmount</a>) - (<a>amountRequested</a> + <var>readableAmount</var> + <a>amountBeingReturned</a>), 0)</li>
 					<li>Set <a>amountRequested</a> to <a>amountRequested</a> + <var>amountToRetrieve</var></li>
-					<li>Send a request to the <a>dataSource</a> to return <var>amountToRetrieve</var> bytes to the ReadableByteStream</li>
+					<li>Send a request to the <a>dataSource</a> to return <var>amountToRetrieve</var> bytes to the ReadableStream</li>
 				</ol>
 			</p>
 
@@ -1303,7 +1303,7 @@ function read() {
 		<h2>ByteStreamReadResult Interface</h2>
 
 		<p>
-			This interface represents the result of methods on <a>ReadableByteStream</a>.
+			This interface represents the result of methods on <a>ReadableStream</a>.
 		</p>
 
 		<dl class="idl" title="interface ByteStreamReadResult">
@@ -1322,7 +1322,7 @@ function read() {
 		<h2>ByteStreamReadType enum</h2>
 
 		<p>
-			Data can be read as various data types from <a>ReadableByteStream</a>.
+			Data can be read as various data types from <a>ReadableStream</a>.
 			This enum defines <a>DOMString</a> values to specify the data types.
 		</p>
 
@@ -1348,7 +1348,7 @@ function read() {
 		<h2>ByteStream</h2>
 
 		<p>
-			This section introduces a simple implementation of the <a>WritableByteStream</a> and <a>ReadableByteStream</a> named <code>ByteStream</code>, as well as accompanying interfaces required as part of the <a>ByteStream</a> implementation.
+			This section introduces a simple implementation of the <a>WritableStream</a> and <a>ReadableStream</a> named <code>ByteStream</code>, as well as accompanying interfaces required as part of the <a>ByteStream</a> implementation.
 			This includes a constructor to build a <a>ByteStream</a> object and the type attribute.
 		</p>
 
@@ -1365,20 +1365,20 @@ function read() {
 			</p>
 
 			<p>
-				The ByteStream inherits the <a>WritableByteStream</a> interface.
+				The ByteStream inherits the <a>WritableStream</a> interface.
 				Its <a>dataSink</a> is <a>bufferedDataQueue</a> wrapped with a <a>data source wrapper</a>.
 			</p>
 
 			<p>
-				The ByteStream inherits the <a>ReadableByteStream</a> interface.
+				The ByteStream inherits the <a>ReadableStream</a> interface.
 				Its <a>dataSource</a> is also <a>bufferedDataQueue</a>.
 			</p>
 
 			<p>
-				<a>bufferedDataQueue</a> just forwards retrieval requests coming from the <a>data source wrapper</a> to the <a>WritableByteStream</a> as a notification of the number of newly acceptable bytes with the same amount.
+				<a>bufferedDataQueue</a> just forwards retrieval requests coming from the <a>data source wrapper</a> to the <a>WritableStream</a> as a notification of the number of newly acceptable bytes with the same amount.
 			</p>
 
-			<dl class="idl" title="interface ByteStream : ReadableByteStream, WritableByteStream">
+			<dl class="idl" title="interface ByteStream : ReadableStream, WritableStream">
 				<dt>Constructor()</dt>
 				<dd>
 					Constructs a <a>ByteStream</a> and sets the <a href="#widl-ByteStream-type">type</a> to the specified value.
@@ -1386,7 +1386,7 @@ function read() {
 					<dl class="parameters">
 						<dt>in unsigned long long pullAmount</dt>
 						<dd>
-							Specifies the initial value of <a href="#widl-ReadableByteStream-pullAmount">pullAmount</a>.
+							Specifies the initial value of <a href="#widl-ReadableStream-pullAmount">pullAmount</a>.
 						</dd>
 						<dt>in optional DOMString type</dt>
 						<dd>
@@ -1409,7 +1409,7 @@ function read() {
 			<section class="section" id="creating-revoking-streamuri">
 				<h4>Creating and Revoking a Stream URI</h4>
 				<p>
-					A <dfn id="stream-uri">Stream URI</dfn> is a <code>Blob URI</code> that is referencing a <a>ReadableByteStream</a>.
+					A <dfn id="stream-uri">Stream URI</dfn> is a <code>Blob URI</code> that is referencing a <a>ReadableStream</a>.
 					These URIs are created and revoked using methods exposed on the URL object,
 					as defined in <a href="http://dev.w3.org/2006/webapi/FileAPI/#creating-revoking">6.7.5. Creating and Revoking a Blob URI</a>
 					of the File API specification. [[!FILE-API]]
@@ -1420,26 +1420,26 @@ function read() {
 					should both be extended as follows:
 				</p>
 				<dl class="idl" title="interface URL">
-					<dt>static DOMString? createObjectURL(in (Blob or ReadableByteStream) object)</dt>
+					<dt>static DOMString? createObjectURL(in (Blob or ReadableStream) object)</dt>
 					<dd>
 						<p>
 							The extension onto <code>createObjectURL</code> should have the following steps added.
 						</p>
 						<p>
-							Returns a unique Blob URL each time it is called on a valid <code>object</code> argument, which is a non-null <a>ReadableByteStream</a> in scope of the global object's URL property from which this static method is called. This method must act as follows:
+							Returns a unique Blob URL each time it is called on a valid <code>object</code> argument, which is a non-null <a>ReadableStream</a> in scope of the global object's URL property from which this static method is called. This method must act as follows:
 							<ol>
 								<li>
-									If called with a <a>ReadableByteStream</a> argument that is NOT valid, then user agents must return null.
+									If called with a <a>ReadableStream</a> argument that is NOT valid, then user agents must return null.
 								</li>
 								<li>
-									If called with a valid <a>ReadableByteStream</a> argument,
+									If called with a valid <a>ReadableStream</a> argument,
 									user agents must run the following sub-steps:
 									<ol>
 										<li>
-											If <a>readPending</a> of the <a>ReadableByteStream</a> is set, return null.
+											If <a>readPending</a> of the <a>ReadableStream</a> is set, return null.
 										</li>
 										<li>
-											Set <a>readPending</a> of the <a>ReadableByteStream</a>.
+											Set <a>readPending</a> of the <a>ReadableStream</a>.
 										</li>
 										<li>
 											Return a unique <code>Blob URI</code> that can be used to dereference the <code>stream</code> argument.
@@ -1453,28 +1453,28 @@ function read() {
 						</p>
 					</dd>
 
-					<dt>static DOMString? createFor(in (Blob or ReadableByteStream) object)</dt>
+					<dt>static DOMString? createFor(in (Blob or ReadableStream) object)</dt>
 					<dd>
 						<p>
 							The extension onto <code>createFor</code> should have the following steps added.
 						</p>
 						<p>
-							Returns a unique Blob URL each time it is called on a valid <code>object</code> argument, which is a non-null <a>ReadableByteStream</a> in scope of the global object's URL property from which this static method is called.
+							Returns a unique Blob URL each time it is called on a valid <code>object</code> argument, which is a non-null <a>ReadableStream</a> in scope of the global object's URL property from which this static method is called.
 							Blob URLs created with this method are said to be auto-revoking since user-agents are responsible for the revocation of Blob URLs created with this method, subject to the lifetime stipulation for Blob URLs.
 							This method must act as follows:
 							<ol>
 								<li>
-									If called with a <a>ReadableByteStream</a> argument that is NOT valid, then user agents must return null.
+									If called with a <a>ReadableStream</a> argument that is NOT valid, then user agents must return null.
 								</li>
 								<li>
-									If called with a valid <a>ReadableByteStream</a> argument,
+									If called with a valid <a>ReadableStream</a> argument,
 									user agents must run the following sub-steps:
 									<ol>
 										<li>
-											If <a>readPending</a> of the <a>ReadableByteStream</a> is set, return null.
+											If <a>readPending</a> of the <a>ReadableStream</a> is set, return null.
 										</li>
 										<li>
-											Set <a>readPending</a> of the <a>ReadableByteStream</a>.
+											Set <a>readPending</a> of the <a>ReadableStream</a>.
 										</li>
 										<li>
 											Return a unique <code>Blob URI</code> that can be used to dereference the <code>stream</code> argument.
@@ -1498,14 +1498,14 @@ function read() {
 						</p>
 						<ol>
 							<li>
-								If the URL refers to a <a>Blob</a> or <a>ReadableByteStream</a> that is both
+								If the URL refers to a <a>Blob</a> or <a>ReadableStream</a> that is both
 								valid and in the same origin of the global object’s <code>URL</code> property on which this static method was called,
 								user agents MUST return a 404 response code when the URL is dereferenced.
 							</li>
 							<li>
-								If the URL refers to a <a>Blob</a> or <a>ReadableByteStream</a> that is <strong>not</strong> valid
+								If the URL refers to a <a>Blob</a> or <a>ReadableStream</a> that is <strong>not</strong> valid
 								or if the value provided for the URL argument is not a <code>Blob URI</code>
-								or if the URL argument refers to a <a>Blob</a> or <a>ReadableByteStream</a> that is <strong>not</strong> in the same origin
+								or if the URL argument refers to a <a>Blob</a> or <a>ReadableStream</a> that is <strong>not</strong> in the same origin
 								as the global object’s<code>URL</code> property, this method call does nothing.
 								User agents MAY display a message on their error console.
 							</li>
@@ -1561,10 +1561,10 @@ function read() {
 	<section class="section" id="security">
 		<h2>Security Considerations</h2>
 		<p>
-			A <a>ReadableByteStream</a> should have the same security considerations as a <code>Blob</code>.
+			A <a>ReadableStream</a> should have the same security considerations as a <code>Blob</code>.
 			This is outlined in <a href="http://dev.w3.org/2006/webapi/FileAPI/#security-discussion">6.8. Security Considerations</a>
 			of the File API specification. [[!FILE-API]]
-			Because a <a>ReadableByteStream</a> uses a <code>Blob URI</code>, cross origin requests on a <a>ReadableByteStream</a> will not be supported.
+			Because a <a>ReadableStream</a> uses a <code>Blob URI</code>, cross origin requests on a <a>ReadableStream</a> will not be supported.
 		</p>
 	</section>
 
@@ -1667,13 +1667,13 @@ enum XMLHttpRequestResponseType {
 				in XMLHttpRequest specification [[!XMLHTTPREQUEST2]] should have the following additions:
 			</p>
 			<dl class="switch">
-				<dt><a>ReadableByteStream</a></dt>
+				<dt><a>ReadableStream</a></dt>
 				<dd>
 					<p>
 						If the object's <a href="#widl-ByteStream-type">type</a> attribute is not the empty string let <var>mime type</var> be its value.
 					</p>
 					<p>
-						Set <a>readPending</a> of the <a>ReadableByteStream</a>.
+						Set <a>readPending</a> of the <a>ReadableStream</a>.
 					</p>
 					<p>
 						Let the <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html#request-entity-body">request entity body</a> be the raw data represented by <var>data</var>.
