@@ -417,7 +417,7 @@ function read() {
 
 							<li><a>Abort wait</a></li>
 
-							<li>Let <var>amountToWrite</var> be the <a>cost</a> of <var>data</var></li>
+							<li>If <var>cost</var> argument is specified, let <var>amountToWrite</var> be <var>cost</var> argument. Otherwise, let <var>amountToWrite</var> be the <a>cost</a> of <var>data</var></li>
 
 							<li>Let <var>writePromise</var> be a new <a>Promise</a></li>
 
@@ -453,6 +453,8 @@ function read() {
 					<dl class="parameters">
 						<dt>any data</dt>
 						<dd>Data to write.</dd>
+						<dt>optional [Clamp] unsigned long long cost</dt>
+						<dd>Overrides <a>cost</a> of data.</dd>
 					</dl>
 				</dd>
 
@@ -502,6 +504,27 @@ function read() {
 						</ol>
 					</p>
 				</dd>
+
+				<dt>Promise&amp;lt;undefined&gt; writeAbort(optional any reason)</dt>
+				<dd>
+					<p>
+						This method tells the WritableByteStream that no more data will be written to it with indication of error.
+						The details of the error will be given by <var>reason</var> argument.
+						The interpretation of <var>reason</var> is up to <a>dataSink</a>.
+						Once writeAbort() has been called on a WritableByteStream, no further method calls can be made on the WritableByteStream.
+					</p>
+
+					<p>
+						This method must run the steps below:
+						<ol>
+							<li>Let <var>abortPromise</var> be a new <a>Promise</a></li>
+							<li>Return <var>abortPromise</var>, and then continue the process the steps in this algorithm</li>
+							<li><a>Write-abort</a> <a>dataSink</a> with <var>reason</var></li>
+							<li>Wait until <a>dataSink</a> acknowledges the write-abort</li>
+							<li>Fulfill <var>abortPromise</var> with <code>undefined</code></li>
+						</ol>
+					</p>
+				</dd>
 			</dl>
 		</section>
 
@@ -522,12 +545,20 @@ function read() {
 						Accepts the EOF signal
 					</li>
 					<li>
+						Accepts the write-abort signal with an object parameter named reason.
+					</li>
+					<li>
 						Notifies <a>WritableByteStream</a> of how much data the data sink can newly accept.
 						When and how to generate such notifications is up to data sinks.
 						Data sinks must be able to accept data more than it notified <a>WritableByteStream</a> of.
 					</li>
 					<li>
-						Notifies <a>WritableByteStream</a> of acknowledgement of the EOF.
+						Notifies <a>WritableByteStream</a> of that the data sink is gone.
+						This signal may mean an error.
+						If it means an error, an object indicating the details of the error is attached.
+					</li>
+					<li>
+						Notifies <a>WritableByteStream</a> of acknowledgement of the write-abort signal with error detail object.
 					</li>
 					<li>
 						How to calculate an integer value <dfn>cost</dfn> of each object which the data sink can consume.
@@ -583,15 +614,32 @@ function read() {
 				<ol>
 					<li>If <a>pendingWriteQueue</a> is empty, break from this loop</li>
 					<li>Let <var>pendingWrite</var> be the head element of <a>pendingWriteQueue</a></li>
-					<li>Let <var>amountToAcknowledge</var> be min(<var>pendingWrite.amount</var> - <var>pendingWrite.ackedAmount</var>, <a>spaceAvailable</a>)</li>
-					<li>Set <a>spaceAvailable</a> to <a>spaceAvailable</a> - <var>amountToAcknowledge</var></li>
-					<li>Set <var>pendingWrite.ackedAmount</var> to <var>pendingWrite.ackedAmount</var> + <var>amountToAcknowledge</var></li>
 					<li>
-						If <var>pendingWrite.ackedAmount</var> equals to <var>pendingWrite.amount</var>, run the steps below:
-						<ol>
-							<li>Pop <var>pendingWrite</var> from <a>pendingWriteQueue</a></li>
-							<li>If <var>pendingWrite.promise</var> is not <code>null</code>, fulfill it with <var>pendingWrite.amount</var></li>
-						</ol>
+						<dl class="switch">
+							<dt>If <a>sinkGone</a> is set</dt>
+							<dd>Run the steps below:
+								<ol>
+									<li>Pop <var>pendingWrite</var> from <a>pendingWriteQueue</a>, and then</li>
+									<li>If <var>pendingWrite.promise</var> is not <code>null</code>, reject it with <a>sinkErrorDetail</a></li>
+								</ol>
+							</dd>
+							<dt>Otherwise</dt>
+							<dd>Run the steps below:
+								<ol>
+									<li>Let <var>amountToAcknowledge</var> be min(<var>pendingWrite.amount</var> - <var>pendingWrite.ackedAmount</var>, <a>spaceAvailable</a>)</li>
+									<li>Set <a>spaceAvailable</a> to <a>spaceAvailable</a> - <var>amountToAcknowledge</var></li>
+									<li>Set <var>pendingWrite.ackedAmount</var> to <var>pendingWrite.ackedAmount</var> + <var>amountToAcknowledge</var></li>
+									<li>
+										If <var>pendingWrite.ackedAmount</var> equals to <var>pendingWrite.amount</var>, run the steps below:
+										<ol>
+											<li>Pop <var>pendingWrite</var> from <a>pendingWriteQueue</a></li>
+											<li>If <var>pendingWrite.promise</var> is not <code>null</code>, fulfill it with <var>pendingWrite.amount</var></li>
+										</ol>
+									</li>
+								</ol>
+							</dd>
+						</dl>
+					</li>
 				</ol>
 			</p>
 
@@ -599,6 +647,23 @@ function read() {
 				When <a>dataSink</a> requests <var>amountNewlyRequested</var> more data, queue a task which runs the steps below:
 				<ol>
 					<li>Set <a>spaceAvailable</a> to <a>spaceAvailable</a> + <var>amountNewlyRequested</var></li>
+					<li><a>Process pendingWriteQueue</a></li>
+				</ol>
+			</p>
+
+			<p>
+				A WritableByteStream has an associated flag <dfn>sinkGone</dfn> which is set when the data sink is gone.
+			</p>
+
+			<p>
+				A WritableByteStream has an associated object <dfn>sinkErrorDetail</dfn> which is initialized to null, and when the data sink is gone, set to the error detail object.
+			</p>
+
+			<p>
+				When <a>dataSink</a> notifies the WritableByteStream of that the data sink is gone, queue a task which runs the steps below:
+				<ol>
+					<li>Set <a>sinkGone</a></li>
+					<li>Set <a>sinkErrorDetail</a> to the error detail object</li>
 					<li><a>Process pendingWriteQueue</a></li>
 				</ol>
 			</p>
@@ -738,6 +803,7 @@ function read() {
 									<li>Let <var>amountConsumed</var> be the total cost of data consumed in the last step</li>
 									<li>Set <a href="#widl-ByteStreamReadResult-amountConsumed">amountConsumed</a> of <var>result</var> to <var>amountConsumed</var></li>
 									<li>Set <a href="#widl-ByteStreamReadResult-eof">eof</a> of <var>result</var> to <code>true</code> if <a>readDataBuffer</a> is empty and <a>eofReached</a> is set</li>
+									<li>Set <var>result</var>.<a href="#widl-ByteStreamReadResult-error">error</a> to <a>sourceErrorDetail</a></li>
 
 									<li>Set <a>amountBeingReturned</a> to <var>amountConsumed</var></li>
 
@@ -880,6 +946,7 @@ function read() {
 							<li>Set <var>result</var>.<a href="#widl-ByteStreamReadResult-data">data</a> to <var>readData</var></li>
 							<li>Set <var>result</var>.<a href="#widl-ByteStreamReadResult-eof">eof</a> to <code>true</code> if <a>eofReached</a> is set and <a>readDataBuffer</a> is empty</li>
 							<li>Set <var>result</var>.<a href="#widl-ByteStreamReadResult-amountConsumed">amountConsumed</a> to <var>amountConsumed</var></li>
+							<li>Set <var>result</var>.<a href="#widl-ByteStreamReadResult-error">error</a> to <a>sourceErrorDetail</a></li>
 
 							<li>Set <a>amountBeingReturned</a> to <var>amountConsumed</var></li>
 
@@ -1058,20 +1125,23 @@ function read() {
 					</p>
 				</dd>
 
-				<dt>Promise&amp;lt;undefined&gt; readClose()</dt>
+				<dt>Promise&amp;lt;undefined&gt; readAbort(optional any reason)</dt>
 				<dd>
 					<p>
-						This method tells the ReadableByteStream that no more data will be read from it without indication of any error.
+						This method tells the ReadableByteStream that no more data will be read from it optionally with indication of error.
+						The details of the error will be given by <var>reason</var> argument.
+						The interpretation of <var>reason</var> is up to <a>dataSource</a>.
+						Once readAbort() has been called on a ReadableByteStream, no further method calls can be made on the ReadableByteStream.
 					</p>
 
 					<p>
 						This method must run the steps below:
 						<ol>
-							<li>Let <var>closePromise</var> be a new <a>Promise</a></li>
-							<li>Return <var>closePromise</var>, and then continue the process the steps in this algorithm</li>
-							<li>Notify <a>dataSource</a> of readClosure</li>
-							<li>Wait until <a>dataSource</a> acknowledges the readClosure</li>
-							<li>Fulfill <var>closePromise</var> with <code>undefined</code></li>
+							<li>Let <var>abortPromise</var> be a new <a>Promise</a></li>
+							<li>Return <var>abortPromise</var>, and then continue the process the steps in this algorithm</li>
+							<li><a>Read-abort</a> <a>dataSource</a> with <var>reason</var></li>
+							<li>Wait until <a>dataSource</a> acknowledges the read-abort</li>
+							<li>Fulfill <var>abortPromise</var> with <code>undefined</code></li>
 						</ol>
 					</p>
 				</dd>
@@ -1095,6 +1165,11 @@ function read() {
 						Newly produced bytes will be delivered to the associated <a>ReadableByteStream</a>.
 					</li>
 					<li>
+						Notifies <a>ReadableByteStream</a> of the EOF signal.
+						This signal may mean an error.
+						If it means an error, an object indicating the details of the error is attached.
+					</li>
+					<li>
 						Accepts requests for production of bytes from a <a>ReadableByteStream</a>.
 						A byte production request consists of an integer indicating the number of bytes to produce in addition to already requested ones.
 						Interpretation of the request is up to data sources.
@@ -1103,7 +1178,7 @@ function read() {
 						Data sources may produce bytes and send to <a>ReadableByteStream</a> unsolicitedly without receiving any retrieval request.
 					</li>
 					<li>
-						Accepts and acknowledges readClosure signal which means the associated <a>ReadableByteStream</a> has completed consuming bytes from this data source without indication of any error.
+						Accepts and acknowledges read-abort signal which means the associated <a>ReadableByteStream</a> has completed consuming bytes from this data source optionally with indication of any error.
 					</li>
 				</ul>
 			</p>
@@ -1191,6 +1266,10 @@ function read() {
 			</p>
 
 			<p>
+				An associated object <dfn>sourceErrorDetail</dfn> which is initialized to <code>null</code>, and once the EOF meaning an error is received from the <a>dataSource</a>, set to the error detail object.
+			</p>
+
+			<p>
 				To <dfn>retrieve data</dfn>, run the steps below:
 				<ol>
 					<li>Let <var>readableAmount</var> be the number of bytes in the <a>readDataBuffer</a></li>
@@ -1215,10 +1294,9 @@ function read() {
 			</p>
 
 			<p>
-				When the EOF is received from <a>dataSource</a>, queue a task which sets <a>eofReached</a>.
+				When the EOF is received from <a>dataSource</a>, queue a task which sets <a>eofReached</a> and <a>sourceErrorDetail</a>
 			</p>
-
-	    </section>
+	  </section>
 	</section>
 
 	<section class="section">
@@ -1235,6 +1313,8 @@ function read() {
 			<dd>The contents read converted into an object of the specified type</dd>
 			<dt>readonly attribute unsigned long long amountConsumed</dt>
 			<dd>The size, in bytes, of the data read</dd>
+			<dt>readonly attribute any error</dt>
+			<dd>Once any error occurred, set to the error detail object on all ByteStreamReadResults returned after the error</dd>
 		</dl>
 	</section>
 
