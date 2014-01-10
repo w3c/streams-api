@@ -134,10 +134,16 @@ var respecConfig = {
 			</li>
 			<li>
 				A struct type named <a>StreamReadResult</a> which represents the result of consuming operations such as <code>read()</code> and <code>pipe()</code>.
-				It holds a chunk of content read from a <a>ReadableStream</a>, the number of bytes consumed, and EOF signal.
+				It holds:
+				<ul>
+					<li>Chunk of content read from a <a>ReadableStream</a></li>
+					<li>The total cost of the chunk</li>
+					<li>EOF signal</li>
+					<li>Error info</li>
+				</ul>
 			</li>
 			<li>
-				An enum <a>ByteStreamReadType</a> which represents data types as which data can be read from a <a>ReadableStream</a>.
+				An enum <a>StreamReadType</a> which represents data types as which data can be read from a <a>ReadableStream</a>.
 			</li>
 			<li>
 				A list of notable byte stream <a href="#producers">producers</a> and <a href="#consumers">consumers</a> for which we can apply either or both of <a>ReadableStream</a> and <a>WritableStream</a> model.
@@ -706,11 +712,11 @@ function read() {
 					A string is a valid MIME type if it matches the media-type token defined in section 3.7 "Media Types" of RFC 2616 [[!HTTP11]].
 				</dd>
 
-				<dt>attribute ByteStreamReadType readBinaryAs</dt>
+				<dt>attribute StreamReadType readBinaryAs</dt>
 				<dd>
 					<p>
 						Specifies what data type will be returned by a <code>read()</code> and <code>readUpTo()</code> method call.
-						This attribute can be set to any of the supported types in <a>ByteStreamReadType</a>.
+						This attribute can be set to any of the supported types in <a>StreamReadType</a>.
 						The default value for this attribute is "<code>arraybuffer</code>".
 					</p>
 				</dd>
@@ -1319,14 +1325,14 @@ function read() {
 	</section>
 
 	<section class="section">
-		<h2>ByteStreamReadType enum</h2>
+		<h2>StreamReadType enum</h2>
 
 		<p>
 			Data can be read as various data types from <a>ReadableStream</a>.
 			This enum defines <a>DOMString</a> values to specify the data types.
 		</p>
 
-		<dl class="idl" title="enum ByteStreamReadType">
+		<dl class="idl" title="enum StreamReadType">
 			<dt>as-is</dt>
 			<dd>Default. <code>read()</code> and <code>readUpTo()</code> return produced data as-is</dd>
 			<dt>blob</dt>
