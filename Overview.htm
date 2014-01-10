@@ -230,7 +230,7 @@ var respecConfig = {
 // Tell stream that we're ready to consume 1024 bytes.
 stream.pullAmount = 1024;
 stream.readEncoding = "UTF-8";
-stream.readType = "arraybuffer";
+stream.readBinaryAs = "arraybuffer";
 stream.read().then(
   function (result) {
     // Process data
@@ -442,7 +442,6 @@ function read() {
 										Write <var>data</var> to <a>dataSink</a>.
 									</dd>
 								</dl>
-								Write <var>bytesToWrite</var> to <a>dataSink</a>
 							</li>
 						</ol>
 					</p>
@@ -642,7 +641,7 @@ function read() {
 					A string is a valid MIME type if it matches the media-type token defined in section 3.7 "Media Types" of RFC 2616 [[!HTTP11]].
 				</dd>
 
-				<dt>attribute ByteStreamReadType readType</dt>
+				<dt>attribute ByteStreamReadType readBinaryAs</dt>
 				<dd>
 					<p>
 						Specifies what data type will be returned by a <code>read()</code> and <code>readUpTo()</code> method call.
@@ -688,18 +687,18 @@ function read() {
 						This method reads data from the ReadableByteStream.
 						The returned <a>Promise</a> is fulfilled only when the total cost of produced data becomes equal to or greater than the specified <a>cost</a> or the EOF is reached.
 						The cost of data returned by this method is the same or less than the specified <var>size</var> argument.
-						The cost of data returned by this method can be less than <var>size</var> when data cannot be fully converted into the type specified by <code>readType</code> or an EOF was reached.
+						The cost of data returned by this method can be less than <var>size</var> when data cannot be fully converted into the type specified by <code>readBinaryAs</code> or an EOF was reached.
 					</p>
 
 					<p>
 						This method must run the steps below:
 						<ol>
-							<li>If <a href="#widl-ReadableByteStream-readType">readType</a> is "<code>text</code>" throw a "<code><a>SyntaxError</a></code>"</li>
+							<li>If <a href="#widl-ReadableByteStream-readBinaryAs">readBinaryAs</a> is "<code>text</code>" throw a "<code><a>SyntaxError</a></code>"</li>
 
 							<li>If <a>readPending</a> is set, throw an "<code><a>InvalidStateError</a></code>"</li>
 							<li>Set <a>readPending</a></li>
 
-							<li>Let <var>latchedType</var> be the current value of <a href="#widl-ReadableByteStream-readType">readType</a></li>
+							<li>Let <var>latchedType</var> be the current value of <a href="#widl-ReadableByteStream-readBinaryAs">readBinaryAs</a></li>
 							<li>Let <var>latchedEncoding</var> be the current value of <a href="#widl-ReadableByteStream-readEncoding">readEncoding</a></li>
 
 							<li>Set <a>readUpToPullAmount</a> to <var>size</var></li>
@@ -781,7 +780,7 @@ function read() {
 							<li>If <a>readPending</a> is set, throw an "<code><a>InvalidStateError</a></code>"</li>
 							<li>Set <a>readPending</a></li>
 
-							<li>Let <var>latchedType</var> be the current value of <a href="#widl-ReadableByteStream-readType">readType</a> attribute</li>
+							<li>Let <var>latchedType</var> be the current value of <a href="#widl-ReadableByteStream-readBinaryAs">readBinaryAs</a> attribute</li>
 							<li>Let <var>latchedEncoding</var> be the current value of <a href="#widl-ReadableByteStream-readEncoding">readEncoding</a> attribute</li>
 
 							<li>Set <a>amountBeingReturned</a> to 0</li>
@@ -795,49 +794,87 @@ function read() {
 								<dl class="switch">
 									<dt>If <var>latchedType</var> is "<code>text</code>"</dt>
 									<dd>
-										<ol>
-											<li>
-												Wait until bytes in <a>readDataBuffer</a> can be converted into a non-empty <a>DOMString</a> when decoded using <var>latchedEncoding</var> or <a>eofReached</a> is set
-											</li>
-											<li>
-												Queue a task which runs the rest of this algorithm
-											</li>
-											<li>
-												Pop non-zero number of bytes from <a>readDataBuffer</a> which can be fully converted into a non-empty <a>DOMString</a> when decoded using <var>latchedEncoding</var>, and then let <var>readBytes</var> be the result of the conversion.
-												If <a>eofReached</a> is set and there are no such bytes, reject <var>readPromise</var> and terminate these steps.
-											</li>
-											<li>
-												Let <var>readData</var> be the result of decoding <var>readBytes</var> using <var>latchedEncoding</var>.
-												If this throws an <var>exception</var>, reject <var>readPromise</var> with <var>exception</var>.
-											</li>
-										</ol>
+										Wait until any of the following conditions is met, and then run the steps for the condition:
+										<dl class="switch">
+											<dt>All or part of bytes in <a>readDataBuffer</a> can be converted into a non-empty <a>DOMString</a> when decoded using <var>latchedEncoding</var></dt>
+											<dd>
+												<ol>
+													<li>Pop the bytes from <a>readDataBuffer</a></li>
+													<li>Let <var>amountConsumed</var> be the number of the popped bytes</li>
+													<li>Let <var>readData</var> be the result of decoding</li>
+												</ol>
+											</dd>
+											<dt>It's clear decoding bytes in <a>readDataBuffer</a> using <var>latchedEncoding</var> fails regardless bytes to be retrieved in the future are</dt>
+											<dd>
+												<ol>
+													<li>Reject <var>readPromise</var> with an "<code><a>InvalidStateError</a></code>"</li>
+													<li>Terminate these steps</li>
+												</ol>
+											</dd>
+											<dt>Anything that doesn't represent bytes in <a>readDataBuffer</a> is encountered</dt>
+											<dd>
+												<ol>
+													<li>Reject <var>readPromise</var> with an "<code><a>InvalidStateError</a></code>"</li>
+													<li>Terminate these steps</li>
+												</ol>
+											</dd>
+										</dl>
+									</dd>
+									<dt>If <var>latchedType</var> is "<code>arraybuffer</code>" or "<code>blob</code>"</dt>
+									<dd>
+										Wait until any of the following conditions is met, and then run the steps for the condition:
+										<dl class="switch">
+											<dt>There're non-zero number of bytes in <a>readDataBuffer</a></dt>
+											<dd>
+												<ol>
+													<li>
+														Pop the bytes from <a>readDataBuffer</a>, and then let <var>readBytes</var> be the popped bytes
+														<section class="note">
+															Implementations may choose to pop only part of bytes readable if it helps reducing memory copy.
+														</section>
+													</li>
+													<li>Let <var>readData</var> be an object of the type specified by <var>latchedType</var> which represents <var>readBytes</var></li>
+													<li>Let <var>amountConsumed</var> be the number of the popped bytes</li>
+												</ol>
+											</dd>
+											<dt>Anything that doesn't represent bytes in <a>readDataBuffer</a> is encountered</dt>
+											<dd>
+												<ol>
+													<li>Reject <var>readPromise</var> with an "<code><a>InvalidStateError</a></code>"</li>
+													<li>Terminate these steps</li>
+												</ol>
+											</dd>
+										</dl>
 									</dd>
 									<dt>Otherwise</dt>
 									<dd>
 										<ol>
 											<li>Wait until <a>readDataBuffer</a> becomes non-empty or <a>eofReached</a> is set</li>
 											<li>
-												Queue a task which runs the rest of this algorithm
-											</li>
-											<li>
-												Pop non-zero number of bytes from <a>readDataBuffer</a>, and then let <var>readBytes</var> be the popped bytes
-												<section class="note">
-													Implementations may choose to pop only part of bytes readable if it helps reducing memory copy.
-												</section>
-											</li>
-											<li>
 												<dl class="switch">
 													<dt>If <var>latchedType</var> is "<code>none</code>"</dt>
-													<dd>Let <var>readData</var> be <code>undefined</code></dd>
+													<dd>
+														<ol>
+															<li>Pop data from <a>readDataBuffer</a></li>
+															<li>Let <var>readData</var> be <code>undefined</code></li>
+														</ol>
+													</dd>
 													<dt>Otherwise</dt>
-													<dd>Let <var>readData</var> be an object of the type specified by <var>latchedType</var> which represents <var>readBytes</var></dd>
+													<dd>
+														<ol>
+															<li>Pop data from <a>readDataBuffer</a></li>
+															<li>Let <var>readData</var> be an object representing the data</li>
+															<li>Let <var>amountConsumed</var> be the <a>cost</a> of the data</li>
+														</ol>
+													</dd>
 												</dl>
 											</li>
 										</ol>
 									</dd>
 								</dl>
 							</li>
-							<li>Let <var>amountConsumed</var> be the size of <var>readBytes</var></li>
+
+							<li>Queue a task which runs the rest of this algorithm</li>
 
 							<li>Let <var>result</var> be a new <a>ByteStreamReadResult</a>.</li>
 							<li>Set <var>result</var>.<a href="#widl-ByteStreamReadResult-data">data</a> to <var>readData</var></li>
