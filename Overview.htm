@@ -378,10 +378,10 @@ function read() {
 	<section class="section" id="writableByteStream">
 		<h2>WritableStream Interface</h2>
 		<p>
-			The WritableStream interface defines a protocol for APIs which consume byte streams.
+			The WritableStream interface defines a protocol for APIs which consume data stream.
 			The protocol includes:
 			<ol>
-				<li>How to receive the byte stream</li>
+				<li>How to receive data stream</li>
 				<li>How to notify the writer of completion of writing</li>
 				<li>How to notify the writer of how much data can be accepted currently</li>
 			</ol>
@@ -391,8 +391,8 @@ function read() {
 
 		<p>
 			The actual data consumer behind the WritableStream is called a data sink and is identified by <dfn>dataSink</dfn>.
-			A data sink consumes byte streams and notifies the WritableStream of the number of bytes the data sink can newly accept.
-			For each data sink, it's defined how to calculate <a>cost</a> of each object which the data sink can consume.
+			A data sink consumes stream of data and notifies the WritableStream of the cost of data the data sink can newly accept.
+			For each data sink, it must be defined how to calculate <a>cost</a> of each object which the data sink can consume.
 		</p>
 
 		<p>
@@ -406,9 +406,9 @@ function read() {
 				<dt>attribute DOMString writeEncoding</dt>
 				<dd>
 					<p>
-						Specifies a <a>DOMString</a> that represents the label of an encoding [[!EncodingDetermination]].
-						If set, it will be used as part of the encoding determination used when processing a <a>DOMString</a> provided in a <code>write()</code> method call.
-						It will return the label last set, or the empty DOMString if never set.
+						A <a>DOMString</a> that represents the label of an encoding [[!EncodingDetermination]] to be passed to <a>dataSink</a> together with data passed to <code>write()</code> method.
+						It will be used by <a>dataSink</a> for encoding determination.
+						This attribute returns the label last set, or the empty DOMString if never set.
 					</p>
 
 					<section class="note">
@@ -419,7 +419,7 @@ function read() {
 				<dt>Promise&amp;lt;unsigned long long&gt; write()</dt>
 				<dd>
 					<p>
-						This method writes the specified <var>data</var> to the WritableStream.
+						This method writes the specified <var>data</var> to <a>dataSink</a>.
 					</p>
 
 					<section class="note">
@@ -465,7 +465,8 @@ function read() {
 					</p>
 
 					<p>
-						If <var>data</var> argument is an <a>ArrayBufferView</a>, modifications made on the ArrayBufferView's contents between <code>write()</code> method call and fulfill of the returned Promise may affect the data written to <a>dataSink</a>.
+						WritableStream interface doesn't guarantee that <var>data</var> argument is cloned.
+						Modifications made on <var>data</var> argument after <code>write()</code> method call may affect the data written to <a>dataSink</a>.
 					</p>
 
 					<dl class="parameters">
@@ -479,27 +480,16 @@ function read() {
 				<dt>Promise&amp;lt;unsigned long long&gt; awaitSpaceAvailable()</dt>
 				<dd>
 					<p>
-						This method waits until the WritableStream becomes able to accept any non-zero amount of data.
-						The returned <a>Promise</a> will be fulfilled with the number of bytes the WritableStream can accept.
+						This method returns a <a>Promise</a>.
+						The returned Promise will be fulfilled with the data <a>cost</a> which <a>dataSink</a> can accept when <a>dataSink</a> becomes able to accept data with any non-zero amount of cost.
 					</p>
 
 					<p>
 						This method must run the steps below:
 						<ol>
 							<li><a>Abort waiting</a></li>
-
 							<li>Set <a>waitPromise</a> to a new <a>Promise</a></li>
-							<li>Return <a>waitPromise</a>, and then continue to process the steps in this algorithm</li>
-							<li>Wait until <a>pendingWriteQueue</a> is empty and <a>spaceAvailable</a> is not 0</li>
-							<li>
-								Queue a task to run the steps below:
-								<ol>
-									<li>If <a>waitPromise</a> is <code>null</code>, terminate these steps</li>
-									<li>Let <var>detachedWaitPromise</var> be <a>waitPromise</a></li>
-									<li>Set <a>waitPromise</a> to <code>null</code></li>
-									<li>Fulfill <var>detachedWaitPromise</var> with <a>spaceAvailable</a></li>
-								</ol>
-							</li>
+							<li>Return <a>waitPromise</a></li>
 						</ol>
 					</p>
 				</dd>
@@ -508,6 +498,8 @@ function read() {
 				<dd>
 					<p>
 						This method tells the WritableStream that no more data will be written to it.
+					</p>
+					<p>
 						Once writeClose() has been called on a WritableStream, no further method calls can be made on the WritableStream.
 					</p>
 
@@ -529,7 +521,9 @@ function read() {
 						This method tells the WritableStream that no more data will be written to it with indication of error.
 						The details of the error will be given by <var>reason</var> argument.
 						The interpretation of <var>reason</var> is up to <a>dataSink</a>.
-						Once writeAbort() has been called on a WritableStream, no further method calls can be made on the WritableStream.
+					</p>
+					<p>
+						Once this method has been called on a WritableStream, no further method calls can be made on the WritableStream.
 					</p>
 
 					<p>
@@ -538,7 +532,7 @@ function read() {
 							<li>Let <var>abortPromise</var> be a new <a>Promise</a></li>
 							<li>Return <var>abortPromise</var>, and then continue the process the steps in this algorithm</li>
 							<li><a>Write-abort</a> <a>dataSink</a> with <var>reason</var></li>
-							<li>Wait until <a>dataSink</a> acknowledges the write-abort</li>
+							<li>Wait until <a>dataSink</a> acknowledges the <a>write-abort</a></li>
 							<li>Fulfill <var>abortPromise</var> with <code>undefined</code></li>
 						</ol>
 					</p>
@@ -563,7 +557,7 @@ function read() {
 						Accepts the EOF signal
 					</li>
 					<li>
-						Accepts the write-abort signal with an object parameter named reason.
+						Accepts the <dfn>write-abort</dfn> signal with an object parameter named reason.
 					</li>
 					<li>
 						Notifies <a>WritableStream</a> of how much data the data sink can newly accept.
@@ -576,10 +570,13 @@ function read() {
 						If it means an error, an object indicating the details of the error is attached.
 					</li>
 					<li>
+						Notifies <a>WritableStream</a> of acknowledgement of the EOF signal.
+					</li>
+					<li>
 						Notifies <a>WritableStream</a> of acknowledgement of the write-abort signal with error detail object.
 					</li>
 					<li>
-						How to calculate an integer value <dfn>cost</dfn> of each object which the data sink can consume.
+						It's defined how to calculate an integer value <dfn>cost</dfn> of each object which the data sink can consume.
 					</li>
 				</ol>
 			</p>
@@ -628,35 +625,57 @@ function read() {
 			</p>
 
 			<p>
-				To <dfn>process pendingWriteQueue</dfn>, repeat the steps below:
+				To <dfn>process pendingWriteQueue</dfn>, run the steps below:
 				<ol>
-					<li>If <a>pendingWriteQueue</a> is empty, break from this loop</li>
-					<li>Let <var>pendingWrite</var> be the head element of <a>pendingWriteQueue</a></li>
 					<li>
-						<dl class="switch">
-							<dt>If <a>sinkGone</a> is set</dt>
-							<dd>Run the steps below:
-								<ol>
-									<li>Pop <var>pendingWrite</var> from <a>pendingWriteQueue</a>, and then</li>
-									<li>If <var>pendingWrite.promise</var> is not <code>null</code>, reject it with <a>sinkErrorDetail</a></li>
-								</ol>
-							</dd>
-							<dt>Otherwise</dt>
-							<dd>Run the steps below:
-								<ol>
-									<li>Let <var>amountToAcknowledge</var> be min(<var>pendingWrite.amount</var> - <var>pendingWrite.ackedAmount</var>, <a>spaceAvailable</a>)</li>
-									<li>Set <a>spaceAvailable</a> to <a>spaceAvailable</a> - <var>amountToAcknowledge</var></li>
-									<li>Set <var>pendingWrite.ackedAmount</var> to <var>pendingWrite.ackedAmount</var> + <var>amountToAcknowledge</var></li>
-									<li>
-										If <var>pendingWrite.ackedAmount</var> equals to <var>pendingWrite.amount</var>, run the steps below:
+						While <a>pendingWriteQueue</a> is not empty, repeat the steps below:
+						<ol>
+							<li>Let <var>pendingWrite</var> be the head element of <a>pendingWriteQueue</a></li>
+							<li>
+								<dl class="switch">
+									<dt>If <a>sinkGone</a> is set</dt>
+									<dd>
 										<ol>
-											<li>Pop <var>pendingWrite</var> from <a>pendingWriteQueue</a></li>
-											<li>If <var>pendingWrite.promise</var> is not <code>null</code>, fulfill it with <var>pendingWrite.amount</var></li>
+											<li>Pop <var>pendingWrite</var> from <a>pendingWriteQueue</a>, and then</li>
+											<li>If <var>pendingWrite.promise</var> is not <code>null</code>, reject it with <a>sinkErrorDetail</a></li>
 										</ol>
-									</li>
-								</ol>
-							</dd>
-						</dl>
+									</dd>
+									<dt>Otherwise</dt>
+									<dd>
+										<ol>
+											<li>Let <var>amountToAcknowledge</var> be min(<var>pendingWrite.amount</var> - <var>pendingWrite.ackedAmount</var>, <a>spaceAvailable</a>)</li>
+											<li>Set <a>spaceAvailable</a> to <a>spaceAvailable</a> - <var>amountToAcknowledge</var></li>
+											<li>Set <var>pendingWrite.ackedAmount</var> to <var>pendingWrite.ackedAmount</var> + <var>amountToAcknowledge</var></li>
+											<li>
+												<dl class="switch">
+													<dt>If <var>pendingWrite.ackedAmount</var> equals to <var>pendingWrite.amount</var></dt>
+													<dd>
+														<ol>
+															<li>Pop <var>pendingWrite</var> from <a>pendingWriteQueue</a></li>
+															<li>If <var>pendingWrite.promise</var> is not <code>null</code>, fulfill it with <var>pendingWrite.amount</var></li>
+														</ol>
+													</dd>
+													<dt>Otherwise</dt>
+													<dd>
+														Exit from this loop
+													</dd>
+												</dl>
+											</li>
+										</ol>
+									</dd>
+								</dl>
+							</li>
+						</ol>
+					</li>
+
+					<li>
+						If <a>pendingWriteQueue</a> is empty and <a>spaceAvailable</a> is not 0, run the steps below:
+						<ol>
+							<li>If <a>waitPromise</a> is <code>null</code>, terminate these steps</li>
+							<li>Let <var>detachedWaitPromise</var> be <a>waitPromise</a></li>
+							<li>Set <a>waitPromise</a> to <code>null</code></li>
+							<li>Fulfill <var>detachedWaitPromise</var> with <a>spaceAvailable</a></li>
+						</ol>
 					</li>
 				</ol>
 			</p>
