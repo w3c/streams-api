@@ -805,9 +805,9 @@ function read() {
 					<p>
 						This method must run the steps below:
 						<ol>
-							<li>If <a href="#widl-ReadableStream-readBinaryAs">readBinaryAs</a> is "<code>text</code>" throw a "<code><a>SyntaxError</a></code>"</li>
+							<li>If <a href="#widl-ReadableStream-readBinaryAs">readBinaryAs</a> is "<code>text</code>", return a <a>Promise</a> rejected with a "<code><a>SyntaxError</a></code>"</li>
 
-							<li>If <a>readPending</a> is set, throw an "<code><a>InvalidStateError</a></code>"</li>
+							<li>If <a>readPending</a> is set, return a <a>Promise</a> rejected with an "<code><a>InvalidStateError</a></code>"</li>
 							<li>Set <a>readPending</a></li>
 
 							<li>Let <var>latchedType</var> be the current value of <a href="#widl-ReadableStream-readBinaryAs">readBinaryAs</a></li>
@@ -890,7 +890,7 @@ function read() {
 						This method must run the steps below:
 
 						<ol>
-							<li>If <a>readPending</a> is set, throw an "<code><a>InvalidStateError</a></code>"</li>
+							<li>If <a>readPending</a> is set, return a Promise reject with an "<code><a>InvalidStateError</a></code>"</li>
 							<li>Set <a>readPending</a></li>
 
 							<li>Let <var>latchedType</var> be the current value of <a href="#widl-ReadableStream-readBinaryAs">readBinaryAs</a> attribute</li>
@@ -1034,7 +1034,7 @@ function read() {
 						This method must run the steps below:
 
 						<ol>
-							<li>If <a>readPending</a> is set, throw an "<code><a>InvalidStateError</a></code>"</li>
+							<li>If <a>readPending</a> is set, return a <a>Promise</a> rejected with an "<code><a>InvalidStateError</a></code>"</li>
 							<li>Set <a>readPending</a></li>
 
 							<li>Run <a>abort waiting</a> algorithm on <var>destination</var></a>
