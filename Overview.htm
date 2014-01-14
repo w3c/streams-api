@@ -378,7 +378,7 @@ function read() {
 	<section class="section" id="writableByteStream">
 		<h2>WritableStream Interface</h2>
 		<p>
-			The WritableStream interface defines a protocol for APIs which consume data stream.
+			The WritableStream interface defines a protocol for APIs which consume a data stream.
 			The protocol includes:
 			<ol>
 				<li>How to receive data stream</li>
@@ -710,9 +710,10 @@ function read() {
 	<section class="section" id="readableByteStream">
 		<h2>ReadableStream Interface</h2>
 		<p>
-			The ReadableStream interface defines a protocol for APIs which produce a byte stream. This protocol includes:
+			The ReadableStream interface defines a protocol for APIs which produce a data stream.
+			This protocol includes:
 			<ol>
-				<li>How to receive a read request from the reader and output bytes</li>
+				<li>How to receive a read request from the reader and pass output data to the reader</li>
 				<li>How to transfer data in bulk to another <a>WritableStream</a> (by using the <code>pipe()</code> method)</li>
 				<li>How to mirror data to multiple destinations (by using the <code>fork()</code>)</li>
 			</ol>
@@ -722,12 +723,12 @@ function read() {
 
 		<p>
 			Interfaces introduced in this section provide simple and convenient ways to consume data.
-			They connect arbitrary byte stream producer and byte stream consuming JavaScript code using Promises and method invocations.
+			They connect arbitrary data stream producer and data consuming code using Promises and method invocations.
 		</p>
 
 		<p>
 			A ReadableStream has a one-to-one mapping with an associated data source, and has defined semantics for <a href='#interactingWithDataSource'>interacting with the data source internally</a>.
-			A data source, however, can have a one-to-many relationship with ReadableStream, in cases where <code>fork()</code> is used.
+			A data source, however, can have a one-to-many relationship with ReadableStreams, in cases where <code>fork()</code> is used.
 		</p>
 
 		<section class="section" id="readableByteStreamInterface">
@@ -736,11 +737,12 @@ function read() {
 			<dl class="idl" title="interface ReadableStream">
 				<dt>readonly attribute DOMString type</dt>
 				<dd>
-					Returns the ASCII-encoded string in lower case representing the media type of the <code>Stream</code>,
-					expressed as an RFC2046 MIME type [[!RFC2046]].
-					Conforming user agents SHOULD return the MIME type of the <code>ReadableStream</code>, if it is known.
-					If conforming user agents cannot determine the media type of the <code>ReadableStream</code>, they MUST return the empty string.
-					A string is a valid MIME type if it matches the media-type token defined in section 3.7 "Media Types" of RFC 2616 [[!HTTP11]].
+					<p>
+						If it makes sense to define a media type for the data to be read from the ReadableStream and the media type is determined, this method returns the media type.
+						Otherwise, this method returns the empty string.
+						The media type is returned as an ASCII-encoded string in lower case representing the media type, expressed as an RFC2046 MIME type [[!RFC2046]].
+						A string is a valid media type if it matches the media-type token defined in section 3.7 "Media Types" of RFC 2616 [[!HTTP11]].
+					</p>
 				</dd>
 
 				<dt>attribute StreamReadType readBinaryAs</dt>
@@ -750,25 +752,31 @@ function read() {
 						This attribute can be set to any of the supported types in <a>StreamReadType</a>.
 						The default value for this attribute is "<code>arraybuffer</code>".
 					</p>
+					<p>
+						This attribute works only when the data to be read from the ReadableStream represents binary data.
+					</p>
 				</dd>
 
 				<dt>attribute DOMString readEncoding</dt>
 				<dd>
 					<p>
 						Specifies a <a>DOMString</a> that represents the label of an encoding [[!EncodingDetermination]].
-						If set, it will be used as part of the encoding determination used when processing a <code>read()</code> method call.
+						If set, it will be used as part of the encoding determination used when processing a <code>read()</code> and <code>readUpTo()</code> method call.
+					</p>
+					<p>
+						This attribute works only when the data to be read from the ReadableStream represents binary data.
 					</p>
 
 					<section class="note">
-						This parameter is not designed to be specified as an argument of <code>read()</code> since it's not likely to be changed frequently.
+						This parameter is not designed to be specified as an argument of the reading methods since it's not likely to be changed frequently.
 					</section>
 				</dd>
 
 				<dt>attribute unsigned long long pullAmount</dt>
 				<dd>
 					<p>
-						This attribute provides ReadableStream with a hint of how much data the reader can consume currently.
-						Each implementation of ReadableStream must initialize the value of pullAmount on construction.
+						This attribute provides the ReadableStream with a hint of how much data the reader can consume currently.
+						Each implementation of the ReadableStream must initialize the value of pullAmount on construction.
 					</p>
 
 					<p>
@@ -779,7 +787,7 @@ function read() {
 						This flow control functionality is provided as a separated attribute rather than as an argument of the read() method based on the assumption that this value is not changed frequently.
 					</section>
 					<section class="note">
-						It's possible that the number of bytes received by <code>read()</code> is more than the pullAmount value.
+						It's possible that the cost of data received by <code>read()</code> is more than the pullAmount value.
 					</section>
 				</dd>
 
