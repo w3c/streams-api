@@ -437,18 +437,18 @@ function read() {
 
 							<li>If <var>cost</var> argument is specified, let <var>amountToWrite</var> be <var>cost</var> argument. Otherwise, let <var>amountToWrite</var> be the <a>cost</a> of <var>data</var></li>
 
-							<li>Let <var>writePromise</var> be a new <a>Promise</a></li>
+							<li>Let <var>writePromise</var> be a newly-created <a>Promise</a></li>
 
-							<li>Let <var>pendingWrite</var> be a new <a>PendingWriteDescriptor</a></li>
+							<li>Let <var>pendingWrite</var> be a newly-created <a>PendingWriteDescriptor</a></li>
 							<li>Set <var>pendingWrite.promise</var> to <var>writePromise</var></li>
 							<li>Set <var>pendingWrite.amount</var> to <var>amountToWrite</var></li>
 							<li>Push <var>pendingWrite</var> to <a>pendingWriteQueue</a></li>
 
 							<li><a>Process pendingWriteQueue</a></li>
 
-							<li>Return <var>writePromise</var>, and then continue to process the steps in this algorithm</li>
-
 							<li>
+								Run these steps possibly asynchronously:
+
 								<dl class="switch">
 									<dt>If <var>data</var> is a <a>DOMString</a></dt>
 									<dd>
@@ -461,6 +461,8 @@ function read() {
 									</dd>
 								</dl>
 							</li>
+
+							<li>Return <var>writePromise</var></li>
 						</ol>
 					</p>
 
@@ -488,7 +490,7 @@ function read() {
 						This method must run the steps below:
 						<ol>
 							<li><a>Abort waiting</a></li>
-							<li>Set <a>waitPromise</a> to a new <a>Promise</a></li>
+							<li>Set <a>waitPromise</a> to a newly-created <a>Promise</a></li>
 							<li>Return <a>waitPromise</a></li>
 						</ol>
 					</p>
@@ -506,7 +508,7 @@ function read() {
 					<p>
 						This method must run the steps below:
 						<ol>
-							<li>Let <var>closePromise</var> be a new <a>Promise</a></li>
+							<li>Let <var>closePromise</var> be a newly-created <a>Promise</a></li>
 							<li>Return <var>closePromise</var>, and then continue the process the steps in this algorithm</li>
 							<li>Write the EOF to <a>dataSink</a></li>
 							<li>Wait until <a>dataSink</a> acknowledges the EOF</li>
@@ -529,7 +531,7 @@ function read() {
 					<p>
 						This method must run the steps below:
 						<ol>
-							<li>Let <var>abortPromise</var> be a new <a>Promise</a></li>
+							<li>Let <var>abortPromise</var> be a newly-created <a>Promise</a></li>
 							<li>Return <var>abortPromise</var>, and then continue the process the steps in this algorithm</li>
 							<li><a>Write-abort</a> <a>dataSink</a> with <var>reason</var></li>
 							<li>Wait until <a>dataSink</a> acknowledges the <a>write-abort</a></li>
@@ -816,7 +818,7 @@ function read() {
 
 							<li><a>Retrieve data</a></li>
 
-							<li>Let <var>readPromise</var> be a new <a>Promise</a></li>
+							<li>Let <var>readPromise</var> be a newly-created <a>Promise</a></li>
 							<li>Return <var>readPromise</var>, and then continue to process the steps in this algorithm</li>
 
 							<li>Wait until the total cost of data in <a>readDataBuffer</a> becomes equal to or greater than <var>size</var> or <a>eofReached</a> is set</li>
@@ -827,7 +829,7 @@ function read() {
 									<li>Let <var>readableAmount</var> be the total cost of data in <a>readDataBuffer</a></li>
 									<li>Let <var>maxAmountToConsume</var> be min(<var>size</var>, <var>readableAmount</var>)</li>
 
-									<li>Let <var>result</var> be a new <a>StreamReadResult</a></li>
+									<li>Let <var>result</var> be a newly-created <a>StreamReadResult</a></li>
 									<li>
 										<dl class="switch">
 											<dt>If <var>latchedType</var> is "<code>none</code>"</dt>
@@ -898,7 +900,7 @@ function read() {
 
 							<li><a>Retrieve data</a></li>
 
-							<li>Let <var>readPromise</var> be a new <a>Promise</a></li>
+							<li>Let <var>readPromise</var> be a newly-created <a>Promise</a></li>
 							<li>Return <var>readPromise</var>, and then continue to process the steps in this algorithm</li>
 
 							<li>
@@ -987,7 +989,7 @@ function read() {
 
 							<li>Queue a task which runs the rest of this algorithm</li>
 
-							<li>Let <var>result</var> be a new <a>StreamReadResult</a>.</li>
+							<li>Let <var>result</var> be a newly-created <a>StreamReadResult</a>.</li>
 							<li>Set <var>result</var>.<a href="#widl-StreamReadResult-data">data</a> to <var>readData</var></li>
 							<li>Set <var>result</var>.<a href="#widl-StreamReadResult-eof">eof</a> to <code>true</code> if <a>eofReached</a> is set and <a>readDataBuffer</a> is empty</li>
 							<li>Set <var>result</var>.<a href="#widl-StreamReadResult-amountConsumed">amountConsumed</a> to <var>amountConsumed</var></li>
@@ -1041,7 +1043,7 @@ function read() {
 
 							<li><a>Retrieve data</a></li>
 
-							<li>Let <var>pipePromise</var> be a new <a>Promise</a></li>
+							<li>Let <var>pipePromise</var> be a newly-created <a>Promise</a></li>
 							<li>Return <var>pipePromise</var>, and then continue to process the steps in this algorithm</li>
 
 							<li>Let <var>totalAmountTransferred</var> be 0</li>
@@ -1074,7 +1076,7 @@ function read() {
 											<li>Set <a>amountBeingReturned</a> to <a>amountBeingReturned</a> + <var>amountToTransfer</var></li>
 											<li>Pop <var>amountToTransfer</var> bytes from <a>readDataBuffer</a>, and then write it to <a>dataSink</a> of <var>destination</var></li>
 
-											<li>Let <var>pendingWrite</var> be a new <a>PendingWriteDescriptor</a></li>
+											<li>Let <var>pendingWrite</var> be a newly-created <a>PendingWriteDescriptor</a></li>
 											<li>Set <var>pendingWrite.promise</var> to <code>null</code></li>
 											<li>Set <var>pendingWrite.amount</var> to <var>amountToTransfer</var></li>
 											<li>Push <var>pendingWrite</var> to <a>pendingWriteQueue</a> of <var>destination</var></li>
@@ -1132,7 +1134,7 @@ function read() {
 
 							<li>Unset <a>readPending</a></li>
 
-							<li>Let <var>result</var> be a new <a>StreamReadResult</a></li>
+							<li>Let <var>result</var> be a newly-created <a>StreamReadResult</a></li>
 							<li>Set <var>result</var>.<a href="#widl-StreamReadResult-data">data</a> to <code>undefined</code>.
 							<li>Set <var>result</var>.<a href="#widl-StreamReadResult-eof">eof</a> to <code>true</code> if <a>eofReached</a></li>
 							<li>Set <var>result</var>.<a href="#widl-StreamReadResult-amountConsumed">amountConsumed</a> to <var>totalAmountTransferred</var></li>
@@ -1182,7 +1184,7 @@ function read() {
 					<p>
 						This method must run the steps below:
 						<ol>
-							<li>Let <var>abortPromise</var> be a new <a>Promise</a></li>
+							<li>Let <var>abortPromise</var> be a newly-created <a>Promise</a></li>
 							<li>Return <var>abortPromise</var>, and then continue the process the steps in this algorithm</li>
 							<li><a>Read-abort</a> <a>dataSource</a> with <var>reason</var></li>
 							<li>Wait until <a>dataSource</a> acknowledges the read-abort</li>
