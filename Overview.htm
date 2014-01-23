@@ -235,6 +235,11 @@ var respecConfig = {
 		</p>
 
 		<p>
+			The base stream classes are defined as JavaScript primitives.
+			Extensions to it for use in browsers are defined separately.
+		</p>
+
+		<p>
 			Examples below will be illustrative.
 		</p>
 
@@ -737,16 +742,6 @@ function read() {
 			<h3>ReadableStream interface</h3>
 
 			<dl class="idl" title="interface ReadableStream">
-				<dt>readonly attribute DOMString type</dt>
-				<dd>
-					<p>
-						If it makes sense to define a media type for the data to be read from the ReadableStream and the media type is determined, this method returns the media type.
-						Otherwise, this method returns the empty string.
-						The media type is returned as an ASCII-encoded string in lower case representing the media type, expressed as an RFC2046 MIME type [[!RFC2046]].
-						A string is a valid media type if it matches the media-type token defined in section 3.7 "Media Types" of RFC 2616 [[!HTTP11]].
-					</p>
-				</dd>
-
 				<dt>attribute StreamReadType readBinaryAs</dt>
 				<dd>
 					<p>
@@ -1467,74 +1462,78 @@ function read() {
 					should both be extended as follows:
 				</p>
 				<dl class="idl" title="interface URL">
-					<dt>static DOMString? createObjectURL(in (Blob or ReadableStream) object)</dt>
+					<dt>static DOMString? createObjectURL()</dt>
 					<dd>
+						<dl class="parameters">
+							<dt>ReadableStream stream</dt>
+							<dd>The <a>ReadableStream</a> for which a Blob URI will be created</dd>
+							<dt>DOMString type</dt>
+							<dd>
+								<p>
+									The media type of this stream.
+									The media type is returned as an ASCII-encoded string in lower case representing the media type, expressed as an RFC2046 MIME type [[!RFC2046]].
+									A string is a valid media type if it matches the media-type token defined in section 3.7 "Media Types" of RFC 2616 [[!HTTP11]].
+								</p>
+							</dd>
+						</dl>
+
 						<p>
 							The extension onto <code>createObjectURL</code> should have the following steps added.
 						</p>
+
 						<p>
-							Returns a unique Blob URL each time it is called on a valid <code>object</code> argument, which is a non-null <a>ReadableStream</a> in scope of the global object's URL property from which this static method is called. This method must act as follows:
-							<ol>
-								<li>
-									If called with a <a>ReadableStream</a> argument that is NOT valid, then user agents must return null.
-								</li>
-								<li>
-									If called with a valid <a>ReadableStream</a> argument,
-									user agents must run the following sub-steps:
+							Returns a unique Blob URL each time it is called on a <a>ReadableStream</a>.
+							This method must act as follows:
+
+							<dl class="switch">
+								<dt>If <var>stream</var> is non-null and in scope of the global object's URL property from which this static method is called</dt>
+								<dd>
+									Run these steps:
 									<ol>
-										<li>
-											If <a>readPending</a> of the <a>ReadableStream</a> is set, return null.
-										</li>
-										<li>
-											Set <a>readPending</a> of the <a>ReadableStream</a>.
-										</li>
-										<li>
-											Return a unique <code>Blob URI</code> that can be used to dereference the <code>stream</code> argument.
-										</li>
-										<li>
-											Add an entry to the Blob URL Store for this Blob URL.
-										</li>
+										<li>If <a>readPending</a> of <var>stream</var> is set, return null</li>
+										<li>Set <a>readPending</a> of <var>stream</var></li>
+										<li>Return a unique <code>Blob URI</code> that can be used to dereference <var>stream</var></li>
+										<li>Add an entry to the Blob URL Store for this Blob URL</li>
 									</ol>
-								</li>
-							</ol>
+								</dd>
+								<dt>Otherwise</dt>
+								<dd>Return null</dd>
+							</dl>
 						</p>
 					</dd>
 
-					<dt>static DOMString? createFor(in (Blob or ReadableStream) object)</dt>
+					<dt>static DOMString? createFor()</dt>
 					<dd>
+						<dl class="parameters">
+							<dt>ReadableStream stream</dt>
+							<dd></dd>
+							<dt>DOMString type</dt>
+							<dd></dd>
+						</dl>
+
 						<p>
 							The extension onto <code>createFor</code> should have the following steps added.
 						</p>
 						<p>
-							Returns a unique Blob URL each time it is called on a valid <code>object</code> argument, which is a non-null <a>ReadableStream</a> in scope of the global object's URL property from which this static method is called.
+							Returns a unique Blob URL each time it is called on a <a>ReadableStream</a>.
 							Blob URLs created with this method are said to be auto-revoking since user-agents are responsible for the revocation of Blob URLs created with this method, subject to the lifetime stipulation for Blob URLs.
 							This method must act as follows:
-							<ol>
-								<li>
-									If called with a <a>ReadableStream</a> argument that is NOT valid, then user agents must return null.
-								</li>
-								<li>
-									If called with a valid <a>ReadableStream</a> argument,
-									user agents must run the following sub-steps:
+
+							<dl class="switch">
+								<dt>If <var>stream</var> is non-null and in scope of the global object's URL property from which this static method is called</dt>
+								<dd>
+									Run these steps:
 									<ol>
-										<li>
-											If <a>readPending</a> of the <a>ReadableStream</a> is set, return null.
-										</li>
-										<li>
-											Set <a>readPending</a> of the <a>ReadableStream</a>.
-										</li>
-										<li>
-											Return a unique <code>Blob URI</code> that can be used to dereference the <code>stream</code> argument.
-										</li>
-										<li>
-											Add an entry to the Blob URL Store for this Blob URL.
-										</li>
-										<li>
-											Add an entry in the Revocation List for this Blob URL.
-										</li>
+										<li>If <a>readPending</a> of <var>stream</var> is set, return null</li>
+										<li>Set <a>readPending</a> of <var>stream</var></li>
+										<li>Return a unique <code>Blob URI</code> that can be used to dereference <var>stream</var></li>
+										<li>Add an entry to the Blob URL Store for this Blob URL</li>
+										<li>Add an entry to the Revocation List for this Blob URL</li>
 									</ol>
-								</li>
-							</ol>
+								</dd>
+								<dt>Otherwise</dt>
+								<dd>Return null</dd>
+							</dl>
 						</p>
 					</dd>
 
@@ -1543,20 +1542,15 @@ function read() {
 						<p>
 							The extension onto <code>revokeObjectURL</code> should have the following steps added.
 						</p>
-						<ol>
-							<li>
-								If the URL refers to a <a>Blob</a> or <a>ReadableStream</a> that is both
-								valid and in the same origin of the global object’s <code>URL</code> property on which this static method was called,
-								user agents MUST return a 404 response code when the URL is dereferenced.
-							</li>
-							<li>
-								If the URL refers to a <a>Blob</a> or <a>ReadableStream</a> that is <strong>not</strong> valid
-								or if the value provided for the URL argument is not a <code>Blob URI</code>
-								or if the URL argument refers to a <a>Blob</a> or <a>ReadableStream</a> that is <strong>not</strong> in the same origin
-								as the global object’s<code>URL</code> property, this method call does nothing.
-								User agents MAY display a message on their error console.
-							</li>
-						</ol>
+						<dl class="switch">
+							<dt>If <var>url</var> is a Blob URI which refers to a <a>ReadableStream</a> and it's in the same origin of the global object’s <code>URL</code> property on which this static method was calld</dt>
+							<dd>Return a 404 response code when the URL is dereferenced</dd>
+							<dt>Otherwise</dt>
+							<dd>
+								Do nothing.
+								A message on their error console may be displayed.
+							</dd>
+						</dl>
 					</dd>
 				</dl>
 			</section>
