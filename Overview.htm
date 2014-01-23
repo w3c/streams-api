@@ -440,7 +440,10 @@ function read() {
 
 							<li><a>Abort wait</a></li>
 
-							<li>If <var>cost</var> argument is specified, let <var>amountToWrite</var> be <var>cost</var> argument. Otherwise, let <var>amountToWrite</var> be the <a>cost</a> of <var>data</var></li>
+							<li>
+								If <var>costOverride</var> argument is specified, let <var>amountToWrite</var> be <var>costOverride</var> argument.
+								Otherwise, let <var>amountToWrite</var> be the <a>cost</a> of <var>data</var>
+							</li>
 
 							<li>Let <var>writePromise</var> be a newly-created <a>Promise</a></li>
 
@@ -479,7 +482,7 @@ function read() {
 					<dl class="parameters">
 						<dt>any data</dt>
 						<dd>Data to write.</dd>
-						<dt>optional [Clamp] unsigned long long cost</dt>
+						<dt>optional [Clamp] unsigned long long costOverride</dt>
 						<dd>Overrides <a>cost</a> of data.</dd>
 					</dl>
 				</dd>
