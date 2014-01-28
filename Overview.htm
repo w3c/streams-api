@@ -814,19 +814,21 @@ function read() {
 
 							<li>If <a>pendingRead</a> is not <code>null</code>, return a <a>Promise</a> rejected with an "<code><a>InvalidStateError</a></code>"</li>
 
+							<li>Let <var>readPromise</var> be a newly-created <a>Promise</a></li>
+
 							<li>Set <a>pendingRead</a> to a newly-created <a>PendingReadDescriptor</a></li>
 
 							<li>Set <a>pendingRead</a>.<var>binaryAs</var> to the current value of <a href="#widl-ReadableStream-readBinaryAs">readBinaryAs</a></li>
 							<li>Set <a>pendingRead</a>.<var>encoding</var> to the current value of <a href="#widl-ReadableStream-readEncoding">readEncoding</a></li>
 							<li>Set <a>pendingRead</a>.<var>size</var> to <var>size</var></li>
-							<li>Set <a>pendingRead</a>.<var>promise</var> to a newly-created <a>Promise</a></li>
+							<li>Set <a>pendingRead</a>.<var>promise</var> to <var>readPromise</var></li>
 
 							<li>Set <a>readUpToPullAmount</a> to <var>size</var></li>
 							<li>Set <a>amountBeingReturned</a> to 0</li>
 
 							<li><a>Retrieve data</a></li>
 
-							<li>Return <a>pendingRead</a>.<var>promise</var></li>
+							<li>Return <var>readPromise</var></li>
 						</ol>
 					</p>
 
@@ -858,18 +860,20 @@ function read() {
 						<ol>
 							<li>If <a>pendingRead</a> is not <code>null</code>, return a Promise reject with an "<code><a>InvalidStateError</a></code>"</li>
 
+							<li>Let <var>readPromise</var> be a newly-created <a>Promise</a></li>
+
 							<li>Set <a>pendingRead</a> to a newly-created <a>PendingReadDescriptor</a></li>
 
 							<li>Set <a>pendingRead</a>.<var>binaryAs</var> to the current value of <a href="#widl-ReadableStream-readBinaryAs">readBinaryAs</a></li>
 							<li>Set <a>pendingRead</a>.<var>encoding</var> to the current value of <a href="#widl-ReadableStream-readEncoding">readEncoding</a></li>
 							<li>Set <a>pendingRead</a>.<var>size</var> to <code>undefined</code></li>
-							<li>Set <a>pendingRead</a>.<var>promise</var> to a newly-created <a>Promise</a></li>
+							<li>Set <a>pendingRead</a>.<var>promise</var> to <var>readPromise</var></li>
 
 							<li>Set <a>amountBeingReturned</a> to 0</li>
 
 							<li><a>Retrieve data</a></li>
 
-							<li>Return <a>pendingRead</a>.<var>promise</var></li>
+							<li>Return <var>readPromise</var></li>
 						</ol>
 					</p>
 
