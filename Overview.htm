@@ -1301,7 +1301,7 @@ function read() {
 
 									<li>
 										<dl class="switch">
-											<dt>If <a>pendingRead</a>.<var>binaryAs</var> is any of "<code>arraybuffer</code>" or "<code>blob</code>"</dt>
+											<dt>If <a>pendingRead</a>.<var>binaryAs</var> is "<code>arraybuffer</code>"</dt>
 											<dd>
 												<ol>
 													<li>Set <var>result</var>.<a href="#widl-StreamReadResult-data">data</a> to an object of the type specified by <var>pendingRead.binaryAs</var> that represents binary data stored in <var>temporaryBuffer</var></li>
@@ -1401,8 +1401,6 @@ function read() {
 		<dl class="idl" title="enum StreamReadType">
 			<dt>as-is</dt>
 			<dd>Default. <code>read()</code> and <code>readUpTo()</code> return produced data as-is</dd>
-			<dt>blob</dt>
-			<dd><code>read()</code> and <code>readUpTo()</code> attempt to convert produced data into a <a>Blob</a>, and then return it</dd>
 			<dt>arraybuffer</dt>
 			<dd><code>read()</code> and <code>readUpTo()</code> attempt to convert produced data into an <a>ArrayBuffer</a>, and then return it</dd>
 			<dt>text</dt>
