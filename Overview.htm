@@ -490,7 +490,6 @@ function read() {
 				<dt>Promise&amp;lt;unsigned long long&gt; awaitSpaceAvailable()</dt>
 				<dd>
 					<p>
-						This method returns a <a>Promise</a>.
 						The returned Promise will be fulfilled with the data <a>cost</a> which <a>dataSink</a> can accept when <a>dataSink</a> becomes able to accept data with any non-zero amount of cost.
 					</p>
 
@@ -498,8 +497,8 @@ function read() {
 						This method must run the steps below:
 						<ol>
 							<li><a>Abort waiting</a></li>
-							<li>Set <a>waitPromise</a> to a newly-created <a>Promise</a></li>
-							<li>Return <a>waitPromise</a></li>
+							<li>Set <a>awaitSpacePromise</a> to a newly-created <a>Promise</a></li>
+							<li>Return <a>awaitSpacePromise</a></li>
 						</ol>
 					</p>
 				</dd>
@@ -537,13 +536,18 @@ function read() {
 					</p>
 
 					<p>
-						This method must run the steps below:
+						This method must run these steps:
 						<ol>
 							<li>Let <var>abortPromise</var> be a newly-created <a>Promise</a></li>
-							<li>Return <var>abortPromise</var>, and then continue the process the steps in this algorithm</li>
-							<li><a>Write-abort</a> <a>dataSink</a> with <var>reason</var></li>
-							<li>Wait until <a>dataSink</a> acknowledges the <a>write-abort</a></li>
-							<li>Fulfill <var>abortPromise</var> with <code>undefined</code></li>
+							<li>
+								Run these steps possibly asynchronously:
+								<ol>
+									<li><a>Write-abort</a> <a>dataSink</a> with <var>reason</var></li>
+									<li>Wait until <a>dataSink</a> acknowledges the <a>write-abort</a></li>
+									<li>Fulfill <var>abortPromise</var> with <code>undefined</code></li>
+								</ol>
+							</li>
+							<li>Return <var>abortPromise</var></li>
 						</ol>
 					</p>
 				</dd>
@@ -606,16 +610,16 @@ function read() {
 			</p>
 
 			<p>
-				A WritableStream has an associated <a>Promise</a> <dfn>waitPromise</dfn> which is used by the <code>awaitSpaceAvailable()</code> method.
+				A WritableStream has an associated <a>Promise</a> <dfn>awaitSpacePromise</dfn> which is used by the <code>awaitSpaceAvailable()</code> method.
 				This variable is initialized to <code>null</code> on construction.
 			</p>
 
 			<p>
 				To <dfn>abort waiting</dfn>, run the steps below:
 				<ol>
-					<li>If <a>waitPromise</a> is <code>null</code>, terminate these steps</li>
-					<li>Let <var>detachedWaitPromise</var> be <a>waitPromise</a></li>
-					<li>Set <a>waitPromise</a> to <code>null</code></li>
+					<li>If <a>awaitSpacePromise</a> is <code>null</code>, terminate these steps</li>
+					<li>Let <var>detachedWaitPromise</var> be <a>awaitSpacePromise</a></li>
+					<li>Set <a>awaitSpacePromise</a> to <code>null</code></li>
 					<li>Reject <var>detachedWaitPromise</var> with an "<code><a>AbortError</a></code>"</li>
 				</ol>
 			</p>
@@ -681,9 +685,9 @@ function read() {
 					<li>
 						If <a>pendingWriteQueue</a> is empty and <a>spaceAvailable</a> is not 0, run the steps below:
 						<ol>
-							<li>If <a>waitPromise</a> is <code>null</code>, terminate these steps</li>
-							<li>Let <var>detachedWaitPromise</var> be <a>waitPromise</a></li>
-							<li>Set <a>waitPromise</a> to <code>null</code></li>
+							<li>If <a>awaitSpacePromise</a> is <code>null</code>, terminate these steps</li>
+							<li>Let <var>detachedWaitPromise</var> be <a>awaitSpacePromise</a></li>
+							<li>Set <a>awaitSpacePromise</a> to <code>null</code></li>
 							<li>Fulfill <var>detachedWaitPromise</var> with <a>spaceAvailable</a></li>
 						</ol>
 					</li>
@@ -1044,18 +1048,20 @@ function read() {
 						This method tells the ReadableStream that no more data will be read from it optionally with indication of error.
 						The details of the error will be given by <var>reason</var> argument.
 						The interpretation of <var>reason</var> is up to <a>dataSource</a>.
-						Once readAbort() has been called on a ReadableStream, no further method calls can be made on the ReadableStream.
+					</p>
+					<p>
+						Once this method has been called on a ReadableStream, no further method calls can be made on the ReadableStream.
 					</p>
 
 					<p>
-						This method must run the steps below:
+						This method must run these steps:
 						<ol>
 							<li>Let <var>abortPromise</var> be a newly-created <a>Promise</a></li>
 							<li>
-								Run these steps asynchronously:
+								Run these steps possibly asynchronously:
 								<ol>
 									<li><a>Read-abort</a> <a>dataSource</a> with <var>reason</var></li>
-									<li>Wait until <a>dataSource</a> acknowledges the read-abort</li>
+									<li>Wait until <a>dataSource</a> acknowledges the <a>read-abort</a></li>
 									<li>Fulfill <var>abortPromise</var> with <code>undefined</code></li>
 								</ol>
 							</li>
