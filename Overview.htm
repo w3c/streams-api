@@ -387,7 +387,7 @@ function read() {
 			The protocol includes:
 			<ol>
 				<li>How to receive data stream</li>
-				<li>How to notify the writer of completion of writing</li>
+				<li>How to notify the writer (data producing code) of completion of writing</li>
 				<li>How to notify the writer of how much data can be accepted currently</li>
 			</ol>
 
@@ -496,7 +496,7 @@ function read() {
 					<p>
 						This method must run the steps below:
 						<ol>
-							<li><a>Abort waiting</a></li>
+							<li><a>Abort awaitSpace</a></li>
 							<li>Set <a>awaitSpacePromise</a> to a newly-created <a>Promise</a></li>
 							<li>Return <a>awaitSpacePromise</a></li>
 						</ol>
@@ -615,7 +615,7 @@ function read() {
 			</p>
 
 			<p>
-				To <dfn>abort waiting</dfn>, run the steps below:
+				To <dfn>abort awaitSpace</dfn>, run the steps below:
 				<ol>
 					<li>If <a>awaitSpacePromise</a> is <code>null</code>, terminate these steps</li>
 					<li>Let <var>detachedWaitPromise</var> be <a>awaitSpacePromise</a></li>
@@ -727,7 +727,7 @@ function read() {
 			The ReadableStream interface defines a protocol for APIs which produce a data stream.
 			This protocol includes:
 			<ol>
-				<li>How to receive a read request from the reader and pass output data to the reader</li>
+				<li>How to receive read requests from the reader (data consuming code) and pass output data to the reader</li>
 				<li>How to transfer data in bulk to another <a>WritableStream</a> (by using the <code>pipe()</code> method)</li>
 				<li>How to mirror data to multiple destinations (by using the <code>fork()</code>)</li>
 			</ol>
@@ -754,10 +754,12 @@ function read() {
 					<p>
 						Specifies what data type will be returned by a <code>read()</code> and <code>readUpTo()</code> method call.
 						This attribute can be set to any of the supported types in <a>StreamReadType</a>.
-						The default value for this attribute is "<code>arraybuffer</code>".
+					<p>
+					</p>
+						The default value for this attribute is "<code>as-is</code>".
 					</p>
 					<p>
-						This attribute works only when the data to be read from the ReadableStream represents binary data.
+						Values other than "<code>as-is</code>" works only when the data to be read from the ReadableStream represents binary data.
 					</p>
 				</dd>
 
@@ -780,11 +782,13 @@ function read() {
 				<dd>
 					<p>
 						This attribute provides the ReadableStream with a hint of how much data the reader can consume currently.
+					</p>
+					<p>
 						Each implementation of the ReadableStream must initialize the value of pullAmount on construction.
 					</p>
 
 					<p>
-						When this attribute is set, <a>retrieve data</a>.
+						When this attribute is set, the user agent must <a>retrieve data</a>.
 					</p>
 
 					<section class="note">
@@ -911,7 +915,7 @@ function read() {
 							<li>If <a>readPending</a> is set, return a <a>Promise</a> rejected with an "<code><a>InvalidStateError</a></code>"</li>
 							<li>Set <a>readPending</a></li>
 
-							<li>Run <a>abort waiting</a> algorithm on <var>destination</var></a>
+							<li>Run <a>abort awaitSpace</a> algorithm on <var>destination</var></a>
 
 							<li>Set <a>amountBeingReturned</a> to 0</li>
 
@@ -970,6 +974,7 @@ function read() {
 											</li>
 										</ol>
 									</li>
+
 									<li>
 										Whenever <a>pendingWriteQueue</a> of <var>destination</var> is empty and <a>spaceAvailable</a> of <var>destination</var> is not 0,
 										<dl class="switch">
