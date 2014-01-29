@@ -827,7 +827,7 @@ function read() {
 							<li>Set <a>pendingRead</a>.<var>encoding</var> to the current value of <a href="#widl-ReadableStream-readEncoding">readEncoding</a></li>
 							<li>Set <a>pendingRead</a>.<var>size</var> to <var>size</var></li>
 							<li>Set <a>pendingRead</a>.<var>promise</var> to <var>readPromise</var></li>
-							<li>Set <a>pendingRead</a>.<var>destination</var> to <code>undefined</code></li>
+							<li>Set <a>pendingRead</a>.<var>destination</var> to <code>null</code></li>
 
 							<li>Set <a>readUpToPullAmount</a> to <var>size</var></li>
 							<li>Set <a>amountBeingReturned</a> to 0</li>
@@ -874,7 +874,7 @@ function read() {
 							<li>Set <a>pendingRead</a>.<var>encoding</var> to the current value of <a href="#widl-ReadableStream-readEncoding">readEncoding</a></li>
 							<li>Set <a>pendingRead</a>.<var>size</var> to <code>undefined</code></li>
 							<li>Set <a>pendingRead</a>.<var>promise</var> to <var>readPromise</var></li>
-							<li>Set <a>pendingRead</a>.<var>destination</var> to <code>undefined</code></li>
+							<li>Set <a>pendingRead</a>.<var>destination</var> to <code>null</code></li>
 
 							<li>Set <a>amountBeingReturned</a> to 0</li>
 
@@ -926,6 +926,8 @@ function read() {
 							<li>Set <a>pendingRead</a>.<var>size</var> to <var>size</var> argument</li>
 							<li>Set <a>pendingRead</a>.<var>promise</var> to <var>pipePromise</var></li>
 							<li>Set <a>pendingRead</a>.<var>destination</var> to <var>destination</var> argument</li>
+
+							<li>Set <a>totalAmountTransferred</a> to 0</li>
 
 							<li><a>Wait for destination</a> possibly asynchronously</li>
 
@@ -1097,7 +1099,7 @@ function read() {
 			</p>
 
 			<p>
-				An associated binary data queue <dfn>binaryReadBuffer</dfn> which holds binary data spliced from <a>readDataBuffer</a>.
+				An associated binary data queue <dfn>splicedBinaryBuffer</dfn> which holds binary data spliced from <a>readDataBuffer</a>.
 				THis queue is initialized to an empty queue on construction.
 			</p>
 
@@ -1126,9 +1128,14 @@ function read() {
 			</p>
 
 			<p>
+				An associated integer variable <dfn>totalAmountTransferred</dfn> which holds the total cost of data transferred for the current <code>pipe()</code> method call.
+				This variable is initialized to 0 on construction.
+			</p>
+
+			<p>
 				To <dfn>retrieve data</dfn>, run the steps below:
 				<ol>
-					<li>Let <var>readableAmount</var> be sum of the total <a>cost</a> in <a>readDataBuffer</a> and the total number of bytes in <a>binaryReadBuffer</a></li>
+					<li>Let <var>readableAmount</var> be sum of the total <a>cost</a> in <a>readDataBuffer</a> and the total number of bytes in <a>splicedBinaryBuffer</a></li>
 					<li>Let <var>amountToNewlyRetrieve</var> be max(max(<a href="#widl-ReadableStream-pullAmount">pullAmount</a>, <a>readUpToPullAmount</a>, <a>pipePullAmount</a>) - (<a>amountRequested</a> + <var>readableAmount</var> + <a>amountBeingReturned</a>), 0)</li>
 					<li>Set <a>amountRequested</a> to <a>amountRequested</a> + <var>amountToNewlyRetrieve</var></li>
 					<li>Send a request to the <a>dataSource</a> to produce data with <var>amountToNewlyRetrieve</var> <a>cost</a> to the ReadableStream</li>
@@ -1157,7 +1164,7 @@ function read() {
 							<dd>
 								<ol>
 									<li>Pop <var>head</var> from <a>readDataBuffer</a></li>
-									<li>Push <var>head</var> to <a>binaryReadBuffer</a></li>
+									<li>Push <var>head</var> to <a>splicedBinaryBuffer</a></li>
 								</ol>
 
 								<section class="note">
@@ -1168,7 +1175,7 @@ function read() {
 							<dd>
 								<ol>
 									<li>Pop <var>head</var> from <a>readDataBuffer</a></li>
-									<li>Push <var>head</var> to <a>binaryReadBuffer</a></li>
+									<li>Push <var>head</var> to <a>splicedBinaryBuffer</a></li>
 									<li>Set <a>pendingRead</a>.<var>size</var> to <a>pendingRead</a>.<var>size</var> - (the number of bytes in <var>head</var>)</li>
 								</ol>
 							</dd>
@@ -1177,7 +1184,7 @@ function read() {
 								<ol>
 									<li>Split <var>head</var> into two elements <var>first</var> and <var>last</var> where the number of bytes in <var>first</var> is <a>pendingRead</a>.<var>size</var></li>
 									<li>Replace <var>head</var> in <a>readDataBuffer</a> with <var>last</var></li>
-									<li>Push <var>first</var> to <var>binaryReadBuffer</var></li>
+									<li>Push <var>first</var> to <var>splicedBinaryBuffer</var></li>
 									<li>Set <a>pendingRead</a>.<var>size</var> to 0</li>
 								</ol>
 							</dd>
@@ -1208,44 +1215,48 @@ function read() {
 									<li><a>Splice binary data</a></li>
 									<li>If the last step failed, terminate these steps</li>
 
-									<li>If <a>pendingRead</a>.<var>size</var> is not <code>undefined</code> and <a>eofReached</a> is not set and the number of bytes in <a>binaryReadBuffer</a> is less than <a>pendingRead</a>.<var>size</var>, terminate these steps</li>
+									<li>If <a>pendingRead</a>.<var>size</var> is not <code>undefined</code> and <a>eofReached</a> is not set and the number of bytes in <a>splicedBinaryBuffer</a> is less than <a>pendingRead</a>.<var>size</var>, terminate these steps</li>
 
 									<li>
+										Switch on <a>pendingRead</a>.<var>binaryAs</var>:
+
 										<dl class="switch">
-											<dt>If <a>pendingRead</a>.<var>binaryAs</var> is "<code>arraybuffer</code>"</dt>
+											<dt>"<code>arraybuffer</code>"</dt>
 											<dd>
 												<ol>
-													<li>Set <var>result</var>.<a href="#widl-StreamReadResult-data">data</a> to an object of the type specified by <var>pendingRead.binaryAs</var> that represents binary data stored in <var>temporaryBuffer</var></li>
-													<li>Let <var>amountConsumed</var> be the number of bytes in <var>temporaryBuffer</var></li>
+													<li>Set <var>result</var>.<a href="#widl-StreamReadResult-data">data</a> to an object of the type specified by <a>pendingRead</a>.<var>binaryAs</var> that represents binary data stored in <a>splicedBinaryBuffer</a></li>
+													<li>Let <var>amountConsumed</var> be the number of bytes in <a>splicedBinaryBuffer</a></li>
 												</ol>
 											</dd>
-											<dt>If <a>pendingRead</a>.<var>binaryAs</var> is "<code>text</code>"</dt>
+											<dt>"<code>text</code>"</dt>
 											<dd>
 												<ol>
-													<li>Set <var>result</var>.<a href="#widl-StreamReadResult-data">data</a> to a DOMString that is the result of decoding as many bytes in <var>temporaryBuffer</var> as possible using <var>pendingRead.encoding</var></li>
-													<li>Let <var>unusedBytes</var> be the bytes in <var>temporaryBuffer</var> which were not used in the step 1</li>
+													<li>Set <var>result</var>.<a href="#widl-StreamReadResult-data">data</a> to a DOMString that is the result of decoding as many bytes in <a>splicedBinaryBuffer</a> as possible using <a>pendingRead</a>.<var>encoding</var></li>
+													<li>
+														Let <var>unusedBytes</var> be the bytes in <a>splicedBinaryBuffer</a> which were not used in the last step, and
+													  let <var>amountConsumed</var> be the number of bytes in <a>splicedBinaryBuffer</a> used in the last step
+													</li>
 													<li>
 														If <a>eofReached</a> is set and <var>unusedBytes</var> is not empty, run the steps below:
 														<ol>
 															<li>Let <var>readPromise</var> be <a>pendingRead</a>.<var>promise</var></li>
 															<li>Set <a>pendingRead</a> to <code>null</code></li>
-															<li>Reject <var>readPromise</var> with "<code><a>EncodingError</a></code>"</li>
+															<li>Reject <var>readPromise</var> with an "<code><a>EncodingError</a></code>"</li>
 														</ol>
 													</li>
 													<li>Prepend <var>unusedBytes</var> to <a>readDataBuffer</a></li>
-													<li>Let <var>amountConsumed</var> be the number of bytes in <var>temporaryBuffer</var> used in the step 1</li>
 												</ol>
 											</dd>
-											<dt>If <a>pendingRead</a>.<var>binaryAs</var> is "<code>none</code>"</dt>
+											<dt>"<code>none</code>"</dt>
 											<dd>
 												<ol>
 													<li>Set <var>result</var>.<a href="#widl-StreamReadResult-data">data</a> to <code>undefined</code></li>
-													<li>Let <var>amountConsumed</var> be the number of bytes in <var>temporaryBuffer</var></li>
+													<li>Let <var>amountConsumed</var> be the number of bytes in <a>splicedBinaryBuffer</a></li>
 												</ol>
 											</dd>
 										</dl>
 									</li>
-									<li>Clear <var>temporaryBuffer</var></li>
+									<li>Clear <a>splicedBinaryBuffer</a></li>
 								</ol>
 							</dd>
 						</dl>
@@ -1259,7 +1270,7 @@ function read() {
 
 					<li>Set <a>readUpToPullAmount</a> to 0</li>
 
-					<li>Let <var>readPromise</var> to <var>pendingRead.promise</var></li>
+					<li>Let <var>readPromise</var> to <a>pendingRead</a>.<var>promise</var></li>
 					<li>Set <a>pendingRead</a> to <code>null</code></li>
 					<li>Fulfill <var>readPromise</var> with <var>result</var></li>
 				</ol>
@@ -1298,10 +1309,23 @@ function read() {
 					</li>
 
 					<li>
+						Let <var>onRejected</var> be a callback which runs the steps below:
+
+						<ol>
+							<li>Set <a>pipePullAmount</a> to 0</li>
+
+							<li>Let <var>pipePromise</var> be <a>pendingRead</a>.<var>promise</var></li>
+							<li>Set <a>pendingRead</a> to <code>null</code></li>
+
+							<li>Reject <var>pipePromise</var> with the first argument</li>
+						</ol>
+					</li>
+
+					<li>
 						Run the algorithm of <code>awaitSpaceAvailable()</code> method on <var>destination</var>, and let <var>promise</var> be the returned <a>Promise</a>
 					</li>
 					<li>
-						Transform <var>promise</var> of <var>destination</var> with <var>onFulfilled</var> and <code>undefined</code>
+						Transform <var>promise</var> of <var>destination</var> with <var>onFulfilled</var> and <var>onRejected</var>
 					</li>
 				</ol>
 			</p>
@@ -1315,6 +1339,7 @@ function read() {
 
 						<ol>
 							<li>Let <var>writtenAmounts</var> be the first argument</li>
+							<li>Set <a>totalAmountTransferred</a> to <a>totalAmountTransferred</a> + (the sum of elements in <var>writtenAmounts</var>)</var>
 							<li>
 								<dl class="switch">
 									<dt>If <a>eofReached</a> is set or <a>pendingRead</a>.<var>size</var> is 0</dt>
@@ -1329,7 +1354,8 @@ function read() {
 
 											<li>Set <var>result</var>.<a href="#widl-StreamReadResult-data">data</a> to <code>undefined</code></li>
 											<li>Set <var>result</var>.<a href="#widl-StreamReadResult-eof">eof</a> to <code>true</code> if <a>eofReached</a></li>
-											<li>Set <var>result</var>.<a href="#widl-StreamReadResult-amountConsumed">amountConsumed</a> to the sum of elements in <var>writtenAmounts</var></li>
+											<li>Set <var>result</var>.<a href="#widl-StreamReadResult-amountConsumed">amountConsumed</a> to <a>totalAmountTransferred</a></li>
+											<li>Set <a>totalAmountTransferred</a> to 0</li>
 											<li>
 												Fulfill <var>pipePromise</var> with <var>result</var>
 												<section class="note">
@@ -1343,9 +1369,23 @@ function read() {
 									</dd>
 									<dt>Otherwise</dt>
 									<dd>
+										<a>Wait for destination</a>
 									</dd>
 								</dl>
 							</li>
+						</ol>
+					</li>
+
+					<li>
+						Let <var>onRejected</var> be a callback which runs the steps below:
+
+						<ol>
+							<li>Set <a>pipePullAmount</a> to 0</li>
+
+							<li>Let <var>pipePromise</var> be <a>pendingRead</a>.<var>promise</var></li>
+							<li>Set <a>pendingRead</a> to <code>null</code></li>
+
+							<li>Reject <var>pipePromise</var> with the first argument</li>
 						</ol>
 					</li>
 
@@ -1376,10 +1416,10 @@ function read() {
 									<li>If the last step failed, terminate these steps</li>
 
 									<li>
-										Repeat the steps below while <a>binaryReadBuffer</a> is not empty:
+										Repeat the steps below while <a>splicedBinaryBuffer</a> is not empty:
 
 										<ol>
-											<li>Pop one element from <a>binaryReadBuffer</a>, and let <var>head</var> be the element</li>
+											<li>Pop one element from <a>splicedBinaryBuffer</a>, and let <var>head</var> be the element</li>
 											<li>Run the algorithm of write() method with <var>head</var> to <a>pendingRead</a>.<var>destination</var></li>
 										</ol>
 									</li>
@@ -1415,7 +1455,19 @@ function read() {
 			</p>
 
 			<p>
-				When the EOF is received from <a>dataSource</a>, queue a task which sets <a>eofReached</a> and <a>sourceErrorDetail</a>
+				When the <a>read EOF</a> is received from <a>dataSource</a>, run the steps below:
+
+				<ol>
+					<li>
+						<dl class="switch">
+							<dt>If in the event loop</dt>
+							<dd>Run the rest of these steps</dd>
+							<dt>Otherwise</dt>
+							<dd>Queue a task which runs the rest of these steps</dd>
+						</dl>
+					</li>
+					<li>Set <a>eofReached</a> and <a>sourceErrorDetail</a></li>
+				</ol>
 			</p>
 	  </section>
 	</section>
@@ -1429,9 +1481,9 @@ function read() {
 
 		<dl class="idl" title="interface StreamReadResult">
 			<dt>readonly attribute boolean eof</dt>
-			<dd>Set if the operation resulted in an EOF</dd>
+			<dd>Set if the operation resulted in the <a>read EOF</a></dd>
 			<dt>readonly attribute any data</dt>
-			<dd>The contents read converted into an object of the specified type</dd>
+			<dd>The contents read (and converted into an object of the specified type if needed)</dd>
 			<dt>readonly attribute unsigned long long amountConsumed</dt>
 			<dd>The cost of the data read</dd>
 			<dt>readonly attribute any error</dt>
