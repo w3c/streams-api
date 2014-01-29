@@ -1090,11 +1090,6 @@ function read() {
 			<p>
 				An associated queue <dfn>readDataBuffer</dfn> which holds the bytes retrieved from <a>dataSource</a>.
 				This queue is initialized to an empty queue on construction.
-				<section class="note">
-					Retrieved bytes can be queued in <a>readDataBuffer</a> in any form.
-					For example, if bytes were retrieved as <a>ArrayBufferView</a> fragments, it's ok to store them as-is to avoid unnecessary copy.
-					If the object representing retrieved bytes is a DOMString, that should be accompanied with the encoding to use to decode it.
-				</section>
 			</p>
 
 			<p>
