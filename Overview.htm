@@ -1097,6 +1097,11 @@ function read() {
 			</p>
 
 			<p>
+				An associated binary data queue <dfn>binaryReadBuffer</dfn> which holds binary data spliced from <a>readDataBuffer</a>.
+				THis queue is initialized to an empty queue on construction.
+			</p>
+
+			<p>
 				A struct type <dfn>PendingReadDescriptor</dfn> has the following members:
 				<ul>
 					<li>A <a>Promise</a> <var>promise</var></li>
@@ -1109,29 +1114,29 @@ function read() {
 
 			<p>
 				A WritableStream has an associated <a>PendingReadDescriptor</a> <dfn>pendingRead</dfn>.
-				This variable is initialized to <code>null</code>.
+				This variable is initialized to <code>null</code> on construction.
 			</p>
 
 			<p>
-				An associated flag <dfn>eofReached</dfn> which indicates that the EOF was received from the <a>dataSource</a>.
+				An associated flag <dfn>eofReached</dfn> which indicates that the <a>read EOF</a> was received from the <a>dataSource</a>.
 			</p>
 
 			<p>
-				An associated object <dfn>sourceErrorDetail</dfn> which is initialized to <code>null</code>, and once the EOF meaning an error is received from the <a>dataSource</a>, set to the error detail object.
+				An associated object <dfn>sourceErrorDetail</dfn> which is initialized to <code>null</code>. Once the <a>read EOF</a> including indication of an error is received from the <a>dataSource</a>, this variable is set to the error detail object.
 			</p>
 
 			<p>
 				To <dfn>retrieve data</dfn>, run the steps below:
 				<ol>
-					<li>Let <var>readableAmount</var> be sum of the total cost in <a>readDataBuffer</a> and the total number of bytes in <a>binaryReadBuffer</a></li>
-					<li>Let <var>amountToRetrieve</var> be max(max(<a href="#widl-ReadableStream-pullAmount">pullAmount</a>, <a>readUpToPullAmount</a>, <a>pipePullAmount</a>) - (<a>amountRequested</a> + <var>readableAmount</var> + <a>amountBeingReturned</a>), 0)</li>
-					<li>Set <a>amountRequested</a> to <a>amountRequested</a> + <var>amountToRetrieve</var></li>
-					<li>Send a request to the <a>dataSource</a> to return data with <var>amountToRetrieve</var> <a>cost</a> to the ReadableStream</li>
+					<li>Let <var>readableAmount</var> be sum of the total <a>cost</a> in <a>readDataBuffer</a> and the total number of bytes in <a>binaryReadBuffer</a></li>
+					<li>Let <var>amountToNewlyRetrieve</var> be max(max(<a href="#widl-ReadableStream-pullAmount">pullAmount</a>, <a>readUpToPullAmount</a>, <a>pipePullAmount</a>) - (<a>amountRequested</a> + <var>readableAmount</var> + <a>amountBeingReturned</a>), 0)</li>
+					<li>Set <a>amountRequested</a> to <a>amountRequested</a> + <var>amountToNewlyRetrieve</var></li>
+					<li>Send a request to the <a>dataSource</a> to produce data with <var>amountToNewlyRetrieve</var> <a>cost</a> to the ReadableStream</li>
 				</ol>
 			</p>
 
 			<p>
-				To <dfn>splice binary data</dfn> with <var>remainingSize</var> and <var>binaryReadBuffer</var> argument, repeat the steps below while <a>readDataBuffer</a> is not empty:
+				To <dfn>splice binary data</dfn>, repeat the steps below while <a>readDataBuffer</a> is not empty:
 
 				<ol>
 					<li>If <a>pendingRead</a>.<var>size</var> is 0, return from this algorithm</li>
