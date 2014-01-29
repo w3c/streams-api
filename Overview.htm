@@ -455,7 +455,7 @@ function read() {
 							<li><a>Process pendingWriteQueue</a></li>
 
 							<li>
-								Run these steps possibly asynchronously:
+								Run the steps below possibly asynchronously:
 
 								<dl class="switch">
 									<dt>If <var>data</var> is a <a>DOMString</a></dt>
@@ -536,11 +536,11 @@ function read() {
 					</p>
 
 					<p>
-						This method must run these steps:
+						This method must run the steps below:
 						<ol>
 							<li>Let <var>abortPromise</var> be a newly-created <a>Promise</a></li>
 							<li>
-								Run these steps possibly asynchronously:
+								Run the steps below possibly asynchronously:
 								<ol>
 									<li><a>Write-abort</a> <a>dataSink</a> with <var>reason</var></li>
 									<li>Wait until <a>dataSink</a> acknowledges the <a>write-abort</a></li>
@@ -616,6 +616,7 @@ function read() {
 
 			<p>
 				To <dfn>abort awaitSpace</dfn>, run the steps below:
+
 				<ol>
 					<li>If <a>awaitSpacePromise</a> is <code>null</code>, terminate these steps</li>
 					<li>Let <var>detachedWaitPromise</var> be <a>awaitSpacePromise</a></li>
@@ -683,12 +684,12 @@ function read() {
 					</li>
 
 					<li>
-						If <a>pendingWriteQueue</a> is empty and <a>spaceAvailable</a> is not 0, run the steps below:
+						If <a>pendingWriteQueue</a> is empty and <a>spaceAvailable</a> is not 0 and <a>awaitSpacePromise</a> is not <code>null</code>, run the steps below:
+
 						<ol>
-							<li>If <a>awaitSpacePromise</a> is <code>null</code>, terminate these steps</li>
-							<li>Let <var>detachedWaitPromise</var> be <a>awaitSpacePromise</a></li>
+							<li>Let <var>detachedPromise</var> be <a>awaitSpacePromise</a></li>
 							<li>Set <a>awaitSpacePromise</a> to <code>null</code></li>
-							<li>Fulfill <var>detachedWaitPromise</var> with <a>spaceAvailable</a></li>
+							<li>Fulfill <var>detachedPromise</var> with <a>spaceAvailable</a></li>
 						</ol>
 					</li>
 				</ol>
@@ -741,7 +742,7 @@ function read() {
 		</p>
 
 		<p>
-			A ReadableStream has a one-to-one mapping with an associated data source, and has defined semantics for <a href='#interactingWithDataSource'>interacting with the data source internally</a>.
+			A ReadableStream has a one-to-one mapping with an associated <a href="#readableByteStreamDataSource">data source</a>, and has defined semantics for <a href='#interactingWithDataSource'>interacting with the data source internally</a>.
 			A data source, however, can have a one-to-many relationship with ReadableStreams, in cases where <code>fork()</code> is used.
 		</p>
 
@@ -812,7 +813,7 @@ function read() {
 					</p>
 
 					<p>
-						This method must run these steps:
+						This method must run the steps below:
 						<ol>
 							<li>If <a href="#widl-ReadableStream-readBinaryAs">readBinaryAs</a> is "<code>as-is</code>", return a <a>Promise</a> rejected with a "<code><a>SyntaxError</a></code>"</li>
 
@@ -826,11 +827,12 @@ function read() {
 							<li>Set <a>pendingRead</a>.<var>encoding</var> to the current value of <a href="#widl-ReadableStream-readEncoding">readEncoding</a></li>
 							<li>Set <a>pendingRead</a>.<var>size</var> to <var>size</var></li>
 							<li>Set <a>pendingRead</a>.<var>promise</var> to <var>readPromise</var></li>
+							<li>Set <a>pendingRead</a>.<var>destination</var> to <code>undefined</code></li>
 
 							<li>Set <a>readUpToPullAmount</a> to <var>size</var></li>
 							<li>Set <a>amountBeingReturned</a> to 0</li>
 
-							<li><a>Retrieve data</a></li>
+							<li><a>Retrieve data</a> possibly asynchronously</li>
 
 							<li>Return <var>readPromise</var></li>
 						</ol>
@@ -859,7 +861,7 @@ function read() {
 					</p>
 
 					<p>
-						This method must run these steps:
+						This method must run the steps below:
 
 						<ol>
 							<li>If <a>pendingRead</a> is not <code>null</code>, return a Promise reject with an "<code><a>InvalidStateError</a></code>"</li>
@@ -872,10 +874,11 @@ function read() {
 							<li>Set <a>pendingRead</a>.<var>encoding</var> to the current value of <a href="#widl-ReadableStream-readEncoding">readEncoding</a></li>
 							<li>Set <a>pendingRead</a>.<var>size</var> to <code>undefined</code></li>
 							<li>Set <a>pendingRead</a>.<var>promise</var> to <var>readPromise</var></li>
+							<li>Set <a>pendingRead</a>.<var>destination</var> to <code>undefined</code></li>
 
 							<li>Set <a>amountBeingReturned</a> to 0</li>
 
-							<li><a>Retrieve data</a></li>
+							<li><a>Retrieve data</a> possibly asynchronously</li>
 
 							<li>Return <var>readPromise</var></li>
 						</ol>
@@ -912,117 +915,21 @@ function read() {
 						This method must run the steps below:
 
 						<ol>
-							<li>If <a>readPending</a> is set, return a <a>Promise</a> rejected with an "<code><a>InvalidStateError</a></code>"</li>
-							<li>Set <a>readPending</a></li>
+							<li>If <a>pendingRead</a> is not <code>null</code>, return a <a>Promise</a> rejected with an "<code><a>InvalidStateError</a></code>"</li>
 
-							<li>Run <a>abort awaitSpace</a> algorithm on <var>destination</var></a>
+							<li>Set <var>pipePromise</var> be a newly-created <a>Promise</a></li>
 
-							<li>Set <a>amountBeingReturned</a> to 0</li>
+							<li>Set <a>pendingRead</a> to a newly-created <a>PendingReadDescriptor</a></li>
 
-							<li><a>Retrieve data</a></li>
+							<li>Set <a>pendingRead</a>.<var>binaryAs</var> to <code>undefined</code></li>
+							<li>Set <a>pendingRead</a>.<var>encoding</var> to <code>undefined</code></li>
+							<li>Set <a>pendingRead</a>.<var>size</var> to <var>size</var> argument</li>
+							<li>Set <a>pendingRead</a>.<var>promise</var> to <var>pipePromise</var></li>
+							<li>Set <a>pendingRead</a>.<var>destination</var> to <var>destination</var> argument</li>
 
-							<li>Let <var>pipePromise</var> be a newly-created <a>Promise</a></li>
-							<li>Return <var>pipePromise</var>, and then continue to process the steps in this algorithm</li>
+							<li><a>Wait for destination</a> possibly asynchronously</li>
 
-							<li>Let <var>totalAmountTransferred</var> be 0</li>
-							<li>
-								Repeat the steps below:
-								<ul>
-									<li>
-										Whenever <a>readDataBuffer</a> is not empty or <a>eofReached</a> is set,
-										<dl class="switch">
-											<dt>If this happened in the event loop</dt>
-											<dd>Run the steps below</dd>
-											<dt>Otherwise</dt>
-											<dd>Queue a task which runs the steps below</dd>
-										</dl>
-										<ol>
-											<li>
-												Let <var>readableAmount</var> be the number of bytes in <a>readDataBuffer</a>
-												<section class="note">
-													It's fine to process only part of the bytes, and process the rest in the next task.
-												</section>
-											</li>
-											<li>
-												<dl class="switch">
-													<dt>If <var>size</var> is specified</dt>
-													<dd>Let <var>amountToTransfer</var> be min(<var>size</var> - <var>totalAmountTransferred</var>, <var>readableAmount</var>)</dd>
-													<dt>Otherwise</dt>
-													<dd>Let <var>amountToTransfer</var> be <var>readableAmount</var></dd>
-												</dl>
-											</li>
-											<li>Set <a>amountBeingReturned</a> to <a>amountBeingReturned</a> + <var>amountToTransfer</var></li>
-											<li>Pop <var>amountToTransfer</var> bytes from <a>readDataBuffer</a>, and then write it to <a>dataSink</a> of <var>destination</var></li>
-
-											<li>Let <var>pendingWrite</var> be a newly-created <a>PendingWriteDescriptor</a></li>
-											<li>Set <var>pendingWrite.promise</var> to <code>null</code></li>
-											<li>Set <var>pendingWrite.amount</var> to <var>amountToTransfer</var></li>
-											<li>Push <var>pendingWrite</var> to <a>pendingWriteQueue</a> of <var>destination</var></li>
-
-											<li>Set <var>totalAmountTransferred</var> to <var>totalAmountTransferred</var> + <var>amountToTransfer</var></li>
-
-											<li>
-												<dl class="switch">
-													<dt>If <a>eofReached</a> is set</dt>
-													<dd>Break from this loop</dd>
-													<dt>If <var>size</var> is specified and <var>totalAmountTransferred</var> equals to <var>size</var></dt>
-													<dd>Break from this loop</dd>
-												</dl>
-												<section class="note">
-													Need to revisit. Finish when write to the destination completes?
-												</section>
-											</li>
-										</ol>
-									</li>
-
-									<li>
-										Whenever <a>pendingWriteQueue</a> of <var>destination</var> is empty and <a>spaceAvailable</a> of <var>destination</var> is not 0,
-										<dl class="switch">
-											<dt>If this happened in the event loop</dt>
-											<dd>Run the steps below</dd>
-											<dt>Otherwise</dt>
-											<dd>Queue a task which runs the steps below</dd>
-										</dl>
-										<ol>
-											<li>Let <var>destSpaceAvailable</var> be <a>spaceAvailable</a> of <var>destination</var></li>
-											<li>
-												<dl class="switch">
-													<dt>If <var>size</var> is specified</dt>
-													<dd>
-														Set <a>pipePullAmount</a> to min(<var>size</var> - <var>totalAmountTransferred</var>, <var>destSpaceAvailable</var>)
-														<section class="note">
-															If <a href="#widl-ReadableStream-pullAmount">pullAmount</a> is set to 0, pipe() transfers data in pull style.
-															I.e. only bytes of the same number as the number of bytes writable to <var>destination</var> are retrieved from the data source.
-														</section>
-														<section class="note">
-															Setting <a href="#widl-ReadableStream-pullAmount">pullAmount</a> to a small value doesn't have an effect of throttling the pace of pipe().
-														</section>
-													</dd>
-													<dt>Otherwise</dt>
-													<dd>Set <a>pipePullAmount</a> to <var>destSpaceAvailable</var></dd>
-												</dl>
-											</li>
-											<li>Set <a>amountBeingReturned</a> to 0</li>
-											<li><a>Retrieve data</a></li>
-										</ol>
-									</li>
-								</ul>
-							</li>
-
-							<li>Set <a>pipePullAmount</a> to 0</li>
-
-							<li>Unset <a>readPending</a></li>
-
-							<li>Let <var>result</var> be a newly-created <a>StreamReadResult</a></li>
-							<li>Set <var>result</var>.<a href="#widl-StreamReadResult-data">data</a> to <code>undefined</code>.
-							<li>Set <var>result</var>.<a href="#widl-StreamReadResult-eof">eof</a> to <code>true</code> if <a>eofReached</a></li>
-							<li>Set <var>result</var>.<a href="#widl-StreamReadResult-amountConsumed">amountConsumed</a> to <var>totalAmountTransferred</var></li>
-							<li>
-								Fulfill <var>pipePromise</var> with <var>result</var>
-								<section class="note">
-									At this point, <a>amountBeingReturned</a> is not yet reset
-								</section>
-							</li>
+							<li>Return <var>pipePromise</var></li>
 						</ol>
 					</p>
 
@@ -1063,11 +970,11 @@ function read() {
 					</p>
 
 					<p>
-						This method must run these steps:
+						This method must run the steps below:
 						<ol>
 							<li>Let <var>abortPromise</var> be a newly-created <a>Promise</a></li>
 							<li>
-								Run these steps possibly asynchronously:
+								Run the steps below possibly asynchronously:
 								<ol>
 									<li><a>Read-abort</a> <a>dataSource</a> with <var>reason</var></li>
 									<li>Wait until <a>dataSource</a> acknowledges the <a>read-abort</a></li>
@@ -1085,8 +992,8 @@ function read() {
 			<h3>Data source model</h3>
 
 			<p>
-				A data source produces the bytes to be consumed via the <a>ReadableStream</a> interface instances.
-				A <a>ReadableStream</a> retrieves bytes from an associated data source.
+				A data source produces data stream to be consumed via the <a>ReadableStream</a> interface instances.
+				A <a>ReadableStream</a> retrieves data from an associated data source.
 				The data source model is not directly surfaced in the API, and is described here to provide details on how internal operations such as <a href="#widl-ReadableStream-fork-ReadableStream">fork()</a> can be handled.
 			</p>
 
@@ -1094,24 +1001,24 @@ function read() {
 				A <dfn>data source</dfn> can be anything that:
 				<ul>
 					<li>
-						Produces bytes.
-						Newly produced bytes will be delivered to the associated <a>ReadableStream</a>.
+						Produces data.
+						Newly produced data will be delivered to the associated <a>ReadableStream</a>.
 					</li>
 					<li>
-						Notifies <a>ReadableStream</a> of the EOF signal.
-						This signal may mean an error.
-						If it means an error, an object indicating the details of the error is attached.
+						Notifies <a>ReadableStream</a> of the <dfn>read EOF</dfn> signal.
+						This signal may include indication of an error.
+						When it indicates an error, an object which represents the details of the error is attached.
 					</li>
 					<li>
-						Accepts requests for production of bytes from a <a>ReadableStream</a>.
-						A byte production request consists of an integer indicating the number of bytes to produce in addition to already requested ones.
-						Interpretation of the request is up to data sources.
+						Accepts requests for production of data from a <a>ReadableStream</a>.
+						A data production request consists of an integer indicating the total cost of data to produce in addition to already requested ones.
+						Interpretation of the request is up to each data source.
 						Data sources may respond to retrieval requests with data larger than requested.
-						Requests and delivery of bytes don't need to 1-to-1 correspond.
-						Data sources may produce bytes and send to <a>ReadableStream</a> unsolicitedly without receiving any retrieval request.
+						Requests and delivery of data don't need to 1-to-1 correspond.
+						Data sources may produce data and send to <a>ReadableStream</a> unsolicitedly without receiving any retrieval request.
 					</li>
 					<li>
-						Accepts and acknowledges read-abort signal which means the associated <a>ReadableStream</a> has completed consuming bytes from this data source optionally with indication of any error.
+						Accepts and acknowledges <dfn>read-abort</dfn> signal which means the associated <a>ReadableStream</a> has completed consuming bytes from this data source optionally with indication of any error.
 					</li>
 				</ul>
 			</p>
@@ -1201,6 +1108,7 @@ function read() {
 					<li>An integer <var>amount</var></li>
 					<li>A <a>DOMString</a> <var>binaryAs</var></li>
 					<li>A <a>DOMString</a> <var>encoding</var></li>
+					<li>A <a>WritableStream</a> <var>destination</var></li>
 				</ul>
 			</p>
 
@@ -1220,7 +1128,7 @@ function read() {
 			<p>
 				To <dfn>retrieve data</dfn>, run the steps below:
 				<ol>
-					<li>Let <var>readableAmount</var> be the number of bytes in the <a>readDataBuffer</a></li>
+					<li>Let <var>readableAmount</var> be sum of the total cost in <a>readDataBuffer</a> and the total number of bytes in <a>binaryReadBuffer</a></li>
 					<li>Let <var>amountToRetrieve</var> be max(max(<a href="#widl-ReadableStream-pullAmount">pullAmount</a>, <a>readUpToPullAmount</a>, <a>pipePullAmount</a>) - (<a>amountRequested</a> + <var>readableAmount</var> + <a>amountBeingReturned</a>), 0)</li>
 					<li>Set <a>amountRequested</a> to <a>amountRequested</a> + <var>amountToRetrieve</var></li>
 					<li>Send a request to the <a>dataSource</a> to return <var>amountToRetrieve</var> bytes to the ReadableStream</li>
@@ -1228,91 +1136,79 @@ function read() {
 			</p>
 
 			<p>
-				To <dfn>output data</dfn>, run these steps:
+				To <dfn>splice binary data</dfn> with <var>remainingSize</var> and <var>binaryReadBuffer</var> argument, repeat the steps below while <a>readDataBuffer</a> is not empty:
+
+				<ol>
+					<li>If <a>pendingRead</a>.<var>size</var> is 0, return from this algorithm</li>
+
+					<li>Let <var>head</var> be the first element in <a>readDataBuffer</a></li>
+					<li>
+						<dl class="switch">
+							<dt>If <var>head</var> is not an object representing binary data</dt>
+							<dd>
+								<ol>
+									<li>Let <var>readPromise</var> be <a>pendingRead</a>.<var>promise</var></li>
+									<li>Set <a>pendingRead</a> to <code>null</code></li>
+									<li>Reject <var>readPromise</var> with an "<code><a>InvalidStateError</a></code>"</li>
+									<li>Return from this algorithm with failure</li>
+								</ol>
+							</dd>
+							<dt>If <a>pendingRead</a>.<var>size</var> is <code>undefined</code></dt>
+							<dd>
+								<ol>
+									<li>Pop <var>head</var> from <a>readDataBuffer</a></li>
+									<li>Push <var>head</var> to <a>binaryReadBuffer</a></li>
+								</ol>
+
+								<section class="note">
+									Implementations may choose to pop only part of bytes readable if it helps reducing memory copy.
+								</section>
+							</dd>
+							<dt>If the number of bytes in <var>head</var> is not greater than <a>pendingRead</a>.<var>size</var></dt>
+							<dd>
+								<ol>
+									<li>Pop <var>head</var> from <a>readDataBuffer</a></li>
+									<li>Push <var>head</var> to <a>binaryReadBuffer</a></li>
+									<li>Set <a>pendingRead</a>.<var>size</var> to <a>pendingRead</a>.<var>size</var> - (the number of bytes in <var>head</var>)</li>
+								</ol>
+							</dd>
+							<dt>Otherwise</dt>
+							<dd>
+								<ol>
+									<li>Split <var>head</var> into two elements <var>first</var> and <var>last</var> where the number of bytes in <var>first</var> is <a>pendingRead</a>.<var>size</var></li>
+									<li>Replace <var>head</var> in <a>readDataBuffer</a> with <var>last</var></li>
+									<li>Push <var>first</var> to <var>binaryReadBuffer</var></li>
+									<li>Set <a>pendingRead</a>.<var>size</var> to 0</li>
+								</ol>
+							</dd>
+						</dl>
+					</li>
+				</ol>
+			</p>
+
+			<p>
+				To <dfn>output data</dfn>, run the steps below:
 
 				<ol>
 					<li>Let <var>result</var> be a newly-created <a>StreamReadResult</a></li>
 
 					<li>
 						<dl class="switch">
-							<dt>If <a>pendingRead<a>.<var>binaryAs</var> is "<code>as-is</code>"</dt>
+							<dt>If <a>pendingRead</a>.<var>binaryAs</var> is "<code>as-is</code>"</dt>
 							<dd>
-								<dl class="switch">
-									<dt>If <a>pendingRead</a>.<var>size</var> is <code>undefined</code></dt>
-									<dd>
-										<ol>
-											<li>Pop one element from <a>readDataBuffer</a>, and set <var>result</var>.<a href="#widl-StreamReadResult-data">data</a> to the element</li>
-											<li>Let <var>amountConsumed</var> be <a>cost</a> of the element</li>
-										</ol>
-									</dd>
-									<dt>Otherwise</dt>
-									<dd>Reject <var>pendingRead.promise</var> with a "<code><a>SyntaxError</a></code>"</dd>
-								</dl>
+								<ol>
+									<li>Pop one element from <a>readDataBuffer</a>, and set <var>result</var>.<a href="#widl-StreamReadResult-data">data</a> to the element</li>
+									<li>Let <var>amountConsumed</var> be <a>cost</a> of the element</li>
+								</ol>
 							</dd>
 
 							<dt>Otherwise</dt>
 							<dd>
 								<ol>
-									<li>Let <var>temporaryBuffer</var> be an empty queue</li>
-									<li>Let <var>remainingSize</var> be <code>undefined</code></li>
-									<li>If <a>pendingRead</a>.<var>size</var> is <code>undefined</code>, set <var>remainingSize</var> to <var>pendingRead.size</var></li>
-									<li>
-										<dl class="switch">
-											<dd>
-												Repeat these steps while <a>readDataBuffer</a> is not empty:
-												<ol>
-													<li>Let <var>head</var> be the first element in <a>readDataBuffer</a></li>
-													<li>
-														<dl class="switch">
-															<dt>If <var>remainingSize</var> is 0</dt>
-															<dd>
-																Exit from this loop
-															</dd>
-															<dt>If <var>head</var> is not an object representing binary data</dt>
-															<dd>
-																<ol>
-																	<li>Reject <var>pendingRead.promise</var> with an "<code><a>InvalidStateError</a></code>"</li>
-																	<li>Exit from this loop</li>
-																</ol>
-															</dd>
-															<dt>If <var>remainingSize</var> is <code>undefined</code></dt>
-															<dd>
-																<ol>
-																	<li>Pop <var>head</var> from <a>readDataBuffer</a></li>
-																	<li>Push <var>head</var> to <var>temporaryBuffer</var></li>
-																</ol>
+									<li><a>Splice binary data</a></li>
+									<li>If the last step failed, terminate these steps</li>
 
-																<section class="note">
-																	Implementations may choose to pop only part of bytes readable if it helps reducing memory copy.
-																</section>
-															</dd>
-															<dt>If <var>remainingSize</var> is not <code>undefined</code> and <a>cost</a> of <var>head</var> is not greater than <var>remainingSize</var></dt>
-															<dd>
-																<ol>
-																	<li>Pop <var>head</var> from <a>readDataBuffer</a></li>
-																	<li>Push <var>head</var> to <var>temporaryBuffer</var></li>
-																	<li>Set <var>remainingSize</var> to <var>remainingSize</var> - (<a>cost</a> of <var>head</var>)</li>
-																</ol>
-															</dd>
-															<dt>Otherwise</dt>
-															<dd>
-																<ol>
-																	<li>Split <var>head</var> into two elements <var>first</var> and <var>last</var> where size of <var>first</var> is <var>remainingSize</var></li>
-																	<li>Replace <var>head</var> in <a>readDataBuffer</a> with <var>last</var></li>
-																	<li>Push <var>first</var> to <var>temporaryBuffer</var></li>
-																	<li>Set <var>remainingSize</var> to 0</li>
-																</ol>
-															</dd>
-														</dl>
-													</li>
-												</ol>
-											</dd>
-											<dt>Otherwise</dt>
-											<dd>
-												
-											</dd>
-										</dl>
-									</li>
+									<li>If <a>pendingRead</a>.<var>size</var> is not <code>undefined</code> and <a>eofReached</a> is not set and the number of bytes in <a>binaryReadBuffer</a> is less than <a>pendingRead</a>.<var>size</var>, terminate these steps</li>
 
 									<li>
 										<dl class="switch">
@@ -1328,7 +1224,14 @@ function read() {
 												<ol>
 													<li>Set <var>result</var>.<a href="#widl-StreamReadResult-data">data</a> to a DOMString that is the result of decoding as many bytes in <var>temporaryBuffer</var> as possible using <var>pendingRead.encoding</var></li>
 													<li>Let <var>unusedBytes</var> be the bytes in <var>temporaryBuffer</var> which were not used in the step 1</li>
-													<li>If <a>eofReached</a> is set and <var>unusedBytes</var> is not empty, reject <var>pendingRead.promise</var> with "<code><a>EncodingError</a></code>"</li>
+													<li>
+														If <a>eofReached</a> is set and <var>unusedBytes</var> is not empty, run the steps below:
+														<ol>
+															<li>Let <var>readPromise</var> be <a>pendingRead</a>.<var>promise</var></li>
+															<li>Set <a>pendingRead</a> to <code>null</code></li>
+															<li>Reject <var>readPromise</var> with "<code><a>EncodingError</a></code>"</li>
+														</ol>
+													</li>
 													<li>Prepend <var>unusedBytes</var> to <a>readDataBuffer</a></li>
 													<li>Let <var>amountConsumed</var> be the number of bytes in <var>temporaryBuffer</var> used in the step 1</li>
 												</ol>
@@ -1363,15 +1266,140 @@ function read() {
 			</p>
 
 			<p>
-				When data is received from <a>dataSource</a>, queue a task which runs the steps below:
+				To <dfn>wait for destination</dfn>, run the steps below:
+
+				<ol>
+					<li>
+						Let <var>onFulfilled</var> be a callback which runs the steps below:
+
+						<ol>
+							<li>Let <var>space</var> be the first argument</li>
+							<li>
+								<dl class="switch">
+									<dt>If <a>pendingRead</a>.<var>size</var> is specified</dt>
+									<dd>
+										Set <a>pipePullAmount</a> to min(<a>pendingRead</a>.<var>size</var>, <var>space</var>)
+
+										<section class="note">
+											If <a href="#widl-ReadableStream-pullAmount">pullAmount</a> is set to 0, pipe() transfers data in pull style.
+											I.e. only bytes of the same number as the number of bytes writable to <var>destination</var> are retrieved from the data source.
+										</section>
+										<section class="note">
+											Setting <a href="#widl-ReadableStream-pullAmount">pullAmount</a> to a small value doesn't have an effect of throttling the pace of pipe().
+										</section>
+									</dd>
+									<dt>Otherwise</dt>
+									<dd>Set <a>pipePullAmount</a> to <var>space</var></dd>
+								</dl>
+							</li>
+							<li>Set <a>amountBeingReturned</a> to 0</li>
+							<li><a>Retrieve data</a></li>
+						</ol>
+					</li>
+
+					<li>
+						Run the algorithm of <code>awaitSpaceAvailable()</code> method on <var>destination</var>, and let <var>promise</var> be the returned <a>Promise</a>
+					</li>
+					<li>
+						Transform <var>promise</var> of <var>destination</var> with <var>onFulfilled</var> and <code>undefined</code>
+					</li>
+				</ol>
+			</p>
+
+			<p>
+				To <dfn>transfer data</dfn>, run the steps below:
+
+				<ol>
+					<li>
+						Let <var>onFulfilled</var> be a callback which runs the steps below:
+
+						<dl class="switch">
+							<dt>If <a>eofReached</a> is set or <a>pendingRead</a>.<var>size</var> is 0</dt>
+							<dd>
+								<ol>
+									<li>Set <a>pipePullAmount</a> to 0</li>
+
+									<li>Unset <a>readPending</a></li>
+
+									<li>Let <var>result</var> be a newly-created <a>StreamReadResult</a></li>
+
+									<li>Set <var>result</var>.<a href="#widl-StreamReadResult-data">data</a> to <code>undefined</code>.
+									<li>Set <var>result</var>.<a href="#widl-StreamReadResult-eof">eof</a> to <code>true</code> if <a>eofReached</a></li>
+									<li>Set <var>result</var>.<a href="#widl-StreamReadResult-amountConsumed">amountConsumed</a> to <var>totalAmountTransferred</var></li>
+									<li>
+										Fulfill <var>pipePromise</var> with <var>result</var>
+										<section class="note">
+											At this point, <a>amountBeingReturned</a> is not yet reset
+										</section>
+									</li>
+								</ol>
+								<section class="note">
+									Need to revisit. Finish when write to the destination completes?
+								</section>
+							</dd>
+							<dt>Otherwise</dt>
+							<dd>
+							</dd>
+						</dl>
+					</li>
+
+					<li>
+						<dl class="switch">
+							<dt>If <a>pendingRead</a>.<var>size</var> is <code>undefined</code></dt>
+							<dd>
+								<ol>
+									<li>Let <var>writePromises</var> be an array of <a>Promise</a>s.
+									<li>
+										Repeat the steps below while <a>readDataBuffer</a> is not empty:
+										<ol>
+											<li>Pop one element from <a>readDataBuffer</a>, and let <var>head</var> be the element</li>
+											<li>Set <a>amountBeingReturned</a> to <a>amountBeingReturned</a> + (<a>cost</a> of <var>head</var>)</li>
+											<li>Run the algorithm of write() method with <var>head</var> on <a>pendingRead</a>.<var>destination</var></li>
+											<li>Push the <a>Promise</a> returned by the last step to <var>writePromises</var></li>
+										</ol>
+									</li>
+
+									<li>Let <var>allPromise</var> be waiting for all of <var>writePromises</var></li>
+									<li>Transform <var>allPromise</var> with <var>onFulfilled</var> and <code>undefined</code></li>
+								</ol>
+							</dd>
+							<dt>Otherwise</dt>
+							<dd>
+								<ol>
+									<li><a>Splice binary data</a></li>
+									<li>If the last step failed, terminate these steps</li>
+
+									<li>
+										Repeat the steps below while <a>binaryReadBuffer</a> is not empty:
+
+										<ol>
+											<li>Pop one element from <a>binaryReadBuffer</a>, and let <var>head</var> be the element</li>
+											<li>Run the algorithm of write() method with <var>head</var> to <a>pendingRead</a>.<var>destination</var></li>
+										</ol>
+									</li>
+								</ol>
+							</dd>
+						</dl>
+					</li>
+				</ol>
+			</p>
+
+			<p>
+				When data is received from <a>dataSource</a>, run the steps below (if not in the event loop, queue a task which runs the steps below):
 				<ol>
 					<li>Let <var>receivedData</var> be the received bytes</li>
 					<li>Let <var>receivedAmount</var> be the size of <var>receivedData</var></li>
 					<li>Set <a>amountRequested</a> to <a>amountRequested</a> - <var>receivedAmount</var></li>
 					<li>Push <var>receivedData</var> to <a>readDataBuffer</a></li>
 
+					<li>If <a>pendingRead</a> is <code>null</code>, terminate these steps</li>
 					<li>
-						If <a>pendingRead</a> is not null, <a>output data</a>
+						<dl class="switch">
+							<dt>If <a>pendingRead</a>.<var>destination</var> is <code>null</code></dt>
+							<dd><a>Output data</a></dd>
+							<dt>Otherwise</dt>
+							<dd><a>Transfer data</a></dd>
+						</dl>
 					</li>
 				</ol>
 			</p>
@@ -1531,7 +1559,7 @@ function read() {
 							<dl class="switch">
 								<dt>If <var>stream</var> is non-null and in scope of the global object's URL property from which this static method is called</dt>
 								<dd>
-									Run these steps:
+									Run the steps below:
 									<ol>
 										<li>If <a>readPending</a> of <var>stream</var> is set, return null</li>
 										<li>Set <a>readPending</a> of <var>stream</var></li>
@@ -1565,7 +1593,7 @@ function read() {
 							<dl class="switch">
 								<dt>If <var>stream</var> is non-null and in scope of the global object's URL property from which this static method is called</dt>
 								<dd>
-									Run these steps:
+									Run the steps below:
 									<ol>
 										<li>If <a>readPending</a> of <var>stream</var> is set, return null</li>
 										<li>Set <a>readPending</a> of <var>stream</var></li>
@@ -1794,6 +1822,7 @@ enum XMLHttpRequestResponseType {
 			<dfn>AbortError</dfn> is defined in <a href="https://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#aborterror">DOM4 specification</a>.
 			<dfn>InvalidStateError</dfn> is defined in <a href="https://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#invalidstateerror">DOM4 specification</a>.
 			<dfn>SyntaxError</dfn> is defined in <a href="https://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#syntaxerror">DOM4 specification</a>.
+			<dfn>EncodingError</dfn> is defined in <a href="https://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#encodingerror">DOM4 specification</a>.
 		</p>
 	</section>
 
