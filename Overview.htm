@@ -1075,11 +1075,11 @@ function read() {
 			</p>
 
 			<p>
-				An associated integer variable <dfn>amountRequested</dfn> which holds the number of bytes being retrieved from the <a>dataSource</a>.
+				An associated integer variable <dfn>amountRequested</dfn> which holds the cost of data being retrieved from the <a>dataSource</a>.
 				This variable is initialized to 0 on construction.
 			</p>
 			<p>
-				An associated integer variable <dfn>amountBeingReturned</dfn> which holds the number of bytes consumed on the last read operation.
+				An associated integer variable <dfn>amountBeingReturned</dfn> which holds the cost of data consumed on the last read operation.
 				This variable is initialized to 0 on construction.
 
 				<section class="note">
@@ -1088,7 +1088,7 @@ function read() {
 			</p>
 
 			<p>
-				An associated queue <dfn>readDataBuffer</dfn> which holds the bytes retrieved from <a>dataSource</a>.
+				An associated queue <dfn>readDataBuffer</dfn> which holds data retrieved from <a>dataSource</a>.
 				This queue is initialized to an empty queue on construction.
 			</p>
 
@@ -1126,7 +1126,7 @@ function read() {
 					<li>Let <var>readableAmount</var> be sum of the total cost in <a>readDataBuffer</a> and the total number of bytes in <a>binaryReadBuffer</a></li>
 					<li>Let <var>amountToRetrieve</var> be max(max(<a href="#widl-ReadableStream-pullAmount">pullAmount</a>, <a>readUpToPullAmount</a>, <a>pipePullAmount</a>) - (<a>amountRequested</a> + <var>readableAmount</var> + <a>amountBeingReturned</a>), 0)</li>
 					<li>Set <a>amountRequested</a> to <a>amountRequested</a> + <var>amountToRetrieve</var></li>
-					<li>Send a request to the <a>dataSource</a> to return <var>amountToRetrieve</var> bytes to the ReadableStream</li>
+					<li>Send a request to the <a>dataSource</a> to return data with <var>amountToRetrieve</var> <a>cost</a> to the ReadableStream</li>
 				</ol>
 			</p>
 
@@ -1277,7 +1277,7 @@ function read() {
 
 										<section class="note">
 											If <a href="#widl-ReadableStream-pullAmount">pullAmount</a> is set to 0, pipe() transfers data in pull style.
-											I.e. only bytes of the same number as the number of bytes writable to <var>destination</var> are retrieved from the data source.
+											I.e. only data of the same cost as one writable to <var>destination</var> are retrieved from the data source.
 										</section>
 										<section class="note">
 											Setting <a href="#widl-ReadableStream-pullAmount">pullAmount</a> to a small value doesn't have an effect of throttling the pace of pipe().
@@ -1388,7 +1388,7 @@ function read() {
 			<p>
 				When data is received from <a>dataSource</a>, run the steps below (if not in the event loop, queue a task which runs the steps below):
 				<ol>
-					<li>Let <var>receivedData</var> be the received bytes</li>
+					<li>Let <var>receivedData</var> be the received data</li>
 					<li>Let <var>receivedAmount</var> be the size of <var>receivedData</var></li>
 					<li>Set <a>amountRequested</a> to <a>amountRequested</a> - <var>receivedAmount</var></li>
 					<li>Push <var>receivedData</var> to <a>readDataBuffer</a></li>
@@ -1428,7 +1428,7 @@ function read() {
 			<dt>readonly attribute any data</dt>
 			<dd>The contents read converted into an object of the specified type</dd>
 			<dt>readonly attribute unsigned long long amountConsumed</dt>
-			<dd>The size, in bytes, of the data read</dd>
+			<dd>The cost of the data read</dd>
 			<dt>readonly attribute any error</dt>
 			<dd>Once any error occurred, set to the error detail object on all StreamReadResults returned after the error</dd>
 		</dl>
