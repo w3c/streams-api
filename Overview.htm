@@ -380,8 +380,8 @@ function read() {
 }</pre>
 	</section>
 
-	<section class="section" id="writableByteStream">
-		<h2>WritableStream Interface</h2>
+	<section class="section" id="writableStream">
+		<h2>WritableStream</h2>
 		<p>
 			The WritableStream interface defines a protocol for APIs which consume a data stream.
 			The protocol includes:
@@ -395,7 +395,7 @@ function read() {
 		</p>
 
 		<p>
-			The actual data consumer behind the WritableStream is called a data sink and is identified by <dfn>dataSink</dfn>.
+			The actual data consumer behind the WritableStream is called a <a href="#dataSinkModel">data sink</a> and is identified by <dfn>dataSink</dfn>.
 			A data sink consumes stream of data and notifies the WritableStream of the cost of data the data sink can newly accept.
 			For each data sink, it must be defined how to calculate <a>cost</a> of each object which the data sink can consume.
 		</p>
@@ -405,7 +405,7 @@ function read() {
 		</p>
 
 		<section class="section">
-			<h3>WritableStream interface</h3>
+			<h3>WritableStream Interface</h3>
 
 			<dl class="idl" title="interface WritableStream">
 				<dt>attribute DOMString writeEncoding</dt>
@@ -438,7 +438,7 @@ function read() {
 						<ol>
 							<li>Let <var>latchedEncoding</var> be the current value of <a href="#widl-WritableStream-writeEncoding">writeEncoding</a></li>
 
-							<li><a>Abort wait</a></li>
+							<li><a>Abort awaitSpace</a></li>
 
 							<li>
 								If <var>costOverride</var> argument is specified, let <var>amountToWrite</var> be <var>costOverride</var> argument.
@@ -509,17 +509,22 @@ function read() {
 						This method tells the WritableStream that no more data will be written to it.
 					</p>
 					<p>
-						Once writeClose() has been called on a WritableStream, no further method calls can be made on the WritableStream.
+						Once this method has been called on a WritableStream, no further method calls can be made on the WritableStream.
 					</p>
 
 					<p>
 						This method must run the steps below:
 						<ol>
 							<li>Let <var>closePromise</var> be a newly-created <a>Promise</a></li>
-							<li>Return <var>closePromise</var>, and then continue the process the steps in this algorithm</li>
-							<li>Write the EOF to <a>dataSink</a></li>
-							<li>Wait until <a>dataSink</a> acknowledges the EOF</li>
-							<li>Fulfill <var>closePromise</var> with <code>undefined</code></li>
+							<li>
+								Run the steps below possibly asynchronously:
+								<ol>
+									<li>Send the <a>write EOF</a> signal to <a>dataSink</a></li>
+									<li>Wait until <a>dataSink</a> acknowledges the <a>write EOF</a></li>
+									<li>Fulfill <var>closePromise</var> with <code>undefined</code></li>
+								</ol>
+							</li>
+							<li>Return <var>closePromise</var></li>
 						</ol>
 					</p>
 				</dd>
@@ -542,8 +547,8 @@ function read() {
 							<li>
 								Run the steps below possibly asynchronously:
 								<ol>
-									<li><a>Write-abort</a> <a>dataSink</a> with <var>reason</var></li>
-									<li>Wait until <a>dataSink</a> acknowledges the <a>write-abort</a></li>
+									<li>Send the <a>write abort</a> signal to <a>dataSink</a> with <var>reason</var></li>
+									<li>Wait until <a>dataSink</a> acknowledges the <a>write abort</a></li>
 									<li>Fulfill <var>abortPromise</var> with <code>undefined</code></li>
 								</ol>
 							</li>
@@ -554,8 +559,8 @@ function read() {
 			</dl>
 		</section>
 
-		<section class="section">
-			<h2>Data sink model</h2>
+		<section class="section" id="dataSinkModel">
+			<h2>Data Sink Model</h2>
 
 			<p>
 				The data sink is the underlying mechanism which a <a>WritableStream</a> interacts with and stores its data in.
@@ -568,10 +573,10 @@ function read() {
 						Accepts data possibly together with a <a>DOMString</a> parameter named <var>encoding</var> indicating in what encoding the data must be interpreted.
 					</li>
 					<li>
-						Accepts the EOF signal
+						Accepts the <dfn>write EOF</dfn> signal
 					</li>
 					<li>
-						Accepts the <dfn>write-abort</dfn> signal with an object parameter named reason.
+						Accepts the <dfn>write abort</dfn> signal with an object parameter named <var>reason</var>.
 					</li>
 					<li>
 						Notifies <a>WritableStream</a> of how much data the data sink can newly accept.
@@ -579,15 +584,15 @@ function read() {
 						Data sinks must be able to accept data more than it notified <a>WritableStream</a> of.
 					</li>
 					<li>
-						Notifies <a>WritableStream</a> of that the data sink is gone.
+						Notifies <a>WritableStream</a> of that the <dfn>data sink is gone</dfn>.
 						This signal may mean an error.
 						If it means an error, an object indicating the details of the error is attached.
 					</li>
 					<li>
-						Notifies <a>WritableStream</a> of acknowledgement of the EOF signal.
+						Notifies <a>WritableStream</a> of acknowledgement of the <a>write EOF</a> signal.
 					</li>
 					<li>
-						Notifies <a>WritableStream</a> of acknowledgement of the write-abort signal with error detail object.
+						Notifies <a>WritableStream</a> of acknowledgement of the <a>write abort</a> signal with error detail object.
 					</li>
 					<li>
 						It's defined how to calculate an integer value <dfn>cost</dfn> of each object which the data sink can consume.
@@ -597,7 +602,7 @@ function read() {
 		</section>
 
 		<section class="section" id='interactingWithDataSink'>
-			<h2>Interacting with the data sink</h2>
+			<h2>Interacting with the Data Sink</h2>
 
 			<p>
 				This section defines the internal mechanisms for how the WritableStream interacts with <a>dataSink</a>.
@@ -605,7 +610,7 @@ function read() {
 			</p>
 
 			<p>
-				A WritableStream has an associated integer variable <dfn>spaceAvailable</dfn> which holds the number of bytes that <a>dataSink</a> requested but not yet written to it.
+				A WritableStream has an associated integer variable <dfn>spaceAvailable</dfn> which holds the cost of data that <a>dataSink</a> requested but not yet written to it.
 				This variable is initialized to 0 on construction.
 			</p>
 
@@ -704,7 +709,7 @@ function read() {
 			</p>
 
 			<p>
-				A WritableStream has an associated flag <dfn>sinkGone</dfn> which is set when the data sink is gone.
+				A WritableStream has an associated flag <dfn>sinkGone</dfn> which is set when the <a>data sink is gone</a>.
 			</p>
 
 			<p>
@@ -712,7 +717,7 @@ function read() {
 			</p>
 
 			<p>
-				When <a>dataSink</a> notifies the WritableStream of that the data sink is gone, queue a task which runs the steps below:
+				When <a>dataSink</a> notifies the WritableStream of that the <a>data sink is gone</a>, queue a task which runs the steps below:
 				<ol>
 					<li>Set <a>sinkGone</a></li>
 					<li>Set <a>sinkErrorDetail</a> to the error detail object</li>
@@ -722,8 +727,8 @@ function read() {
 		</section>
 	</section>
 
-	<section class="section" id="readableByteStream">
-		<h2>ReadableStream Interface</h2>
+	<section class="section" id="readableStream">
+		<h2>ReadableStream</h2>
 		<p>
 			The ReadableStream interface defines a protocol for APIs which produce a data stream.
 			This protocol includes:
@@ -742,12 +747,12 @@ function read() {
 		</p>
 
 		<p>
-			A ReadableStream has a one-to-one mapping with an associated <a href="#readableByteStreamDataSource">data source</a>, and has defined semantics for <a href='#interactingWithDataSource'>interacting with the data source internally</a>.
+			A ReadableStream has a one-to-one mapping with an associated <a href="#dataSourceModel">data source</a>, and has defined semantics for <a href='#interactingWithDataSource'>interacting with the data source internally</a>.
 			A data source, however, can have a one-to-many relationship with ReadableStreams, in cases where <code>fork()</code> is used.
 		</p>
 
-		<section class="section" id="readableByteStreamInterface">
-			<h3>ReadableStream interface</h3>
+		<section class="section" id="readableStreamInterface">
+			<h3>ReadableStream Interface</h3>
 
 			<dl class="idl" title="interface ReadableStream">
 				<dt>attribute StreamReadType readBinaryAs</dt>
@@ -807,9 +812,9 @@ function read() {
 						The returned <a>Promise</a> is fulfilled when any of the following conditions is met:
 						<ul>
 							<li>The total size of produced bytes becomes equal to <var></var></li>
-							<li>The EOF is reached</li>
+							<li>The <a>read EOF</a> is reached</li>
 						</ul>
-						The <a>cost</a> of data returned by this method can be less than <var>size</var> when data cannot be fully converted into the type specified by <a href="#widl-ReadableStream-readBinaryAs">readBinaryAs</a> or the EOF is reached.
+						The <a>cost</a> of data returned by this method can be less than <var>size</var> when data cannot be fully converted into the type specified by <a href="#widl-ReadableStream-readBinaryAs">readBinaryAs</a> or the <a>read EOF</a> is reached.
 					</p>
 
 					<p>
@@ -990,8 +995,8 @@ function read() {
 			</dl>
 		</section>
 
-		<section class="section" id='readableByteStreamDataSource'>
-			<h3>Data source model</h3>
+		<section class="section" id='dataSourceModel'>
+			<h3>Data Source Model</h3>
 
 			<p>
 				A data source produces data stream to be consumed via the <a>ReadableStream</a> interface instances.
@@ -1043,7 +1048,7 @@ function read() {
 		</section>
 
 		<section class="section" id="interactingWithDataSource">
-			<h2>Interacting with the data source</h2>
+			<h2>Interacting with the Data Source</h2>
 
 			<section class="note">
 				This interface is designed to work even if operations on <a>dataSource</a> are asynchronous.
@@ -1354,6 +1359,7 @@ function read() {
 
 											<li>Set <var>result</var>.<a href="#widl-StreamReadResult-data">data</a> to <code>undefined</code></li>
 											<li>Set <var>result</var>.<a href="#widl-StreamReadResult-eof">eof</a> to <code>true</code> if <a>eofReached</a></li>
+											<li>Set <var>result</var>.<a href="#widl-StreamReadResult-error">error</a> to <a>sourceErrorDetail</a></li>
 											<li>Set <var>result</var>.<a href="#widl-StreamReadResult-amountConsumed">amountConsumed</a> to <a>totalAmountTransferred</a></li>
 											<li>Set <a>totalAmountTransferred</a> to 0</li>
 											<li>
