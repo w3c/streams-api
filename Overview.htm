@@ -1018,7 +1018,7 @@ function read() {
 						Data sources may produce data and send to <a>ReadableStream</a> unsolicitedly without receiving any retrieval request.
 					</li>
 					<li>
-						Accepts and acknowledges <dfn>read-abort</dfn> signal which means the associated <a>ReadableStream</a> has completed consuming bytes from this data source optionally with indication of any error.
+						Accepts and acknowledges <dfn>read-abort</dfn> signal which means the associated <a>ReadableStream</a> has completed consuming data from this data source optionally with indication of any error.
 					</li>
 				</ul>
 			</p>
@@ -1049,7 +1049,7 @@ function read() {
 			</section>
 
 			<p>
-				A ReadableStream has an associated <a>data source</a> referred by <dfn>dataSource</dfn> from which the ReadableStream retrieves bytes.
+				A <a>ReadableStream</a> has an associated <a>data source</a> referred by <dfn>dataSource</dfn> from which the ReadableStream retrieves data.
 				The data source model is explained in <a href="#h2_data_source">this section</a>.
 				A data source can be shared by multiple ReadableStream instances when <code>fork()</code> is used.
 				A ReadableStream is registered with a data source on construction and given a reader ID.
@@ -1260,7 +1260,7 @@ function read() {
 					<li>Set <a>readUpToPullAmount</a> to 0</li>
 
 					<li>Let <var>readPromise</var> to <var>pendingRead.promise</var></li>
-					<li>Set <a>pendingRead</a> to null</li>
+					<li>Set <a>pendingRead</a> to <code>null</code></li>
 					<li>Fulfill <var>readPromise</var> with <var>result</var></li>
 				</ol>
 			</p>
@@ -1313,34 +1313,40 @@ function read() {
 					<li>
 						Let <var>onFulfilled</var> be a callback which runs the steps below:
 
-						<dl class="switch">
-							<dt>If <a>eofReached</a> is set or <a>pendingRead</a>.<var>size</var> is 0</dt>
-							<dd>
-								<ol>
-									<li>Set <a>pipePullAmount</a> to 0</li>
+						<ol>
+							<li>Let <var>writtenAmounts</var> be the first argument</li>
+							<li>
+								<dl class="switch">
+									<dt>If <a>eofReached</a> is set or <a>pendingRead</a>.<var>size</var> is 0</dt>
+									<dd>
+										<ol>
+											<li>Set <a>pipePullAmount</a> to 0</li>
 
-									<li>Unset <a>readPending</a></li>
+											<li>Let <var>pipePromise</var> be <a>pendingRead</a>.<var>promise</var></li>
+											<li>Set <a>pendingRead</a> to <code>null</code></li>
 
-									<li>Let <var>result</var> be a newly-created <a>StreamReadResult</a></li>
+											<li>Let <var>result</var> be a newly-created <a>StreamReadResult</a></li>
 
-									<li>Set <var>result</var>.<a href="#widl-StreamReadResult-data">data</a> to <code>undefined</code>.
-									<li>Set <var>result</var>.<a href="#widl-StreamReadResult-eof">eof</a> to <code>true</code> if <a>eofReached</a></li>
-									<li>Set <var>result</var>.<a href="#widl-StreamReadResult-amountConsumed">amountConsumed</a> to <var>totalAmountTransferred</var></li>
-									<li>
-										Fulfill <var>pipePromise</var> with <var>result</var>
+											<li>Set <var>result</var>.<a href="#widl-StreamReadResult-data">data</a> to <code>undefined</code></li>
+											<li>Set <var>result</var>.<a href="#widl-StreamReadResult-eof">eof</a> to <code>true</code> if <a>eofReached</a></li>
+											<li>Set <var>result</var>.<a href="#widl-StreamReadResult-amountConsumed">amountConsumed</a> to the sum of elements in <var>writtenAmounts</var></li>
+											<li>
+												Fulfill <var>pipePromise</var> with <var>result</var>
+												<section class="note">
+													At this point, <a>amountBeingReturned</a> is not yet reset
+												</section>
+											</li>
+										</ol>
 										<section class="note">
-											At this point, <a>amountBeingReturned</a> is not yet reset
+											Need to revisit. Finish when write to the destination completes?
 										</section>
-									</li>
-								</ol>
-								<section class="note">
-									Need to revisit. Finish when write to the destination completes?
-								</section>
-							</dd>
-							<dt>Otherwise</dt>
-							<dd>
-							</dd>
-						</dl>
+									</dd>
+									<dt>Otherwise</dt>
+									<dd>
+									</dd>
+								</dl>
+							</li>
+						</ol>
 					</li>
 
 					<li>
