@@ -449,10 +449,9 @@ function read() {
 
 							<li>Let <var>pendingWrite</var> be a newly-created <a>PendingWriteDescriptor</a></li>
 							<li>Set <var>pendingWrite.promise</var> to <var>writePromise</var></li>
-							<li>Set <var>pendingWrite.amount</var> to <var>amountToWrite</var></li>
 							<li>Push <var>pendingWrite</var> to <a>pendingWriteQueue</a></li>
 
-							<li><a>Process pendingWriteQueue</a></li>
+							<li>Set <a>spaceAvailable</a> to <a>spaceAvailable</a> - <var>amountToWrite</var></li>
 
 							<li>
 								Run the steps below possibly asynchronously:
@@ -495,10 +494,13 @@ function read() {
 
 					<p>
 						This method must run the steps below:
+
 						<ol>
 							<li><a>Abort awaitSpace</a></li>
-							<li>Set <a>awaitSpacePromise</a> to a newly-created <a>Promise</a></li>
-							<li>Return <a>awaitSpacePromise</a></li>
+							<li>Let <var>newPromise</var> be a newly-created <a>Promise</a></li>
+							<li>Set <a>awaitSpacePromise</a> to <var>newPromise</var></li>
+							<li><a>Check space</a></li>
+							<li>Return <a>newPromise</a></li>
 						</ol>
 					</p>
 				</dd>
@@ -589,6 +591,9 @@ function read() {
 						If it means an error, an object indicating the details of the error is attached.
 					</li>
 					<li>
+						Notifies <a>WritableStream</a> of acknowledgement of written data with the <a>cost</a> of the data.
+					</li>
+					<li>
 						Notifies <a>WritableStream</a> of acknowledgement of the <a>write EOF</a> signal.
 					</li>
 					<li>
@@ -634,8 +639,6 @@ function read() {
 				A struct type <dfn>PendingWriteDescriptor</dfn> has the following members:
 				<ul>
 					<li>A <a>Promise</a> <var>promise</var></li>
-					<li>An integer <var>amount</var></li>
-					<li>An integer <var>ackedAmount</var></li>
 				</ul>
 			</p>
 
@@ -645,51 +648,9 @@ function read() {
 			</p>
 
 			<p>
-				To <dfn>process pendingWriteQueue</dfn>, run the steps below:
+				To <dfn>check space</dfn>, run the steps below:
 
 				<ol>
-					<li>
-						While <a>pendingWriteQueue</a> is not empty, repeat the steps below:
-
-						<ol>
-							<li>Let <var>pendingWrite</var> be the head element of <a>pendingWriteQueue</a></li>
-							<li>
-								<dl class="switch">
-									<dt>If <a>sinkGone</a> is set</dt>
-									<dd>
-										<ol>
-											<li>Pop <var>pendingWrite</var> from <a>pendingWriteQueue</a></li>
-											<li>If <var>pendingWrite.promise</var> is not <code>null</code>, reject it with <a>sinkErrorDetail</a></li>
-										</ol>
-									</dd>
-									<dt>Otherwise</dt>
-									<dd>
-										<ol>
-											<li>Let <var>amountToAcknowledge</var> be min(<var>pendingWrite.amount</var> - <var>pendingWrite.ackedAmount</var>, <a>spaceAvailable</a>)</li>
-											<li>Set <a>spaceAvailable</a> to <a>spaceAvailable</a> - <var>amountToAcknowledge</var></li>
-											<li>Set <var>pendingWrite.ackedAmount</var> to <var>pendingWrite.ackedAmount</var> + <var>amountToAcknowledge</var></li>
-											<li>
-												<dl class="switch">
-													<dt>If <var>pendingWrite.ackedAmount</var> equals to <var>pendingWrite.amount</var></dt>
-													<dd>
-														<ol>
-															<li>Pop <var>pendingWrite</var> from <a>pendingWriteQueue</a></li>
-															<li>If <var>pendingWrite.promise</var> is not <code>null</code>, fulfill it with <var>pendingWrite.amount</var></li>
-														</ol>
-													</dd>
-													<dt>Otherwise</dt>
-													<dd>
-														Exit from this loop
-													</dd>
-												</dl>
-											</li>
-										</ol>
-									</dd>
-								</dl>
-							</li>
-						</ol>
-					</li>
-
 					<li>
 						If <a>pendingWriteQueue</a> is empty and <a>spaceAvailable</a> is not 0 and <a>awaitSpacePromise</a> is not <code>null</code>, run the steps below:
 
@@ -703,27 +664,56 @@ function read() {
 			</p>
 
 			<p>
-				When <a>dataSink</a> requests <var>amountNewlyRequested</var> more data, queue a task which runs the steps below:
+				When <a>dataSink</a> notified the <a>WritableStream</a> of acknowledgement of data writing with <var>writtenAmount</var> which is the <a>cost</a> of the written data, run the steps below:
+
 				<ol>
-					<li>Set <a>spaceAvailable</a> to <a>spaceAvailable</a> + <var>amountNewlyRequested</var></li>
-					<li><a>Process pendingWriteQueue</a></li>
+					<li>
+						<dl class="switch">
+							<dt>If in the event loop</dt>
+							<dd>Run the rest of these steps</dd>
+							<dt>Otherwise</dt>
+							<dd>Queue a task which runs the rest of these steps</dd>
+						</dl>
+					</li>
+
+					<li>Pop the head element from <a>pendingWriteQueue</a>, and let <var>pendingWrite</var> be the element</li>
+					<li>If <var>pendingWrite.promise</var> is not <code>null</code>, fulfill it with <var>writtenAmount</var></li>
 				</ol>
 			</p>
 
 			<p>
-				A WritableStream has an associated flag <dfn>sinkGone</dfn> which is set when the <a>data sink is gone</a>.
-			</p>
+				When <a>dataSink</a> notified the <a>WritableStream</a> of failure of data writing with an object <var>reason</var> which represents the detail of the error, run the steps below:
 
-			<p>
-				A WritableStream has an associated object <dfn>sinkErrorDetail</dfn> which is initialized to null, and when the data sink is gone, set to the error detail object.
-			</p>
-
-			<p>
-				When <a>dataSink</a> notifies the WritableStream of that the <a>data sink is gone</a>, queue a task which runs the steps below:
 				<ol>
-					<li>Set <a>sinkGone</a></li>
-					<li>Set <a>sinkErrorDetail</a> to the error detail object</li>
-					<li><a>Process pendingWriteQueue</a></li>
+					<li>
+						<dl class="switch">
+							<dt>If in the event loop</dt>
+							<dd>Run the rest of these steps</dd>
+							<dt>Otherwise</dt>
+							<dd>Queue a task which runs the rest of these steps</dd>
+						</dl>
+					</li>
+
+					<li>Pop the head element from <a>pendingWriteQueue</a>, and let <var>pendingWrite</var> be the element</li>
+					<li>If <var>pendingWrite.promise</var> is not <code>null</code>, reject it with <var>reason</var></li>
+				</ol>
+			</p>
+
+			<p>
+				When <a>dataSink</a> requests <var>amountNewlyRequested</var> more data, run the steps below:
+
+				<ol>
+					<li>
+						<dl class="switch">
+							<dt>If in the event loop</dt>
+							<dd>Run the rest of these steps</dd>
+							<dt>Otherwise</dt>
+							<dd>Queue a task which runs the rest of these steps</dd>
+						</dl>
+					</li>
+
+					<li>Set <a>spaceAvailable</a> to <a>spaceAvailable</a> + <var>amountNewlyRequested</var></li>
+					<li><a>Check space</a></li>
 				</ol>
 			</p>
 		</section>
