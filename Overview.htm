@@ -1137,9 +1137,9 @@ function read() {
 				To <dfn>request data production</dfn>, run the steps below:
 				<ol>
 					<li>Let <var>readableAmount</var> be sum of the total <a>cost</a> in <a>readDataBuffer</a> and the total number of bytes in <a>splicedBinaryBuffer</a></li>
-					<li>Let <var>amountToNewlyRetrieve</var> be max(max(<a href="#widl-ReadableStream-pullAmount">pullAmount</a>, <a>readUpToPullAmount</a>, <a>pipePullAmount</a>) - (<a>amountRequested</a> + <var>readableAmount</var> + <a>amountBeingReturned</a>), 0)</li>
-					<li>Set <a>amountRequested</a> to <a>amountRequested</a> + <var>amountToNewlyRetrieve</var></li>
-					<li>Send a request to the <a>dataSource</a> to produce data with <var>amountToNewlyRetrieve</var> <a>cost</a> to the ReadableStream</li>
+					<li>Let <var>amountToNewlyRequest</var> be max(max(<a href="#widl-ReadableStream-pullAmount">pullAmount</a>, <a>readUpToPullAmount</a>, <a>pipePullAmount</a>) - (<a>amountRequested</a> + <var>readableAmount</var> + <a>amountBeingReturned</a>), 0)</li>
+					<li>Set <a>amountRequested</a> to <a>amountRequested</a> + <var>amountToNewlyRequest</var></li>
+					<li>Send a request to the <a>dataSource</a> to produce data with <var>amountToNewlyRequest</var> <a>cost</a> to the ReadableStream</li>
 				</ol>
 			</p>
 
@@ -1305,7 +1305,7 @@ function read() {
 								</dl>
 							</li>
 							<li>Set <a>amountBeingReturned</a> to 0</li>
-							<li><a>Retrieve data</a></li>
+							<li><a>Request data production</a></li>
 						</ol>
 					</li>
 
