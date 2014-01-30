@@ -436,9 +436,9 @@ function read() {
 					<p>
 						This method must run the steps below:
 						<ol>
-							<li>Let <var>latchedEncoding</var> be the current value of <a href="#widl-WritableStream-writeEncoding">writeEncoding</a></li>
+							<li>If <a>sinkGone</a> is set, return a <a>Promise</a> rejected with <a>sinkGoneReason</a></li>
 
-							<li><a>Abort awaitSpace</a></li>
+							<li>Let <var>latchedEncoding</var> be the current value of <a href="#widl-WritableStream-writeEncoding">writeEncoding</a></li>
 
 							<li>
 								If <var>costOverride</var> argument is specified, let <var>amountToWrite</var> be <var>costOverride</var> argument.
@@ -496,7 +496,8 @@ function read() {
 						This method must run the steps below:
 
 						<ol>
-							<li><a>Abort awaitSpace</a></li>
+							<li>If <a>sinkGone</a> is set, return a <a>Promise</a> rejected with <a>sinkGoneReason</a></li>
+							<li>If <a>awaitSpacePromise</a> is not <code>null</code>, return <a>awaitSpacePromise</a> and terminate these steps</li>
 							<li>Let <var>newPromise</var> be a newly-created <a>Promise</a></li>
 							<li>Set <a>awaitSpacePromise</a> to <var>newPromise</var></li>
 							<li><a>Check space</a></li>
@@ -516,17 +517,17 @@ function read() {
 
 					<p>
 						This method must run the steps below:
+
 						<ol>
-							<li>Let <var>closePromise</var> be a newly-created <a>Promise</a></li>
+							<li>Set <var>writeClosePromise</var> be a newly-created <a>Promise</a></li>
 							<li>
 								Run the steps below possibly asynchronously:
+
 								<ol>
 									<li>Send the <a>write EOF</a> signal to <a>dataSink</a></li>
-									<li>Wait until <a>dataSink</a> acknowledges the <a>write EOF</a></li>
-									<li>Fulfill <var>closePromise</var> with <code>undefined</code></li>
 								</ol>
 							</li>
-							<li>Return <var>closePromise</var></li>
+							<li>Return <var>writeClosePromise</var></li>
 						</ol>
 					</p>
 				</dd>
@@ -544,17 +545,17 @@ function read() {
 
 					<p>
 						This method must run the steps below:
+
 						<ol>
-							<li>Let <var>abortPromise</var> be a newly-created <a>Promise</a></li>
+							<li>Set <var>writeAbortPromise</var> to a newly-created <a>Promise</a></li>
 							<li>
 								Run the steps below possibly asynchronously:
+
 								<ol>
 									<li>Send the <a>write abort</a> signal to <a>dataSink</a> with <var>reason</var></li>
-									<li>Wait until <a>dataSink</a> acknowledges the <a>write abort</a></li>
-									<li>Fulfill <var>abortPromise</var> with <code>undefined</code></li>
 								</ol>
 							</li>
-							<li>Return <var>abortPromise</var></li>
+							<li>Return <var>writeAbortPromise</var></li>
 						</ol>
 					</p>
 				</dd>
@@ -591,13 +592,16 @@ function read() {
 						If it means an error, an object indicating the details of the error is attached.
 					</li>
 					<li>
-						Notifies <a>WritableStream</a> of acknowledgement of written data with the <a>cost</a> of the data.
+						Notifies <a>WritableStream</a> of acknowledgement of data writing with the <a>cost</a> of the data or
+						failure of data writing with an object representing the reason.
 					</li>
 					<li>
-						Notifies <a>WritableStream</a> of acknowledgement of the <a>write EOF</a> signal.
+						Notifies <a>WritableStream</a> of acknowledgement of the <a>write EOF</a> signal or
+						failure with an object representing the reason.
 					</li>
 					<li>
-						Notifies <a>WritableStream</a> of acknowledgement of the <a>write abort</a> signal with error detail object.
+						Notifies <a>WritableStream</a> of acknowledgement of the <a>write abort</a> signal with error detail object or
+						failure with an object representing the reason.
 					</li>
 					<li>
 						It's defined how to calculate an integer value <dfn>cost</dfn> of each object which the data sink can consume.
@@ -664,6 +668,26 @@ function read() {
 			</p>
 
 			<p>
+				An associated <a>Promise</a> <dfn>writeClosePromise</dfn>.
+				This variable is initialized to <code>null</code> on construction.
+			</p>
+
+			<p>
+				An associated <a>Promise</a> <dfn>writeAbortPromise</dfn>.
+				This variable is initialized to <code>null</code> on construction.
+			</p>
+
+			<p>
+				An associated boolean <dfn>sinkGone</dfn>.
+				This variable is initialized to <code>false</code> on construction.
+			</p>
+
+			<p>
+				An associated object <dfn>sinkGoneReason</dfn>.
+				This variable is initialized to <code>null</code> on construction.
+			</p>
+
+			<p>
 				When <a>dataSink</a> notified the <a>WritableStream</a> of acknowledgement of data writing with <var>writtenAmount</var> which is the <a>cost</a> of the written data, run the steps below:
 
 				<ol>
@@ -682,6 +706,25 @@ function read() {
 			</p>
 
 			<p>
+				When <a>dataSink</a> notified the <a>WritableStream</a> of that <a>data sink is gone</a> with an object <var>reason</var> which represents the reason, run the steps below:
+
+				<ol>
+					<li>
+						<dl class="switch">
+							<dt>If in the event loop</dt>
+							<dd>Run the rest of these steps</dd>
+							<dt>Otherwise</dt>
+							<dd>Queue a task which runs the rest of these steps</dd>
+						</dl>
+					</li>
+
+					<li>Set <a>sinkGone</a></li>
+					<li>Set <a>sinkGoneReason</a> to <var>reason</var></li>
+					<li><a>Abort awaitSpace</a></li>
+				</ol>
+			</p>
+
+			<p>
 				When <a>dataSink</a> notified the <a>WritableStream</a> of failure of data writing with an object <var>reason</var> which represents the detail of the error, run the steps below:
 
 				<ol>
@@ -696,6 +739,74 @@ function read() {
 
 					<li>Pop the head element from <a>pendingWriteQueue</a>, and let <var>pendingWrite</var> be the element</li>
 					<li>If <var>pendingWrite.promise</var> is not <code>null</code>, reject it with <var>reason</var></li>
+				</ol>
+			</p>
+
+			<p>
+				When <a>dataSink</a> acknowledges the <a>write EOF</a>, run the steps below:
+
+				<ol>
+					<li>
+						<dl class="switch">
+							<dt>If in the event loop</dt>
+							<dd>Run the rest of these steps</dd>
+							<dt>Otherwise</dt>
+							<dd>Queue a task which runs the rest of these steps</dd>
+						</dl>
+					</li>
+
+					<li>Fulfill <var>writeClosePromise</var> with <code>undefined</code></li>
+				</ol>
+			</p>
+
+			<p>
+				When <a>dataSink</a> notifies of failure of the <a>write EOF</a> signal with <var>reason</var>, run the steps below:
+
+				<ol>
+					<li>
+						<dl class="switch">
+							<dt>If in the event loop</dt>
+							<dd>Run the rest of these steps</dd>
+							<dt>Otherwise</dt>
+							<dd>Queue a task which runs the rest of these steps</dd>
+						</dl>
+					</li>
+
+					<li>Reject <var>writeClosePromise</var> with <var>reason</var></li>
+				</ol>
+			</p>
+
+			<p>
+				When <a>dataSink</a> acknowledges the <a>write abort</a>, run the steps below:
+
+				<ol>
+					<li>
+						<dl class="switch">
+							<dt>If in the event loop</dt>
+							<dd>Run the rest of these steps</dd>
+							<dt>Otherwise</dt>
+							<dd>Queue a task which runs the rest of these steps</dd>
+						</dl>
+					</li>
+
+					<li>Fulfill <var>writeAbortPromise</var> with <code>undefined</code></li>
+				</ol>
+			</p>
+
+			<p>
+				When <a>dataSink</a> notifies of failure of the <a>write abort</a> signal with <var>reason</var>, run the steps below:
+
+				<ol>
+					<li>
+						<dl class="switch">
+							<dt>If in the event loop</dt>
+							<dd>Run the rest of these steps</dd>
+							<dt>Otherwise</dt>
+							<dd>Queue a task which runs the rest of these steps</dd>
+						</dl>
+					</li>
+
+					<li>Reject <var>writeAbortPromise</var> with <var>reason</var></li>
 				</ol>
 			</p>
 
