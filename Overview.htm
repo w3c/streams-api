@@ -979,16 +979,9 @@ function read() {
 					<p>
 						This method must run the steps below:
 						<ol>
-							<li>Let <var>abortPromise</var> be a newly-created <a>Promise</a></li>
-							<li>
-								Run the steps below possibly asynchronously:
-								<ol>
-									<li><a>Read-abort</a> <a>dataSource</a> with <var>reason</var></li>
-									<li>Wait until <a>dataSource</a> acknowledges the <a>read-abort</a></li>
-									<li>Fulfill <var>abortPromise</var> with <code>undefined</code></li>
-								</ol>
-							</li>
-							<li>Return <var>abortPromise</var></li>
+							<li>Set <a>abortPromise</a> to a newly-created <a>Promise</a></li>
+							<li>Send the <a>read abort</a> with <var>reason</var> to <a>dataSource</a> possibly asynchronously</li>
+							<li>Return <a>abortPromise</a></li>
 						</ol>
 					</p>
 				</dd>
@@ -1012,7 +1005,7 @@ function read() {
 						Newly produced data will be delivered to the associated <a>ReadableStream</a>.
 					</li>
 					<li>
-						Notifies <a>ReadableStream</a> of the <dfn>read EOF</dfn> signal.
+						Notifies the associated <a>ReadableStream</a> of the <dfn>read EOF</dfn> signal.
 						This signal may include indication of an error.
 						When it indicates an error, an object which represents the details of the error is attached.
 					</li>
@@ -1025,7 +1018,7 @@ function read() {
 						Data sources may produce data and send to <a>ReadableStream</a> unsolicitedly without receiving any retrieval request.
 					</li>
 					<li>
-						Accepts and acknowledges <dfn>read-abort</dfn> signal which means the associated <a>ReadableStream</a> has completed consuming data from this data source optionally with indication of any error.
+						Accepts and acknowledges the <dfn>read abort</dfn> signal which means the associated <a>ReadableStream</a> has completed consuming data from this data source optionally with indication of any error.
 					</li>
 				</ul>
 			</p>
@@ -1122,6 +1115,10 @@ function read() {
 				A WritableStream has an associated <a>PendingReadDescriptor</a> <dfn>pendingRead</dfn>.
 				This variable is initialized to <code>null</code> on construction.
 			</p>
+
+			<p>
+				An associated <a>Promise</a> <dfn>abortPromise</dfn>.
+				This variable is initialized to <code>null</code> on construction.
 
 			<p>
 				An associated flag <dfn>eofReached</dfn> which indicates that the <a>read EOF</a> was received from the <a>dataSource</a>.
@@ -1343,7 +1340,7 @@ function read() {
 
 						<ol>
 							<li>Let <var>writtenAmounts</var> be the first argument</li>
-							<li>Set <a>totalAmountTransferred</a> to <a>totalAmountTransferred</a> + (the sum of elements in <var>writtenAmounts</var>)</var>
+							<li>Set <a>totalAmountTransferred</a> to <a>totalAmountTransferred</a> + (the sum of elements in <var>writtenAmounts</var>)</li>
 							<li>
 								<dl class="switch">
 									<dt>If <a>eofReached</a> is set or <a>pendingRead</a>.<var>size</var> is 0</dt>
@@ -1436,13 +1433,9 @@ function read() {
 			</p>
 
 			<p>
-				When data is received from <a>dataSource</a>, run the steps below (if not in the event loop, queue a task which runs the steps below):
-				<ol>
-					<li>Let <var>receivedData</var> be the received data</li>
-					<li>Let <var>receivedAmount</var> be the size of <var>receivedData</var></li>
-					<li>Set <a>amountRequested</a> to <a>amountRequested</a> - <var>receivedAmount</var></li>
-					<li>Push <var>receivedData</var> to <a>readDataBuffer</a></li>
+				To <dfn>process received data and signal</dfn>, run the steps below:
 
+				<ol>
 					<li>If <a>pendingRead</a> is <code>null</code>, terminate these steps</li>
 					<li>
 						<dl class="switch">
@@ -1452,6 +1445,27 @@ function read() {
 							<dd><a>Transfer data</a></dd>
 						</dl>
 					</li>
+				</ol>
+			</p>
+
+			<p>
+				When data is received from <a>dataSource</a>, run the steps below:
+				<ol>
+					<li>
+						<dl class="switch">
+							<dt>If in the event loop</dt>
+							<dd>Run the rest of these steps</dd>
+							<dt>Otherwise</dt>
+							<dd>Queue a task which runs the rest of these steps</dd>
+						</dl>
+					</li>
+
+					<li>Let <var>receivedData</var> be the received data</li>
+					<li>Let <var>receivedAmount</var> be the size of <var>receivedData</var></li>
+					<li>Set <a>amountRequested</a> to <a>amountRequested</a> - <var>receivedAmount</var></li>
+					<li>Push <var>receivedData</var> to <a>readDataBuffer</a></li>
+
+					<li><a>Process received data and signal</a></li>
 				</ol>
 			</p>
 
@@ -1471,7 +1485,27 @@ function read() {
 							<dd>Queue a task which runs the rest of these steps</dd>
 						</dl>
 					</li>
+
 					<li>Set <a>eofReached</a> and <a>sourceErrorDetail</a></li>
+					<li><a>Process received data and signal</a></li>
+				</ol>
+			</p>
+
+			<p>
+				When the <a>read abort</a> signal is acknowledged by <a>dataSource</a>, run the steps below:
+
+				<ol>
+					<li>
+						<dl class="switch">
+							<dt>If in the event loop</dt>
+							<dd>Run the rest of these steps</dd>
+							<dt>Otherwise</dt>
+							<dd>Queue a task which runs the rest of these steps</dd>
+						</dl>
+					</li>
+
+					<li>Fulfill <a>abortPromise</a> with <code>undefined</code></li>
+					<li><a>Process received data and signal</a></li>
 				</ol>
 			</p>
 	  </section>
