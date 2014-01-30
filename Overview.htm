@@ -777,37 +777,11 @@ function read() {
 			</p>
 
 			<p>
-				When <a>dataSink</a> acknowledges the <a>write abort</a>, run the steps below:
-
-				<ol>
-					<li>
-						<dl class="switch">
-							<dt>If in the event loop</dt>
-							<dd>Run the rest of these steps</dd>
-							<dt>Otherwise</dt>
-							<dd>Queue a task which runs the rest of these steps</dd>
-						</dl>
-					</li>
-
-					<li>Fulfill <var>writeAbortPromise</var> with <code>undefined</code></li>
-				</ol>
+				When <a>dataSink</a> acknowledges the <a>write abort</a>, fulfill <var>writeAbortPromise</var> with <code>undefined</code>
 			</p>
 
 			<p>
-				When <a>dataSink</a> notifies of failure of the <a>write abort</a> signal with <var>reason</var>, run the steps below:
-
-				<ol>
-					<li>
-						<dl class="switch">
-							<dt>If in the event loop</dt>
-							<dd>Run the rest of these steps</dd>
-							<dt>Otherwise</dt>
-							<dd>Queue a task which runs the rest of these steps</dd>
-						</dl>
-					</li>
-
-					<li>Reject <var>writeAbortPromise</var> with <var>reason</var></li>
-				</ol>
+				When <a>dataSink</a> notifies of failure of the <a>write abort</a> signal with <var>reason</var>, reject <var>writeAbortPromise</var> with <var>reason</var>
 			</p>
 
 			<p>
