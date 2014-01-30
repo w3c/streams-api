@@ -490,7 +490,7 @@ function read() {
 				<dt>Promise&amp;lt;unsigned long long&gt; awaitSpaceAvailable()</dt>
 				<dd>
 					<p>
-						The returned Promise will be fulfilled with the data <a>cost</a> which <a>dataSink</a> can accept when <a>dataSink</a> becomes able to accept data with any non-zero amount of cost.
+						The returned <a>Promise</a> will be fulfilled with the data <a>cost</a> which <a>dataSink</a> can accept when <a>dataSink</a> becomes able to accept data with any non-zero amount of cost.
 					</p>
 
 					<p>
@@ -646,9 +646,11 @@ function read() {
 
 			<p>
 				To <dfn>process pendingWriteQueue</dfn>, run the steps below:
+
 				<ol>
 					<li>
 						While <a>pendingWriteQueue</a> is not empty, repeat the steps below:
+
 						<ol>
 							<li>Let <var>pendingWrite</var> be the head element of <a>pendingWriteQueue</a></li>
 							<li>
@@ -656,7 +658,7 @@ function read() {
 									<dt>If <a>sinkGone</a> is set</dt>
 									<dd>
 										<ol>
-											<li>Pop <var>pendingWrite</var> from <a>pendingWriteQueue</a>, and then</li>
+											<li>Pop <var>pendingWrite</var> from <a>pendingWriteQueue</a></li>
 											<li>If <var>pendingWrite.promise</var> is not <code>null</code>, reject it with <a>sinkErrorDetail</a></li>
 										</ol>
 									</dd>
@@ -809,7 +811,7 @@ function read() {
 				<dd>
 					<p>
 						This method reads binary data from the ReadableStream.
-						The returned <a>Promise</a> is fulfilled when any of the following conditions is met:
+						The returned <a>Promise</a> will be fulfilled when any of the following conditions is met:
 						<ul>
 							<li>The total size of produced bytes becomes equal to <var></var></li>
 							<li>The <a>read EOF</a> is reached</li>
