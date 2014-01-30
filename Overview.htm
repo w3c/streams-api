@@ -794,7 +794,7 @@ function read() {
 					</p>
 
 					<p>
-						When this attribute is set, the user agent must <a>retrieve data</a>.
+						When this attribute is set, the user agent must <a>request data production</a>.
 					</p>
 
 					<section class="note">
@@ -837,7 +837,7 @@ function read() {
 							<li>Set <a>readUpToPullAmount</a> to <var>size</var></li>
 							<li>Set <a>amountBeingReturned</a> to 0</li>
 
-							<li><a>Retrieve data</a> possibly asynchronously</li>
+							<li><a>Request data production</a> possibly asynchronously</li>
 
 							<li>Return <var>readPromise</var></li>
 						</ol>
@@ -883,7 +883,7 @@ function read() {
 
 							<li>Set <a>amountBeingReturned</a> to 0</li>
 
-							<li><a>Retrieve data</a> possibly asynchronously</li>
+							<li><a>Request data production</a> possibly asynchronously</li>
 
 							<li>Return <var>readPromise</var></li>
 						</ol>
@@ -1134,7 +1134,7 @@ function read() {
 			</p>
 
 			<p>
-				To <dfn>retrieve data</dfn>, run the steps below:
+				To <dfn>request data production</dfn>, run the steps below:
 				<ol>
 					<li>Let <var>readableAmount</var> be sum of the total <a>cost</a> in <a>readDataBuffer</a> and the total number of bytes in <a>splicedBinaryBuffer</a></li>
 					<li>Let <var>amountToNewlyRetrieve</var> be max(max(<a href="#widl-ReadableStream-pullAmount">pullAmount</a>, <a>readUpToPullAmount</a>, <a>pipePullAmount</a>) - (<a>amountRequested</a> + <var>readableAmount</var> + <a>amountBeingReturned</a>), 0)</li>
@@ -1492,20 +1492,9 @@ function read() {
 			</p>
 
 			<p>
-				When the <a>read abort</a> signal is acknowledged by <a>dataSource</a>, run the steps below:
+				When the <a>read abort</a> signal is acknowledged by <a>dataSource</a>,
 
-				<ol>
-					<li>
-						<dl class="switch">
-							<dt>If in the event loop</dt>
-							<dd>Run the rest of these steps</dd>
-							<dt>Otherwise</dt>
-							<dd>Queue a task which runs the rest of these steps</dd>
-						</dl>
-					</li>
-
-					<li>Fulfill <a>abortPromise</a> with <code>undefined</code></li>
-				</ol>
+				fulfill <a>abortPromise</a> with <code>undefined</code>
 			</p>
 	  </section>
 	</section>
