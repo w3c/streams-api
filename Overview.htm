@@ -828,11 +828,11 @@ function read() {
 
 							<li>Set <a>pendingRead</a> to a newly-created <a>PendingReadDescriptor</a></li>
 
+							<li>Set <a>pendingRead</a>.<var>promise</var> to <var>readPromise</var></li>
+							<li>Set <a>pendingRead</a>.<var>remaining</var> to <var>size</var></li>
+							<li>Set <a>pendingRead</a>.<var>destination</var> to <code>null</code></li>
 							<li>Set <a>pendingRead</a>.<var>binaryAs</var> to the current value of <a href="#widl-ReadableStream-readBinaryAs">readBinaryAs</a></li>
 							<li>Set <a>pendingRead</a>.<var>encoding</var> to the current value of <a href="#widl-ReadableStream-readEncoding">readEncoding</a></li>
-							<li>Set <a>pendingRead</a>.<var>size</var> to <var>size</var></li>
-							<li>Set <a>pendingRead</a>.<var>promise</var> to <var>readPromise</var></li>
-							<li>Set <a>pendingRead</a>.<var>destination</var> to <code>null</code></li>
 
 							<li>Set <a>readUpToPullAmount</a> to <var>size</var></li>
 							<li>Set <a>amountBeingReturned</a> to 0</li>
@@ -869,17 +869,17 @@ function read() {
 						This method must run the steps below:
 
 						<ol>
-							<li>If <a>pendingRead</a> is not <code>null</code>, return a Promise reject with an "<code><a>InvalidStateError</a></code>"</li>
+							<li>If <a>pendingRead</a> is not <code>null</code>, return a <a>Promise</a> rejected with an "<code><a>InvalidStateError</a></code>"</li>
 
 							<li>Let <var>readPromise</var> be a newly-created <a>Promise</a></li>
 
 							<li>Set <a>pendingRead</a> to a newly-created <a>PendingReadDescriptor</a></li>
 
+							<li>Set <a>pendingRead</a>.<var>promise</var> to <var>readPromise</var></li>
+							<li>Set <a>pendingRead</a>.<var>remaining</var> to <code>undefined</code></li>
+							<li>Set <a>pendingRead</a>.<var>destination</var> to <code>null</code></li>
 							<li>Set <a>pendingRead</a>.<var>binaryAs</var> to the current value of <a href="#widl-ReadableStream-readBinaryAs">readBinaryAs</a></li>
 							<li>Set <a>pendingRead</a>.<var>encoding</var> to the current value of <a href="#widl-ReadableStream-readEncoding">readEncoding</a></li>
-							<li>Set <a>pendingRead</a>.<var>size</var> to <code>undefined</code></li>
-							<li>Set <a>pendingRead</a>.<var>promise</var> to <var>readPromise</var></li>
-							<li>Set <a>pendingRead</a>.<var>destination</var> to <code>null</code></li>
 
 							<li>Set <a>amountBeingReturned</a> to 0</li>
 
@@ -926,11 +926,11 @@ function read() {
 
 							<li>Set <a>pendingRead</a> to a newly-created <a>PendingReadDescriptor</a></li>
 
+							<li>Set <a>pendingRead</a>.<var>promise</var> to <var>pipePromise</var></li>
+							<li>Set <a>pendingRead</a>.<var>remaining</var> to <var>size</var> argument</li>
+							<li>Set <a>pendingRead</a>.<var>destination</var> to <var>destination</var> argument</li>
 							<li>Set <a>pendingRead</a>.<var>binaryAs</var> to <code>undefined</code></li>
 							<li>Set <a>pendingRead</a>.<var>encoding</var> to <code>undefined</code></li>
-							<li>Set <a>pendingRead</a>.<var>size</var> to <var>size</var> argument</li>
-							<li>Set <a>pendingRead</a>.<var>promise</var> to <var>pipePromise</var></li>
-							<li>Set <a>pendingRead</a>.<var>destination</var> to <var>destination</var> argument</li>
 
 							<li>Set <a>totalAmountTransferred</a> to 0</li>
 
@@ -1112,13 +1112,12 @@ function read() {
 				A struct type <dfn>PendingReadDescriptor</dfn> has the following members:
 				<ul>
 					<li>A <a>Promise</a> <var>promise</var></li>
-					<li>An integer <var>amount</var></li>
+					<li>An integer <var>remaining</var></li>
+					<li>A <a>WritableStream</a> <var>destination</var></li>
 					<li>A <a>DOMString</a> <var>binaryAs</var></li>
 					<li>A <a>DOMString</a> <var>encoding</var></li>
-					<li>A <a>WritableStream</a> <var>destination</var></li>
 				</ul>
 			</p>
-
 			<p>
 				A WritableStream has an associated <a>PendingReadDescriptor</a> <dfn>pendingRead</dfn>.
 				This variable is initialized to <code>null</code> on construction.
