@@ -1001,8 +1001,7 @@ function read() {
 				A <dfn>data source</dfn> can be anything that:
 				<ul>
 					<li>
-						Produces data.
-						Newly produced data will be delivered to the associated <a>ReadableStream</a>.
+						Produces data and delivers it to the associated <a>ReadableStream</a>.
 					</li>
 					<li>
 						Notifies the associated <a>ReadableStream</a> of the <dfn>read EOF</dfn> signal.
@@ -1058,11 +1057,6 @@ function read() {
 
 			<p>
 				A ReadableStream has the following internal mechanisms:
-			</p>
-
-			<p>
-				An associated flag <dfn>readPending</dfn> which prevents multiple read operations from being run.
-				This flag is set to false on construction.
 			</p>
 
 			<p>
@@ -1139,7 +1133,7 @@ function read() {
 					<li>Let <var>readableAmount</var> be sum of the total <a>cost</a> in <a>readDataBuffer</a> and the total number of bytes in <a>splicedBinaryBuffer</a></li>
 					<li>Let <var>amountToNewlyRequest</var> be max(max(<a href="#widl-ReadableStream-pullAmount">pullAmount</a>, <a>readUpToPullAmount</a>, <a>pipePullAmount</a>) - (<a>amountRequested</a> + <var>readableAmount</var> + <a>amountBeingReturned</a>), 0)</li>
 					<li>Set <a>amountRequested</a> to <a>amountRequested</a> + <var>amountToNewlyRequest</var></li>
-					<li>Send a request to the <a>dataSource</a> to produce data with <var>amountToNewlyRequest</var> <a>cost</a> to the ReadableStream</li>
+					<li>Send a request to the <a>dataSource</a> to produce <var>amountToNewlyRequest</var> more data</li>
 				</ol>
 			</p>
 
@@ -1639,15 +1633,17 @@ function read() {
 
 						<p>
 							Returns a unique Blob URL each time it is called on a <a>ReadableStream</a>.
-							This method must act as follows:
+						</p>
+						<p>
+							This method must run the steps below:
 
 							<dl class="switch">
 								<dt>If <var>stream</var> is non-null and in scope of the global object's URL property from which this static method is called</dt>
 								<dd>
 									Run the steps below:
 									<ol>
-										<li>If <a>readPending</a> of <var>stream</var> is set, return null</li>
-										<li>Set <a>readPending</a> of <var>stream</var></li>
+										<li>If <a>pendingRead</a> of <var>stream</var> is not <code>null</code>, return <code>null</code></li>
+										<li>Set <a>pendingRead</a> of <var>stream</var> to a newly-created <a>PendingReadDescriptor</a></li>
 										<li>Return a unique <code>Blob URI</code> that can be used to dereference <var>stream</var></li>
 										<li>Add an entry to the Blob URL Store for this Blob URL</li>
 									</ol>
@@ -1673,22 +1669,24 @@ function read() {
 						<p>
 							Returns a unique Blob URL each time it is called on a <a>ReadableStream</a>.
 							Blob URLs created with this method are said to be auto-revoking since user-agents are responsible for the revocation of Blob URLs created with this method, subject to the lifetime stipulation for Blob URLs.
-							This method must act as follows:
+						</p>
+						<p>
+							This method must run the steps below:
 
 							<dl class="switch">
 								<dt>If <var>stream</var> is non-null and in scope of the global object's URL property from which this static method is called</dt>
 								<dd>
 									Run the steps below:
 									<ol>
-										<li>If <a>readPending</a> of <var>stream</var> is set, return null</li>
-										<li>Set <a>readPending</a> of <var>stream</var></li>
+										<li>If <a>pendingRead</a> of <var>stream</var> is not <code>null</code>, return <code>null</code></li>
+										<li>Set <a>pendingRead</a> of <var>stream</var> to a newly-created <a>PendingReadDescriptor</a></li>
 										<li>Return a unique <code>Blob URI</code> that can be used to dereference <var>stream</var></li>
 										<li>Add an entry to the Blob URL Store for this Blob URL</li>
 										<li>Add an entry to the Revocation List for this Blob URL</li>
 									</ol>
 								</dd>
 								<dt>Otherwise</dt>
-								<dd>Return null</dd>
+								<dd>Return <code>null</code></dd>
 							</dl>
 						</p>
 					</dd>
@@ -1870,7 +1868,7 @@ enum XMLHttpRequestResponseType {
 						If the object's <a href="#widl-ByteStream-type">type</a> attribute is not the empty string let <var>mime type</var> be its value.
 					</p>
 					<p>
-						Set <a>readPending</a> of the <a>ReadableStream</a>.
+						Set <a>pendingRead</a> of the <a>ReadableStream</a> to a newly-created <a>PendingReadDescriptor</a>.
 					</p>
 					<p>
 						Let the <a href="https://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html#request-entity-body">request entity body</a> be the raw data represented by <var>data</var>.
