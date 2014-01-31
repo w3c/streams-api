@@ -143,6 +143,9 @@ var respecConfig = {
 				</ul>
 			</li>
 			<li>
+				An extra helper method <code>readBytes()</code> which ease consumption of ReadableStream from which bytes are read.
+			</li>
+			<li>
 				An enum <a>StreamReadType</a> which represents data types as which data can be read from a <a>ReadableStream</a>.
 			</li>
 			<li>
@@ -201,7 +204,7 @@ var respecConfig = {
 			Data consuming code reads data from the internal data source inside the data producing API using:
 			<ul>
 				<li>
-					The <code>read()</code> and <code>readUpTo()</code> methods which reads data from the data source
+					The <code>read()</code> and <code>readBytes()</code> methods which reads data from the data source
 				</li>
 				<li>
 					The <code>pullAmount</code> attribute which paces data retrieval from the data source
@@ -244,7 +247,7 @@ var respecConfig = {
 		</p>
 
 		<p>
-			The example below demonstrates how to read a chunk of data from a <a>ReadableStream</a> using <code>read()</code>.
+			The example below demonstrates how to read a chunk of data from a <a>ReadableStream</a> using <code>readBytes()</code>.
 			The <a>ReadableStream</a> may of come from a <a href="#producers">producer</a> such as <code>XMLHttpRequest</code>.
 		</p>
 
@@ -252,8 +255,8 @@ var respecConfig = {
 // Tell stream that we're ready to consume 1024 bytes.
 stream.pullAmount = 1024;
 stream.readEncoding = "UTF-8";
-stream.readBinaryAs = "arraybuffer";
-stream.read().then(
+stream.readBytesAs = "arraybuffer";
+stream.readBytes().then(
   function (result) {
     // Process data
   },
@@ -806,10 +809,10 @@ function read() {
 			<h3>ReadableStream Interface</h3>
 
 			<dl class="idl" title="interface ReadableStream">
-				<dt>attribute StreamReadType readBinaryAs</dt>
+				<dt>attribute StreamReadType readBytesAs</dt>
 				<dd>
 					<p>
-						Specifies what data type will be returned by a <code>read()</code> and <code>readUpTo()</code> method call.
+						Specifies what data type will be returned by <code>readBytes()</code> method calls.
 						This attribute can be set to any of the supported types in <a>StreamReadType</a>.
 					<p>
 					</p>
@@ -824,7 +827,7 @@ function read() {
 				<dd>
 					<p>
 						Specifies a <a>DOMString</a> that represents the label of an encoding [[!EncodingDetermination]].
-						If set, it will be used as part of the encoding determination used when processing a <code>read()</code> and <code>readUpTo()</code> method call.
+						If set, it will be used as part of the encoding determination used when processing a <code>readBytes()</code> method call.
 					</p>
 					<p>
 						This attribute works only when the data to be read from the ReadableStream represents binary data.
@@ -849,14 +852,14 @@ function read() {
 					</p>
 
 					<section class="note">
-						This flow control functionality is provided as a separated attribute rather than as an argument of the read() method based on the assumption that this value is not changed frequently.
+						This flow control functionality is provided as a separated attribute rather than as an argument of the <code>read()</code> method based on the assumption that this value is not changed frequently.
 					</section>
 					<section class="note">
-						It's possible that the cost of data received by <code>read()</code> is more than the pullAmount value.
+						It's possible that the cost of data received by the <code>read()</code> method is more than the pullAmount value.
 					</section>
 				</dd>
 
-				<dt>Promise&amp;lt;StreamReadResult&gt; readUpTo()</dt>
+				<dt>Promise&amp;lt;StreamReadResult&gt; readBytes()</dt>
 				<dd>
 					<p>
 						This method reads binary data from the ReadableStream.
@@ -865,14 +868,12 @@ function read() {
 							<li>The total size of produced bytes becomes equal to <var></var></li>
 							<li>The <a>read EOF</a> is reached</li>
 						</ul>
-						The <a>cost</a> of data returned by this method can be less than <var>size</var> when data cannot be fully converted into the type specified by <a href="#widl-ReadableStream-readBinaryAs">readBinaryAs</a> or the <a>read EOF</a> is reached.
+						The <a>cost</a> of data returned by this method can be less than <var>size</var> when data cannot be fully converted into the type specified by <a href="#widl-ReadableStream-readBytesAs">readBytesAs</a> or the <a>read EOF</a> is reached.
 					</p>
 
 					<p>
 						This method must run the steps below:
 						<ol>
-							<li>If <a href="#widl-ReadableStream-readBinaryAs">readBinaryAs</a> is "<code>as-is</code>", return a <a>Promise</a> rejected with a "<code><a>SyntaxError</a></code>"</li>
-
 							<li>If <a>pendingRead</a> is not <code>null</code>, return a <a>Promise</a> rejected with an "<code><a>InvalidStateError</a></code>"</li>
 
 							<li>Let <var>readPromise</var> be a newly-created <a>Promise</a></li>
@@ -880,12 +881,12 @@ function read() {
 							<li>Set <a>pendingRead</a> to a newly-created <a>PendingReadDescriptor</a></li>
 
 							<li>Set <a>pendingRead</a>.<var>promise</var> to <var>readPromise</var></li>
-							<li>Set <a>pendingRead</a>.<var>remaining</var> to <var>size</var></li>
+							<li>Set <a>pendingRead</a>.<var>remaining</var> to <var>size</var> argument</li>
 							<li>Set <a>pendingRead</a>.<var>destination</var> to <code>null</code></li>
-							<li>Set <a>pendingRead</a>.<var>binaryAs</var> to the current value of <a href="#widl-ReadableStream-readBinaryAs">readBinaryAs</a></li>
+							<li>Set <a>pendingRead</a>.<var>bytesAs</var> to the current value of <a href="#widl-ReadableStream-readBytesAs">readBytesAs</a></li>
 							<li>Set <a>pendingRead</a>.<var>encoding</var> to the current value of <a href="#widl-ReadableStream-readEncoding">readEncoding</a></li>
 
-							<li>Set <a>readUpToPullAmount</a> to <var>size</var></li>
+							<li>If <var>size</var> argument is not <code>undefined</code>, set <a>readBytesPullAmount</a> to <var>size</var></li>
 							<li>Set <a>amountBeingReturned</a> to 0</li>
 
 							<li><a>Request data production</a> possibly asynchronously</li>
@@ -895,7 +896,7 @@ function read() {
 					</p>
 
 					<dl class="parameters">
-						<dt>[Clamp] unsigned long long size</dt>
+						<dt>optional [Clamp] unsigned long long size</dt>
 						<dd>Upper limit of total cost of data to be read</dd>
 					</dl>
 
@@ -929,8 +930,8 @@ function read() {
 							<li>Set <a>pendingRead</a>.<var>promise</var> to <var>readPromise</var></li>
 							<li>Set <a>pendingRead</a>.<var>remaining</var> to <code>undefined</code></li>
 							<li>Set <a>pendingRead</a>.<var>destination</var> to <code>null</code></li>
-							<li>Set <a>pendingRead</a>.<var>binaryAs</var> to the current value of <a href="#widl-ReadableStream-readBinaryAs">readBinaryAs</a></li>
-							<li>Set <a>pendingRead</a>.<var>encoding</var> to the current value of <a href="#widl-ReadableStream-readEncoding">readEncoding</a></li>
+							<li>Set <a>pendingRead</a>.<var>bytesAs</var> to <code>undefined</code></li>
+							<li>Set <a>pendingRead</a>.<var>encoding</var> to <code>undefined</code></li>
 
 							<li>Set <a>amountBeingReturned</a> to 0</li>
 
@@ -980,7 +981,7 @@ function read() {
 							<li>Set <a>pendingRead</a>.<var>promise</var> to <var>pipePromise</var></li>
 							<li>Set <a>pendingRead</a>.<var>remaining</var> to <var>size</var> argument</li>
 							<li>Set <a>pendingRead</a>.<var>destination</var> to <var>destination</var> argument</li>
-							<li>Set <a>pendingRead</a>.<var>binaryAs</var> to <code>undefined</code></li>
+							<li>Set <a>pendingRead</a>.<var>bytesAs</var> to <code>undefined</code></li>
 							<li>Set <a>pendingRead</a>.<var>encoding</var> to <code>undefined</code></li>
 
 							<li>Set <a>totalAmountTransferred</a> to 0</li>
@@ -1111,7 +1112,7 @@ function read() {
 			</p>
 
 			<p>
-				An associated integer variable <dfn>readUpToPullAmount</dfn> which temporarily overrides <a href="#widl-ReadableStream-pullAmount">pullAmount</a> if necessary for a <code>readUpTo()</code> method call.
+				An associated integer variable <dfn>readBytesPullAmount</dfn> which temporarily overrides <a href="#widl-ReadableStream-pullAmount">pullAmount</a> if necessary for a <code>readBytes()</code> method call.
 				This variable is initialized to 0 on construction.
 			</p>
 			<p>
@@ -1152,7 +1153,7 @@ function read() {
 					<li>A <a>Promise</a> <var>promise</var></li>
 					<li>An integer <var>remaining</var></li>
 					<li>A <a>WritableStream</a> <var>destination</var></li>
-					<li>A <a>DOMString</a> <var>binaryAs</var></li>
+					<li>A <a>DOMString</a> <var>bytesAs</var></li>
 					<li>A <a>DOMString</a> <var>encoding</var></li>
 				</ul>
 			</p>
@@ -1182,7 +1183,7 @@ function read() {
 				To <dfn>request data production</dfn>, run the steps below:
 				<ol>
 					<li>Let <var>readableAmount</var> be sum of the total <a>cost</a> in <a>readDataBuffer</a> and the total number of bytes in <a>splicedBinaryBuffer</a></li>
-					<li>Let <var>amountToNewlyRequest</var> be max(max(<a href="#widl-ReadableStream-pullAmount">pullAmount</a>, <a>readUpToPullAmount</a>, <a>pipePullAmount</a>) - (<a>amountRequested</a> + <var>readableAmount</var> + <a>amountBeingReturned</a>), 0)</li>
+					<li>Let <var>amountToNewlyRequest</var> be max(max(<a href="#widl-ReadableStream-pullAmount">pullAmount</a>, <a>readBytesPullAmount</a>, <a>pipePullAmount</a>) - (<a>amountRequested</a> + <var>readableAmount</var> + <a>amountBeingReturned</a>), 0)</li>
 					<li>Set <a>amountRequested</a> to <a>amountRequested</a> + <var>amountToNewlyRequest</var></li>
 					<li>Send a request to the <a>dataSource</a> to produce <var>amountToNewlyRequest</var> more data</li>
 				</ol>
@@ -1247,7 +1248,7 @@ function read() {
 
 					<li>
 						<dl class="switch">
-							<dt>If <a>pendingRead</a>.<var>binaryAs</var> is "<code>as-is</code>"</dt>
+							<dt>If <a>pendingRead</a>.<var>bytesAs</var> is <code>undefined</code></dt>
 							<dd>
 								<ol>
 									<li>Pop one element from <a>readDataBuffer</a>, and set <var>result</var>.<a href="#widl-StreamReadResult-data">data</a> to the element</li>
@@ -1264,13 +1265,13 @@ function read() {
 									<li>If <a>pendingRead</a>.<var>size</var> is not <code>undefined</code> and <a>eofReached</a> is not set and the number of bytes in <a>splicedBinaryBuffer</a> is less than <a>pendingRead</a>.<var>size</var>, terminate these steps</li>
 
 									<li>
-										Switch on <a>pendingRead</a>.<var>binaryAs</var>:
+										Switch on <a>pendingRead</a>.<var>bytesAs</var>:
 
 										<dl class="switch">
 											<dt>"<code>arraybuffer</code>"</dt>
 											<dd>
 												<ol>
-													<li>Set <var>result</var>.<a href="#widl-StreamReadResult-data">data</a> to an object of the type specified by <a>pendingRead</a>.<var>binaryAs</var> that represents binary data stored in <a>splicedBinaryBuffer</a></li>
+													<li>Set <var>result</var>.<a href="#widl-StreamReadResult-data">data</a> to an object of the type specified by <a>pendingRead</a>.<var>bytesAs</var> that represents binary data stored in <a>splicedBinaryBuffer</a></li>
 													<li>Let <var>amountConsumed</var> be the number of bytes in <a>splicedBinaryBuffer</a></li>
 												</ol>
 											</dd>
@@ -1314,7 +1315,7 @@ function read() {
 
 					<li>Set <a>amountBeingReturned</a> to <var>amountConsumed</var></li>
 
-					<li>Set <a>readUpToPullAmount</a> to 0</li>
+					<li>Set <a>readBytesPullAmount</a> to 0</li>
 
 					<li>Let <var>readPromise</var> to <a>pendingRead</a>.<var>promise</var></li>
 					<li>Set <a>pendingRead</a> to <code>null</code></li>
@@ -1557,7 +1558,7 @@ function read() {
 			<dt>readonly attribute any data</dt>
 			<dd>The contents read (and converted into an object of the specified type if needed)</dd>
 			<dt>readonly attribute unsigned long long amountConsumed</dt>
-			<dd>The cost of the data read</dd>
+			<dd>The <a>cost</a> of the data read</dd>
 			<dt>readonly attribute any error</dt>
 			<dd>Once any error occurred, set to the error detail object on all StreamReadResults returned after the error</dd>
 		</dl>
@@ -1572,15 +1573,13 @@ function read() {
 		</p>
 
 		<dl class="idl" title="enum StreamReadType">
-			<dt>as-is</dt>
-			<dd>Default. <code>read()</code> and <code>readUpTo()</code> return produced data as-is</dd>
 			<dt>arraybuffer</dt>
-			<dd><code>read()</code> and <code>readUpTo()</code> attempt to convert produced data into an <a>ArrayBuffer</a>, and then return it</dd>
+			<dd><code>readBytes()</code> attempts to convert produced data into an <a>ArrayBuffer</a>, and then returns it</dd>
 			<dt>text</dt>
-			<dd><code>read()</code> and <code>readUpTo()</code> attempt to convert produced data into a <a>DOMString</a>, and then return it</dd>
+			<dd><code>readBytes()</code> attempts to convert produced data into a <a>DOMString</a>, and then returns it</dd>
 			<dt>none</dt>
 			<dd>
-				<code>read()</code> and <code>readUpTo()</code> return nothing.
+				<code>readBytes()</code> returns nothing.
 				Useful for seeking data by skipping some amount of data.
 				User agents may implement some optimization for "<code>none</code>" type read for example omitting internal data transfer.
 			</dd>
