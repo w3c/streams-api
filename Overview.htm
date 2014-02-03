@@ -865,10 +865,10 @@ function read() {
 						This method reads binary data from the ReadableStream.
 						The returned <a>Promise</a> will be fulfilled when any of the following conditions is met:
 						<ul>
-							<li>The total size of produced bytes becomes equal to <var></var></li>
-							<li>The <a>read EOF</a> is reached</li>
+							<li>The total size of produced bytes becomes equal to the <var>size</var> argument</li>
+							<li>The <a>read EOF</a> signal is received from <a>dataSource</a></li>
 						</ul>
-						The <a>cost</a> of data returned by this method can be less than <var>size</var> when data cannot be fully converted into the type specified by <a href="#widl-ReadableStream-readBytesAs">readBytesAs</a> or the <a>read EOF</a> is reached.
+						The <a>cost</a> of data returned by this method can be less than <var>size</var> when data cannot be fully converted into the type specified by <a href="#widl-ReadableStream-readBytesAs">readBytesAs</a> or the <a>read EOF</a> signal is received.
 					</p>
 
 					<p>
@@ -1167,7 +1167,7 @@ function read() {
 				This variable is initialized to <code>null</code> on construction.
 
 			<p>
-				An associated flag <dfn>eofReached</dfn> which indicates that the <a>read EOF</a> was received from the <a>dataSource</a>.
+				An associated flag <dfn>eofReached</dfn> which indicates that the <a>read EOF</a> is received from the <a>dataSource</a>.
 			</p>
 
 			<p>
@@ -1181,11 +1181,12 @@ function read() {
 
 			<p>
 				To <dfn>request data production</dfn>, run the steps below:
+
 				<ol>
 					<li>Let <var>readableAmount</var> be sum of the total <a>cost</a> in <a>readDataBuffer</a> and the total number of bytes in <a>splicedBinaryBuffer</a></li>
 					<li>Let <var>amountToNewlyRequest</var> be max(max(<a href="#widl-ReadableStream-pullAmount">pullAmount</a>, <a>readBytesPullAmount</a>, <a>pipePullAmount</a>) - (<a>amountRequested</a> + <var>readableAmount</var> + <a>amountBeingReturned</a>), 0)</li>
 					<li>Set <a>amountRequested</a> to <a>amountRequested</a> + <var>amountToNewlyRequest</var></li>
-					<li>Send a request to the <a>dataSource</a> to produce <var>amountToNewlyRequest</var> more data</li>
+					<li>Send a request to the <a>dataSource</a> to produce <var>amountToNewlyRequest</var> more data. This step is called <var>pull operation</var>.</li>
 				</ol>
 			</p>
 
@@ -1495,18 +1496,25 @@ function read() {
 			</p>
 
 			<p>
-				When data is received from <a>dataSource</a>, run the steps below:
+				In this section, when it is required to run steps <dfn>with task queuing if necessary</dfn>, run the following additional steps before the steps listed in the algorithm:
+
 				<ol>
 					<li>
 						<dl class="switch">
 							<dt>If in the event loop</dt>
-							<dd>Run the rest of these steps</dd>
+							<dd>Run the rest of the algorithm</dd>
 							<dt>Otherwise</dt>
-							<dd>Queue a task which runs the rest of these steps</dd>
+							<dd>Queue a task which runs the rest of the algorithm</dd>
 						</dl>
 					</li>
+				</ol>
+			</p>
 
-					<li>Let <var>receivedData</var> be the received data</li>
+			<p>
+				A <a>dataSource</a> delivers produced data to the associated <a>ReadableStream</a> by running the steps below called <var>push operation</var> <a>with task queuing if necessary</a>:
+
+				<ol>
+					<li>Let <var>receivedData</var> be the produced data</li>
 					<li>Let <var>receivedAmount</var> be the size of <var>receivedData</var></li>
 					<li>Set <a>amountRequested</a> to <a>amountRequested</a> - <var>receivedAmount</var></li>
 					<li>Push <var>receivedData</var> to <a>readDataBuffer</a></li>
@@ -1520,18 +1528,9 @@ function read() {
 			</p>
 
 			<p>
-				When the <a>read EOF</a> is received from <a>dataSource</a>, run the steps below:
+				A <a>dataSource</a> sends the <a>read EOF</a> signal to the associated <a>ReadableStream</a> by running the steps below called <var>close operation</var> <a>with task queuing if necessary</a>:
 
 				<ol>
-					<li>
-						<dl class="switch">
-							<dt>If in the event loop</dt>
-							<dd>Run the rest of these steps</dd>
-							<dt>Otherwise</dt>
-							<dd>Queue a task which runs the rest of these steps</dd>
-						</dl>
-					</li>
-
 					<li>Set <a>eofReached</a> and <a>sourceErrorDetail</a></li>
 					<li><a>Process received data and signal</a></li>
 				</ol>
