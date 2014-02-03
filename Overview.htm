@@ -383,6 +383,25 @@ function read() {
 }</pre>
 	</section>
 
+	<section>
+		<h2>Terminology</h2>
+
+		<p>
+			In this section, when it is required to run steps <dfn>with task queuing if necessary</dfn>, run the following additional steps before the steps listed in the algorithm:
+
+			<ol>
+				<li>
+					<dl class="switch">
+						<dt>If in the event loop</dt>
+						<dd>Run the rest of the algorithm</dd>
+						<dt>Otherwise</dt>
+						<dd>Queue a task which runs the rest of the algorithm</dd>
+					</dl>
+				</li>
+			</ol>
+		</p>
+	</section>
+
 	<section class="section" id="writableStream">
 		<h2>WritableStream</h2>
 		<p>
@@ -457,7 +476,7 @@ function read() {
 							<li>Set <a>spaceAvailable</a> to <a>spaceAvailable</a> - <var>amountToWrite</var></li>
 
 							<li>
-								Run the steps below possibly asynchronously:
+								Run the steps below called <var>write operation</var> possibly asynchronously:
 
 								<dl class="switch">
 									<dt>If <var>data</var> is a <a>DOMString</a></dt>
@@ -524,7 +543,7 @@ function read() {
 						<ol>
 							<li>Set <var>writeClosePromise</var> be a newly-created <a>Promise</a></li>
 							<li>
-								Run the steps below possibly asynchronously:
+								Run the steps below called <var>close operation</var> possibly asynchronously:
 
 								<ol>
 									<li>Send the <a>write EOF</a> signal to <a>dataSink</a></li>
@@ -691,36 +710,18 @@ function read() {
 			</p>
 
 			<p>
-				When <a>dataSink</a> notified the <a>WritableStream</a> of acknowledgement of data writing with <var>writtenAmount</var> which is the <a>cost</a> of the written data, run the steps below:
+				When <a>dataSink</a> notified the <a>WritableStream</a> of acknowledgement of data writing with <var>writtenAmount</var> which is the <a>cost</a> of the written data, run the steps below <a>with task queuing if necessary</a>:
 
 				<ol>
-					<li>
-						<dl class="switch">
-							<dt>If in the event loop</dt>
-							<dd>Run the rest of these steps</dd>
-							<dt>Otherwise</dt>
-							<dd>Queue a task which runs the rest of these steps</dd>
-						</dl>
-					</li>
-
 					<li>Pop the head element from <a>pendingWriteQueue</a>, and let <var>pendingWrite</var> be the element</li>
 					<li>If <var>pendingWrite.promise</var> is not <code>null</code>, fulfill it with <var>writtenAmount</var></li>
 				</ol>
 			</p>
 
 			<p>
-				When <a>dataSink</a> notifies of that <a>data sink is gone</a> with an object <var>reason</var> which represents the reason, run the steps below:
+				When <a>dataSink</a> notifies of that <a>data sink is gone</a> with an object <var>reason</var> which represents the reason, run the steps below <a>with task queuing if necessary</a>:
 
 				<ol>
-					<li>
-						<dl class="switch">
-							<dt>If in the event loop</dt>
-							<dd>Run the rest of these steps</dd>
-							<dt>Otherwise</dt>
-							<dd>Queue a task which runs the rest of these steps</dd>
-						</dl>
-					</li>
-
 					<li>Set <a>sinkGone</a></li>
 					<li>Set <a>sinkGoneReason</a> to <var>reason</var></li>
 					<li><a>Abort awaitSpace</a></li>
@@ -728,29 +729,20 @@ function read() {
 			</p>
 
 			<p>
-				When <a>dataSink</a> notifies of failure of data writing with an object <var>reason</var> which represents the detail of the failure, run the steps below:
+				When <a>dataSink</a> notifies of failure of data writing with an object <var>reason</var> which represents the detail of the failure, run the steps below <a>with task queuing if necessary</a>:
 
 				<ol>
-					<li>
-						<dl class="switch">
-							<dt>If in the event loop</dt>
-							<dd>Run the rest of these steps</dd>
-							<dt>Otherwise</dt>
-							<dd>Queue a task which runs the rest of these steps</dd>
-						</dl>
-					</li>
-
 					<li>Pop the head element from <a>pendingWriteQueue</a>, and let <var>pendingWrite</var> be the element</li>
 					<li>If <var>pendingWrite.promise</var> is not <code>null</code>, reject it with <var>reason</var></li>
 				</ol>
 			</p>
 
 			<p>
-				When <a>dataSink</a> notifies of acknowledgement of the <a>write EOF</a> signal, fulfill <var>writeClosePromise</var> with <code>undefined</code>
+				When <a>dataSink</a> notifies of acknowledgement of the <a>write EOF</a> signal (called <var>"done" notification</var>), fulfill <var>writeClosePromise</var> with <code>undefined</code>
 			</p>
 
 			<p>
-				When <a>dataSink</a> notifies of failure of the <a>write EOF</a> signal with <var>reason</var>, reject <var>writeClosePromise</var> with <var>reason</var>
+				When <a>dataSink</a> notifies of failure of the <a>write EOF</a> signal with <var>reason</var> (called <var>"error" notification</var>), reject <var>writeClosePromise</var> with <var>reason</var>
 			</p>
 
 			<p>
@@ -762,18 +754,9 @@ function read() {
 			</p>
 
 			<p>
-				When <a>dataSink</a> requests <var>amountNewlyRequested</var> more data, run the steps below:
+				When <a>dataSink</a> requests <var>amountNewlyRequested</var> more data (called <var>"done and want more" notification</var>), run the steps below <a>with task queuing if necessary</a>:
 
 				<ol>
-					<li>
-						<dl class="switch">
-							<dt>If in the event loop</dt>
-							<dd>Run the rest of these steps</dd>
-							<dt>Otherwise</dt>
-							<dd>Queue a task which runs the rest of these steps</dd>
-						</dl>
-					</li>
-
 					<li>Set <a>spaceAvailable</a> to <a>spaceAvailable</a> + <var>amountNewlyRequested</var></li>
 					<li><a>Check space</a></li>
 				</ol>
@@ -1490,21 +1473,6 @@ function read() {
 							<dd><a>Output data</a></dd>
 							<dt>Otherwise</dt>
 							<dd><a>Transfer data</a></dd>
-						</dl>
-					</li>
-				</ol>
-			</p>
-
-			<p>
-				In this section, when it is required to run steps <dfn>with task queuing if necessary</dfn>, run the following additional steps before the steps listed in the algorithm:
-
-				<ol>
-					<li>
-						<dl class="switch">
-							<dt>If in the event loop</dt>
-							<dd>Run the rest of the algorithm</dd>
-							<dt>Otherwise</dt>
-							<dd>Queue a task which runs the rest of the algorithm</dd>
 						</dl>
 					</li>
 				</ol>
