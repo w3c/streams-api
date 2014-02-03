@@ -496,18 +496,7 @@ function read() {
 			<h3>WritableStream Interface</h3>
 
 			<dl class="idl" title="interface WritableStream">
-				<dt>attribute DOMString writeEncoding</dt>
-				<dd>
-					<p>
-						A <a>DOMString</a> that represents the label of an encoding [[!EncodingDetermination]] to be passed to <a>dataSink</a> together with data passed to <code>write()</code> method.
-						It will be used by <a>dataSink</a> for encoding determination.
-						This attribute returns the label last set, or the empty DOMString if never set.
-					</p>
-
-					<section class="note">
-						This parameter is not designed to be specified as an argument of write() since it's not likely to be changed frequently.
-					</section>
-				</dd>
+				<dt>// Generic properties</dt>
 
 				<dt>Promise&amp;lt;unsigned long long&gt; write()</dt>
 				<dd>
@@ -646,6 +635,21 @@ function read() {
 							<li>Return <var>writeAbortPromise</var></li>
 						</ol>
 					</p>
+				</dd>
+
+				<dt>// Binary data specific properties</dt>
+
+				<dt>attribute DOMString writeEncoding</dt>
+				<dd>
+					<p>
+						A <a>DOMString</a> that represents the label of an encoding [[!EncodingDetermination]] to be passed to <a>dataSink</a> together with data passed to <code>write()</code> method.
+						It will be used by <a>dataSink</a> for encoding determination.
+						This attribute returns the label last set, or the empty DOMString if never set.
+					</p>
+
+					<section class="note">
+						This parameter is not designed to be specified as an argument of write() since it's not likely to be changed frequently.
+					</section>
 				</dd>
 			</dl>
 		</section>
@@ -858,6 +862,158 @@ function read() {
 			<h3>ReadableStream Interface</h3>
 
 			<dl class="idl" title="interface ReadableStream">
+				<dt>// Generic properties</dt>
+
+				<dt>attribute unsigned long long pullAmount</dt>
+				<dd>
+					<p>
+						This attribute provides the ReadableStream with a hint of how much data the reader can consume currently.
+					</p>
+					<p>
+						Each implementation of the ReadableStream must initialize the value of pullAmount on construction.
+					</p>
+
+					<p>
+						When this attribute is set, the user agent must <a>request data production</a>.
+					</p>
+
+					<section class="note">
+						This flow control functionality is provided as a separated attribute rather than as an argument of the <code>read()</code> method based on the assumption that this value is not changed frequently.
+					</section>
+					<section class="note">
+						It's possible that the cost of data received by the <code>read()</code> method is more than the pullAmount value.
+					</section>
+				</dd>
+
+				<dt>Promise&amp;lt;StreamReadResult&gt; read()</dt>
+				<dd>
+					<p>
+						This method reads data from the ReadableStream.
+						The speed of reading can be roughly adjusted by using <a href="#widl-StreamReadResult-pullAmount">pullAmount</a>.
+						<a href="#widl-StreamReadResult-pullAmount">pullAmount</a> doesn't necessarily limit the size of data being read by this method.
+					</p>
+
+					<p>
+						This method must run the steps below:
+
+						<ol>
+							<li>If <a>pendingRead</a> is not <code>null</code>, return a <a>Promise</a> rejected with an "<code><a>InvalidStateError</a></code>"</li>
+
+							<li>Let <var>readPromise</var> be a newly-created <a>Promise</a></li>
+
+							<li>Set <a>pendingRead</a> to a newly-created <a>PendingReadDescriptor</a></li>
+
+							<li>Set <a>pendingRead</a>.<var>promise</var> to <var>readPromise</var></li>
+							<li>Set <a>pendingRead</a>.<var>remaining</var> to <code>undefined</code></li>
+							<li>Set <a>pendingRead</a>.<var>destination</var> to <code>null</code></li>
+							<li>Set <a>pendingRead</a>.<var>bytesAs</var> to <code>undefined</code></li>
+							<li>Set <a>pendingRead</a>.<var>encoding</var> to <code>undefined</code></li>
+
+							<li>Set <a>amountBeingReturned</a> to 0</li>
+
+							<li><a>Request data production</a> possibly asynchronously</li>
+
+							<li>Return <var>readPromise</var></li>
+						</ol>
+					</p>
+
+					<p>
+						<img src="images/fulfilling.png" alt="How new data is automatically fetched">
+					</p>
+
+					<section class="note">
+						This method is useful if
+						<ol>
+							<li>You don't care in what size and as how many fragments the data will be received</li>
+							<li>You want to limit the number of bytes read for flow control</li>
+						</ol>
+					</section>
+				</dd>
+
+				<dt>Promise&amp;lt;StreamReadResult&gt; pipe()</dt>
+				<dd>
+					<p>
+						This method bulk transfers data from the ReadableStream to another <a>WritableStream</a>.
+					</p>
+
+					<section class="note">
+						Fulfillment of the returned Promise doesn't necessarily mean that the data transferred to <var>destination</var> has been successfully read from it.
+					</section>
+
+					<section class="note">
+						TODO: Rewrite this to update <a>amountBeingReturned</a> as numBytesAcknowledged of <a>PendingWriteDescriptor</a>s are updated
+					</section>
+
+					<p>
+						This method must run the steps below:
+
+						<ol>
+							<li>If <a>pendingRead</a> is not <code>null</code>, return a <a>Promise</a> rejected with an "<code><a>InvalidStateError</a></code>"</li>
+
+							<li>Set <var>pipePromise</var> be a newly-created <a>Promise</a></li>
+
+							<li>Set <a>pendingRead</a> to a newly-created <a>PendingReadDescriptor</a></li>
+
+							<li>Set <a>pendingRead</a>.<var>promise</var> to <var>pipePromise</var></li>
+							<li>Set <a>pendingRead</a>.<var>remaining</var> to <code>undefined</code></li>
+							<li>Set <a>pendingRead</a>.<var>destination</var> to <var>destination</var> argument</li>
+							<li>Set <a>pendingRead</a>.<var>bytesAs</var> to <code>undefined</code></li>
+							<li>Set <a>pendingRead</a>.<var>encoding</var> to <code>undefined</code></li>
+
+							<li>Set <a>totalAmountTransferred</a> to 0</li>
+
+							<li><a>Wait for destination</a> possibly asynchronously</li>
+
+							<li>Return <var>pipePromise</var></li>
+						</ol>
+					</p>
+
+					<dl class="parameters">
+						<dt>WritableStream destination</dt>
+						<dd>Destination <a>WritableStream</a>.</dd>
+					</dl>
+				</dd>
+
+				<dt>ReadableStream fork()</dt>
+				<dd>
+					<p>
+						This method creates a new ReadableStream which refers to the same <a>dataSource</a> as the current ReadableStream.
+						Data sources are range reference counted so that a range in a data source is freed only when all the ReadableStreams sharing the data source finish consuming it.
+					</p>
+
+					<p>
+						This method must run the steps below:
+						<ol>
+							<li>Let <var>branch</var> be a new ReadableStream which refers to <a>dataSource</a> and has the same <a>amountRequested</a> value, <a>readDataBuffer</a> contents and <a>eofReached</a> value as the current ReadableStream.</li>
+							<li>If <a>amountRequested</a> is not 0, up to <a>amountRequested</a> bytes arriving in the future must be forwarded to <var>branch</var>.</li>
+							<li>Return <var>branch</var>.</li>
+						</ol>
+					</p>
+				</dd>
+
+				<dt>Promise&amp;lt;undefined&gt; readAbort(optional any reason)</dt>
+				<dd>
+					<p>
+						This method tells the ReadableStream that no more data will be read from it optionally with indication of error.
+						The details of the error will be given by <var>reason</var> argument.
+						The interpretation of <var>reason</var> is up to <a>dataSource</a>.
+					</p>
+					<p>
+						Once this method has been called on a ReadableStream, no further method calls can be made on the ReadableStream.
+					</p>
+
+					<p>
+						This method must run the steps below:
+						<ol>
+							<li>Set <a>abortPromise</a> to a newly-created <a>Promise</a></li>
+							<li>Send the <a>read abort</a> with <var>reason</var> to <a>dataSource</a> possibly asynchronously</li>
+							<li>Return <a>abortPromise</a></li>
+						</ol>
+					</p>
+				</dd>
+
+				<dt>// Binary data specific properties</dt>
+
 				<dt>attribute StreamReadType readBytesAs</dt>
 				<dd>
 					<p>
@@ -884,27 +1040,6 @@ function read() {
 
 					<section class="note">
 						This parameter is not designed to be specified as an argument of the reading methods since it's not likely to be changed frequently.
-					</section>
-				</dd>
-
-				<dt>attribute unsigned long long pullAmount</dt>
-				<dd>
-					<p>
-						This attribute provides the ReadableStream with a hint of how much data the reader can consume currently.
-					</p>
-					<p>
-						Each implementation of the ReadableStream must initialize the value of pullAmount on construction.
-					</p>
-
-					<p>
-						When this attribute is set, the user agent must <a>request data production</a>.
-					</p>
-
-					<section class="note">
-						This flow control functionality is provided as a separated attribute rather than as an argument of the <code>read()</code> method based on the assumption that this value is not changed frequently.
-					</section>
-					<section class="note">
-						It's possible that the cost of data received by the <code>read()</code> method is more than the pullAmount value.
 					</section>
 				</dd>
 
@@ -958,60 +1093,11 @@ function read() {
 					</section>
 				</dd>
 
-				<dt>Promise&amp;lt;StreamReadResult&gt; read()</dt>
-				<dd>
-					<p>
-						This method reads data from the ReadableStream.
-						The speed of reading can be roughly adjusted by using <a href="#widl-StreamReadResult-pullAmount">pullAmount</a>.
-						<a href="#widl-StreamReadResult-pullAmount">pullAmount</a> doesn't necessarily limit the size of data being read by this method.
-					</p>
-
-					<p>
-						This method must run the steps below:
-
-						<ol>
-							<li>If <a>pendingRead</a> is not <code>null</code>, return a <a>Promise</a> rejected with an "<code><a>InvalidStateError</a></code>"</li>
-
-							<li>Let <var>readPromise</var> be a newly-created <a>Promise</a></li>
-
-							<li>Set <a>pendingRead</a> to a newly-created <a>PendingReadDescriptor</a></li>
-
-							<li>Set <a>pendingRead</a>.<var>promise</var> to <var>readPromise</var></li>
-							<li>Set <a>pendingRead</a>.<var>remaining</var> to <code>undefined</code></li>
-							<li>Set <a>pendingRead</a>.<var>destination</var> to <code>null</code></li>
-							<li>Set <a>pendingRead</a>.<var>bytesAs</var> to <code>undefined</code></li>
-							<li>Set <a>pendingRead</a>.<var>encoding</var> to <code>undefined</code></li>
-
-							<li>Set <a>amountBeingReturned</a> to 0</li>
-
-							<li><a>Request data production</a> possibly asynchronously</li>
-
-							<li>Return <var>readPromise</var></li>
-						</ol>
-					</p>
-
-					<p>
-						<img src="images/fulfilling.png" alt="How new data is automatically fetched">
-					</p>
-
-					<section class="note">
-						This method is useful if
-						<ol>
-							<li>You don't care in what size and as how many fragments the data will be received</li>
-							<li>You want to limit the number of bytes read for flow control</li>
-						</ol>
-					</section>
-				</dd>
-
-				<dt>Promise&amp;lt;StreamReadResult&gt; pipe()</dt>
+				<dt>Promise&amp;lt;StreamReadResult&gt; pipeBytes()</dt>
 				<dd>
 					<p>
 						This method bulk transfers bytes from the ReadableStream to another <a>WritableStream</a>.
 					</p>
-
-					<section class="note">
-						Fulfillment of the returned Promise doesn't necessarily mean that the data transferred to <var>destination</var> has been successfully read from it.
-					</section>
 
 					<section class="note">
 						TODO: Rewrite this to update <a>amountBeingReturned</a> as numBytesAcknowledged of <a>PendingWriteDescriptor</a>s are updated
@@ -1028,7 +1114,7 @@ function read() {
 							<li>Set <a>pendingRead</a> to a newly-created <a>PendingReadDescriptor</a></li>
 
 							<li>Set <a>pendingRead</a>.<var>promise</var> to <var>pipePromise</var></li>
-							<li>Set <a>pendingRead</a>.<var>remaining</var> to <var>size</var> argument</li>
+							<li>Set <a>pendingRead</a>.<var>remaining</var> to the <var>size</var> argument</li>
 							<li>Set <a>pendingRead</a>.<var>destination</var> to <var>destination</var> argument</li>
 							<li>Set <a>pendingRead</a>.<var>bytesAs</var> to <code>undefined</code></li>
 							<li>Set <a>pendingRead</a>.<var>encoding</var> to <code>undefined</code></li>
@@ -1047,44 +1133,6 @@ function read() {
 						<dt>optional [Clamp] unsigned long long size</dt>
 						<dd>Number of bytes to transfer.</dd>
 					</dl>
-				</dd>
-
-				<dt>ReadableStream fork()</dt>
-				<dd>
-					<p>
-						This method creates a new ReadableStream which refers to the same <a>dataSource</a> as the current ReadableStream.
-						Data sources are range reference counted so that a range in a data source is freed only when all the ReadableStreams sharing the data source finish consuming it.
-					</p>
-
-					<p>
-						This method must run the steps below:
-						<ol>
-							<li>Let <var>branch</var> be a new ReadableStream which refers to <a>dataSource</a> and has the same <a>amountRequested</a> value, <a>readDataBuffer</a> contents and <a>eofReached</a> value as the current ReadableStream.</li>
-							<li>If <a>amountRequested</a> is not 0, up to <a>amountRequested</a> bytes arriving in the future must be forwarded to <var>branch</var>.</li>
-							<li>Return <var>branch</var>.</li>
-						</ol>
-					</p>
-				</dd>
-
-				<dt>Promise&amp;lt;undefined&gt; readAbort(optional any reason)</dt>
-				<dd>
-					<p>
-						This method tells the ReadableStream that no more data will be read from it optionally with indication of error.
-						The details of the error will be given by <var>reason</var> argument.
-						The interpretation of <var>reason</var> is up to <a>dataSource</a>.
-					</p>
-					<p>
-						Once this method has been called on a ReadableStream, no further method calls can be made on the ReadableStream.
-					</p>
-
-					<p>
-						This method must run the steps below:
-						<ol>
-							<li>Set <a>abortPromise</a> to a newly-created <a>Promise</a></li>
-							<li>Send the <a>read abort</a> with <var>reason</var> to <a>dataSource</a> possibly asynchronously</li>
-							<li>Return <a>abortPromise</a></li>
-						</ol>
-					</p>
 				</dd>
 			</dl>
 		</section>
