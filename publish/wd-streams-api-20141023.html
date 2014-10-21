@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" typeof="bibo:Document w3p:WD" about="" property="dcterms:language" content="en">
+<head>
+	<title>Streams API</title>
+	<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+
+	<!-- <script class=remove src="http://dev.w3.org/2009/dap/ReSpec.js/js/respec.js"></script> -->
+	
+	<!-- <script class="remove" src="respec-w3c-common.js"></script> -->
+
+	
+
+	<!-- Styles to mimic File API spec -->
+	<!-- <style type="text/css"> -->
+	<!-- 	table.error { border-collapse:collapse; border-style:hidden hidden none hidden } -->
+	<!-- 	table.error thead { border-bottom:solid } -->
+	<!-- 	table.error tbody th:first-child { border-left:solid } -->
+	<!-- 	table.error td, table th { border-left:solid; border-right:solid; border-bottom:solid thin; vertical-align:top; padding:0.2em } -->
+	<!-- </style> -->
+
+<style>/*****************************************************************
+ * ReSpec 3 CSS
+ * Robin Berjon - http://berjon.com/
+ *****************************************************************/
+
+/* --- INLINES --- */
+em.rfc2119 { 
+    text-transform:     lowercase;
+    font-variant:       small-caps;
+    font-style:         normal;
+    color:              #900;
+}
+
+h1 acronym, h2 acronym, h3 acronym, h4 acronym, h5 acronym, h6 acronym, a acronym,
+h1 abbr, h2 abbr, h3 abbr, h4 abbr, h5 abbr, h6 abbr, a abbr {
+    border: none;
+}
+
+dfn {
+    font-weight:    bold;
+}
+
+a.internalDFN {
+    color:  inherit;
+    border-bottom:  1px solid #99c;
+    text-decoration:    none;
+}
+
+a.externalDFN {
+    color:  inherit;
+    border-bottom:  1px dotted #ccc;
+    text-decoration:    none;
+}
+
+a.bibref {
+    text-decoration:    none;
+}
+
+cite .bibref {
+    font-style: normal;
+}
+
+code {
+    color:  #C83500;
+}
+
+/* --- TOC --- */
+.toc a, .tof a {
+    text-decoration:    none;
+}
+
+a .secno, a .figno {
+    color:  #000;
+}
+
+ul.tof, ol.tof {
+    list-style: none outside none;
+}
+
+.caption {
+    margin-top: 0.5em;
+    font-style:   italic;
+}
+
+/* --- TABLE --- */
+table.simple {
+    border-spacing: 0;
+    border-collapse:    collapse;
+    border-bottom:  3px solid #005a9c;
+}
+
+.simple th {
+    background: #005a9c;
+    color:  #fff;
+    padding:    3px 5px;
+    text-align: left;
+}
+
+.simple th[scope="row"] {
+    background: inherit;
+    color:  inherit;
+    border-top: 1px solid #ddd;
+}
+
+.simple td {
+    padding:    3px 10px;
+    border-top: 1px solid #ddd;
+}
+
+.simple tr:nth-child(even) {
+    background: #f0f6ff;
+}
+
+/* --- DL --- */
+.section dd > p:first-child {
+    margin-top: 0;
+}
+
+.section dd > p:last-child {
+    margin-bottom: 0;
+}
+
+.section dd {
+    margin-bottom:  1em;
+}
+
+.section dl.attrs dd, .section dl.eldef dd {
+    margin-bottom:  0;
+}
+
+@media print {
+    .removeOnSave {
+        display: none;
+    }
+}
+</style><style>/* --- EXAMPLES --- */
+div.example-title {
+    min-width: 7.5em;
+    color: #b9ab2d;
+}
+div.example-title span {
+    text-transform: uppercase;   
+}
+aside.example, div.example, div.illegal-example {
+    padding: 0.5em;
+    margin: 1em 0;
+    position: relative;
+    clear: both;
+}
+div.illegal-example { color: red }
+div.illegal-example p { color: black }
+aside.example, div.example {
+    padding: .5em;
+    border-left-width: .5em;
+    border-left-style: solid;
+    border-color: #e0cb52;
+    background: #fcfaee;    
+}
+
+aside.example div.example {
+    border-left-width: .1em;
+    border-color: #999;
+    background: #fff;
+}
+aside.example div.example div.example-title {
+    color: #999;
+}
+</style><style>/* --- ISSUES/NOTES --- */
+div.issue-title, div.note-title {
+    padding-right:  1em;
+    min-width: 7.5em;
+    color: #b9ab2d;
+}
+div.issue-title { color: #e05252; }
+div.note-title { color: #2b2; }
+div.issue-title span, div.note-title span {
+    text-transform: uppercase;
+}
+div.note, div.issue {
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+.note > p:first-child, .issue > p:first-child { margin-top: 0 }
+.issue, .note {
+    padding: .5em;
+    border-left-width: .5em;
+    border-left-style: solid;
+}
+div.issue, div.note {
+    padding: 1em 1.2em 0.5em;
+    margin: 1em 0;
+    position: relative;
+    clear: both;
+}
+span.note, span.issue { padding: .1em .5em .15em; }
+
+.issue {
+    border-color: #e05252;
+    background: #fbe9e9;
+}
+.note {
+    border-color: #52e052;
+    background: #e9fbe9;
+}
+
+
+</style><link rel="stylesheet" href="https://www.w3.org/StyleSheets/TR/W3C-WD"><!--[if lt IE 9]><script src='https://www.w3.org/2008/site/js/html5shiv.js'></script><![endif]--></head>
+<body class="h-entry" role="document" id="respecDocument"><div class="head" role="contentinfo" id="respecHeader">
+  <p>
+      
+        
+            <a href="http://www.w3.org/"><img width="72" height="48" src="https://www.w3.org/Icons/w3c_home" alt="W3C"></a>
+        
+      
+  </p>
+  <h1 class="title p-name" id="title" property="dcterms:title">Streams API</h1>
+  
+  <h2 property="dcterms:issued" datatype="xsd:dateTime" content="2014-10-23T04:00:00.000Z" id="w3c-working-draft-23-october-2014"><abbr title="World Wide Web Consortium">W3C</abbr> Working Draft <time class="dt-published" datetime="2014-10-23">23 October 2014</time></h2>
+  <dl>
+    
+      <dt>This version:</dt>
+      <dd><a class="u-url" href="http://www.w3.org/TR/2014/WD-streams-api-20141023/">http://www.w3.org/TR/2014/WD-streams-api-20141023/</a></dd>
+      <dt>Latest published version:</dt>
+      <dd><a href="http://www.w3.org/TR/streams-api/">http://www.w3.org/TR/streams-api/</a></dd>
+    
+    
+      <dt>Latest editor's draft:</dt>
+      <dd><a href="http://dvcs.w3.org/hg/streams-api/raw-file/tip/Overview.htm">http://dvcs.w3.org/hg/streams-api/raw-file/tip/Overview.htm</a></dd>
+    
+    
+    
+    
+    
+    
+      <dt>Previous version:</dt>
+      <dd><a rel="dcterms:replaces" href="http://www.w3.org/TR/2013/WD-streams-api-20131105/">http://www.w3.org/TR/2013/WD-streams-api-20131105/</a></dd>
+    
+    
+    <dt>Editors:</dt>
+    <dd class="p-author h-card vcard" rel="bibo:editor" inlist=""><span typeof="foaf:Person"><a class="u-url url p-name fn" rel="foaf:homepage" property="foaf:name" content="Feras Moussa" href="mailto:feras.moussa@hotmail.com">Feras Moussa</a>, Invited Expert</span>
+</dd>
+<dd class="p-author h-card vcard" rel="bibo:editor" inlist=""><span typeof="foaf:Person"><a class="u-url url p-name fn" rel="foaf:homepage" property="foaf:name" content="Takeshi Yoshino" href="mailto:tyoshino@google.com">Takeshi Yoshino</a>, Google, Inc.</span>
+</dd>
+
+    
+    
+  </dl>
+  
+  
+  
+  
+    
+      <p class="copyright">
+        <a href="http://www.w3.org/Consortium/Legal/ipr-notice#Copyright">Copyright</a> ©
+        2014
+        
+        <a href="http://www.w3.org/"><abbr title="World Wide Web Consortium">W3C</abbr></a><sup>®</sup>
+        (<a href="http://www.csail.mit.edu/"><abbr title="Massachusetts Institute of Technology">MIT</abbr></a>,
+        <a href="http://www.ercim.eu/"><abbr title="European Research Consortium for Informatics and Mathematics">ERCIM</abbr></a>,
+        <a href="http://www.keio.ac.jp/">Keio</a>, <a href="http://ev.buaa.edu.cn/">Beihang</a>), 
+        
+        All Rights Reserved.
+        
+        <abbr title="World Wide Web Consortium">W3C</abbr> <a href="http://www.w3.org/Consortium/Legal/ipr-notice#Legal_Disclaimer">liability</a>,
+        <a href="http://www.w3.org/Consortium/Legal/ipr-notice#W3C_Trademarks">trademark</a> and
+        
+          <a href="http://www.w3.org/Consortium/Legal/copyright-documents">document use</a>
+        
+        rules apply.
+      </p>
+    
+  
+  <hr>
+</div>
+
+	
+
+	<section id="abstract" class="introductory" property="dcterms:abstract" datatype="" typeof="bibo:Chapter" resource="#abstract" rel="bibo:Chapter"><h2 role="heading" id="h2_abstract">Abstract</h2>
+		<p>
+			<a href="https://github.com/whatwg/streams">WHATWG Streams API</a> provides an API for representing and handling a stream of data in web applications.
+			This specification is intended to extend the spec to meet requirements specific to the browser environment.
+		</p>
+	</section><section id="sotd" class="introductory" typeof="bibo:Chapter" resource="#sotd" rel="bibo:Chapter"><h2 role="heading" id="h2_sotd">Status of This Document</h2>
+  
+    
+      
+        <p>
+          <em>This section describes the status of this document at the time of its publication.
+          Other documents may supersede this document. A list of current <abbr title="World Wide Web Consortium">W3C</abbr> publications and the
+          latest revision of this technical report can be found in the <a href="http://www.w3.org/TR/"><abbr title="World Wide Web Consortium">W3C</abbr> technical reports index</a> at
+          http://www.w3.org/TR/.</em>
+        </p>
+        
+		<p>
+                  </p><ul>
+                    <li>To check recent changes and rationale for them, please visit <a href="https://dvcs.w3.org/hg/streams-api/">Mercurial history</a>.
+                    </li><li>Check open bugs at Bugzilla using <a href="https://www.w3.org/Bugs/Public/buglist.cgi?component=Streams%20API">this link</a>.
+                    </li><li>If you wish to submit a bug, please use <a href="https://www.w3.org/Bugs/Public/enter_bug.cgi?product=WebAppsWG&amp;component=Streams%20API">this link</a>.
+                  </li></ul>
+		<p></p>
+	
+        <p>
+          This document was published by the <a href="http://www.w3.org/2008/webapps/"><abbr title="World Wide Web Consortium">W3C</abbr> Web Applications (WebApps)</a> as a Working Draft.
+          
+            This document is intended to become a <abbr title="World Wide Web Consortium">W3C</abbr> Recommendation.
+          
+          
+            If you wish to make comments regarding this document, please send them to 
+            <a href="mailto:public-webapps@w3.org">public-webapps@w3.org</a> 
+            (<a href="mailto:public-webapps-request@w3.org?subject=subscribe">subscribe</a>,
+            <a href="http://lists.w3.org/Archives/Public/public-webapps/">archives</a>).
+          
+          
+          
+          
+            All comments are welcome.
+          
+        </p>
+        
+        
+          <p>
+            Publication as a Working Draft does not imply endorsement by the <abbr title="World Wide Web Consortium">W3C</abbr>
+            Membership. This is a draft document and may be updated, replaced or obsoleted by other
+            documents at any time. It is inappropriate to cite this document as other than work in
+            progress.
+          </p>
+        
+        
+        
+        <p>
+          
+            This document was produced by a group operating under the 
+            <a id="sotd_patent" about="" rel="w3p:patentRules" href="http://www.w3.org/Consortium/Patent-Policy-20040205/">5 February 2004 <abbr title="World Wide Web Consortium">W3C</abbr> Patent
+            Policy</a>.
+          
+          
+          
+            
+              <abbr title="World Wide Web Consortium">W3C</abbr> maintains a <a href="" rel="disclosure">public list of any patent
+              disclosures</a> 
+            
+            made in connection with the deliverables of the group; that page also includes
+            instructions for disclosing a patent. An individual who has actual knowledge of a patent
+            which the individual believes contains
+            <a href="http://www.w3.org/Consortium/Patent-Policy-20040205/#def-essential">Essential
+            Claim(s)</a> must disclose the information in accordance with
+            <a href="http://www.w3.org/Consortium/Patent-Policy-20040205/#sec-Disclosure">section
+            6 of the <abbr title="World Wide Web Consortium">W3C</abbr> Patent Policy</a>.
+          
+          
+        </p>
+        
+          <p>
+            This document is governed by the  <a id="w3c_process_revision" href="http://www.w3.org/2005/10/Process-20051014/">14 October 2005 <abbr title="World Wide Web Consortium">W3C</abbr> Process Document</a>.
+          </p>
+        
+        
+      
+    
+  
+</section><section id="toc"><h2 class="introductory" role="heading" id="h2_toc">Table of Contents</h2><ul class="toc" role="directory" id="respecContents"><li class="tocline"><a href="#introduction" class="tocxref"><span class="secno">1. </span>Introduction</a></li><li class="tocline"><a href="#writableStream" class="tocxref"><span class="secno">2. </span>Extension to WritableByteStream</a></li><li class="tocline"><a href="#readableStream" class="tocxref"><span class="secno">3. </span>Extension to ReadableByteStream</a></li><li class="tocline"><a href="#producers-consumers" class="tocxref"><span class="secno">4. </span>Stream Consumers and Producers</a><ul class="toc"><li class="tocline"><a href="#consumers" class="tocxref"><span class="secno">4.1 </span>Stream Consumers</a></li><li class="tocline"><a href="#producers" class="tocxref"><span class="secno">4.2 </span>Stream Producers</a></li></ul></li><li class="tocline"><a href="#security" class="tocxref"><span class="secno">5. </span>Security Considerations</a></li><li class="tocline"><a href="#acknowledgements" class="tocxref"><span class="secno">A. </span>Acknowledgements</a></li><li class="tocline"><a href="#references" class="tocxref"><span class="secno">B. </span>References</a><ul class="toc"><li class="tocline"><a href="#normative-references" class="tocxref"><span class="secno">B.1 </span>Normative references</a></li></ul></li></ul></section>
+
+	<section id="introduction" class="section informative" typeof="bibo:Chapter" resource="#introduction" rel="bibo:Chapter">
+		<!--OddPage--><h2 role="heading" id="h2_introduction"><span class="secno">1. </span>Introduction</h2><p><em>This section is non-normative.</em></p>
+
+		<p>
+			Web applications should have the ability to acquire, manipulate, and pass data in a wide variety of forms, including as a sequence of data made available over time.
+			This <a href="https://github.com/whatwg/streams">WHATWG Streams API</a> specification defines the basic representation for streams of data, and programmatic ways to read and write streams of data and errors raised on those operations.
+                        This <abbr title="World Wide Web Consortium">W3C</abbr> spec had been defining a Streams API, but has been merged into the effort at WHATWG.
+                        Feedback made for the <abbr title="World Wide Web Consortium">W3C</abbr> spec has been incorporated into the WHATWG Streams API specification.
+                        Currently, the goal of this spec is for discussing and defining extensions to meet requirements specific to the browser environment.
+		</p>
+
+		<p>
+			The WritableStream interface defines a general protocol for <a href="#consumers">data consuming APIs</a> to communicate with data producing code.
+			In these cases, the data consuming API, such as a decoder, provides a WritableStream for other applications to write to, enabling the decoder to begin decoding data as it becomes available.
+		</p>
+
+		<p>
+			The ReadableStream interface defines a general protocol for <a href="#producers">data producing APIs</a> to communicate with data consuming code.
+			This interface represents the potential for an infinite amount of data which are obtained over time and read once.
+		</p>
+
+                <p>
+                  The ReadableByteStream interface is extended version of ReadableStream which has functionality for high performance binary data handling.
+                  As well as Blob, it might be worth providing a way to get a URL from which we can load data stored in a ReadableByteStream.
+                </p>
+
+		<p>
+			The example below demonstrates how to obtain a ReadableByteStream from XMLHttpRequest to begin playing a large video in <code>readystate</code> LOADING.
+			The example takes the ReadableByteStream from a <a href="#producers">producer</a>, XMLHttpRequest, and gives it to a <a href="#consumers">consumer</a>, the video tag.
+		</p>
+
+		<div class="example"><div class="example-title"><span>Example 1</span></div><pre class="example">function handler() {
+  if (this.readyState == this.LOADING) {
+    var rbs = this.response;
+    var rbsURL = URL.createObjectURL(rbs);
+    document.getElementById("placeToPlayMyVideo").src = rbsURL;
+  }
+}
+
+var client = new XMLHttpRequest();
+client.onreadystatechange = handler;
+client.open("GET", "/myvideo");
+client.responseType = "stream";
+client.send();</pre></div>
+	</section>
+
+	<section class="section" id="writableStream" typeof="bibo:Chapter" resource="#writableStream" rel="bibo:Chapter">
+          <!--OddPage--><h2 role="heading" id="h2_writableStream"><span class="secno">2. </span>Extension to WritableByteStream</h2>
+
+          <p>
+            It might be worth adding an option to pass a pair of a DOMString and an encoding identifier to the write() method.
+				This parameter could be provided as an attribute of the stream instead of the argument of the write() method as it's not likely to be changed frequently.
+          </p>
+	</section>
+
+	<section class="section" id="readableStream" typeof="bibo:Chapter" resource="#readableStream" rel="bibo:Chapter">
+	  <!--OddPage--><h2 role="heading" id="h2_readableStream"><span class="secno">3. </span>Extension to ReadableByteStream</h2>
+
+          <p>
+            It was discussed that the ReadableByteStream should provide a method to read data in various form such as Blob, ArrayBuffer, etc.
+            However, the stream may receive data from the underlying sink without preceding read() call.
+            It would be inefficient to create a data holder of the type specified on read() call.
+            Type specification method should be done on the API instead of being included in the Streams API.
+            The same argument applies to the functionality to specify the encoding using which the read data will be converted into a DOMString.
+          </p>
+	</section>
+
+	<section class="section" id="producers-consumers" typeof="bibo:Chapter" resource="#producers-consumers" rel="bibo:Chapter">
+		<!--OddPage--><h2 role="heading" id="h2_producers-consumers"><span class="secno">4. </span>Stream Consumers and Producers</h2>
+		<p>
+			Byte streams can be both produced and consumed by various APIs. APIs which create streams are identified as producers, and ones which read and act on a byte stream are known as consumers.
+			This section identifies some of the notable APIs where Streams may be produced and consumed.
+			</p><div class="note"><div class="note-title" aria-level="1" role="heading" id="h_note_1"><span>Note</span></div><section class="">The list of producers and consumers below is not an exhaustive list. It is placed here as informative for the time being.</section></div>
+		<p></p>
+		<section class="section" id="consumers" typeof="bibo:Chapter" resource="#consumers" rel="bibo:Chapter">
+			<h3 role="heading" id="h3_consumers"><span class="secno">4.1 </span>Stream Consumers</h3>
+			<p>This section outlines APIs which can consume a byte stream</p>
+			<ul>
+				<li>XMLHttpRequest</li>
+				<li>Web Audio</li>
+				<li>Media Source Extensions</li>
+				<li>Web Cryptography API</li>
+				<li>TextEncoder</li>
+				<li>TextDecoder</li>
+				<li>WebSockets</li>
+				<li>RTCPeerConnection</li>
+				<li>FileWriter</li>
+			</ul>
+		</section>
+
+		<section class="section" id="producers" typeof="bibo:Chapter" resource="#producers" rel="bibo:Chapter">
+			<h3 role="heading" id="h3_producers"><span class="secno">4.2 </span>Stream Producers</h3>
+			<p>This section outlines APIs which can produce a byte stream</p>
+			<ul>
+				<li>XMLHttpRequest</li>
+				<li>FileReader</li>
+				<li>Media Capture</li>
+				<li>MediaStream Recording API</li>
+				<li>Indexed Database</li>
+				<li>Web Cryptography API</li>
+				<li>TextEncoder</li>
+				<li>TextDecoder</li>
+				<li>WebSockets</li>
+				<li>EventSource</li>
+				<li>RTCPeerConnection</li>
+			</ul>
+		</section>
+	</section>
+
+	<section class="section" id="security" typeof="bibo:Chapter" resource="#security" rel="bibo:Chapter">
+		<!--OddPage--><h2 role="heading" id="h2_security"><span class="secno">5. </span>Security Considerations</h2>
+		<p>
+			A ReadableByteStream should have the same security considerations as a <code>Blob</code>.
+			This is outlined in <a href="http://dev.w3.org/2006/webapi/FileAPI/#security-discussion">6.8. Security Considerations</a>
+			of the File API specification. [<cite><a class="bibref" href="#bib-FILE-API">FILE-API</a></cite>]
+			Because a ReadableByteStream uses a <code>Blob URI</code>, cross origin requests on a ReadableByteStream will not be supported.
+		</p>
+	</section>
+
+	<section class="appendix" id="acknowledgements">
+		<!--OddPage--><h2 role="heading" id="h2_acknowledgements"><span class="secno">A. </span>Acknowledgements</h2>
+		<p>
+			Thanks to Eliot Graff for editorial assistance.
+			Special thanks to the <abbr title="World Wide Web Consortium">W3C</abbr>.
+			The editor would like to thank
+			Adrian Bateman,
+			Anne van Kesteren,
+			Austin William Wright,
+			Aymeric Vitte,
+			Domenic Denicola,
+			Elliott Sprehn,
+			Francois-Xavier Kowalski,
+			Harris Syed,
+			Isaac Schlueter,
+			Jonas Sicking,
+			Kenneth Russell,
+			Kinuko Yasuda,
+			Lindsay Verola,
+			Michael Davidson,
+			Rob Manson,
+			Taiju Tsuiki,
+			Yusuke Suzuki,
+			Yutaka Hirano,
+			for their contributions to this specification.
+		</p>
+	</section>
+
+
+
+<section id="references" class="appendix" typeof="bibo:Chapter" resource="#references" rel="bibo:Chapter"><!--OddPage--><h2 role="heading" id="h2_references"><span class="secno">B. </span>References</h2><section id="normative-references" typeof="bibo:Chapter" resource="#normative-references" rel="bibo:Chapter"><h3 role="heading" id="h3_normative-references"><span class="secno">B.1 </span>Normative references</h3><dl class="bibliography" about=""><dt id="bib-FILE-API">[FILE-API]</dt><dd rel="dcterms:requires">Arun Ranganathan; Jonas Sicking. <a href="http://www.w3.org/TR/FileAPI/"><cite>File API</cite></a>. 12 September 2013. W3C Last Call Working Draft. URL: <a href="http://www.w3.org/TR/FileAPI/">http://www.w3.org/TR/FileAPI/</a>
+</dd></dl></section></section></body></html>
