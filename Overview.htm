@@ -115,8 +115,8 @@ var respecConfig = {
 
 	<section id="abstract">
 		<p>
-			<a href="https://github.com/whatwg/streams">WHATWG Streams API</a> provides an API for representing and handling a stream of data in web applications.
-			This specification is intended to extend the spec to meet requirements specific to the browser environment.
+			The <a href="https://github.com/whatwg/streams">WHATWG Streams API</a> spec provides an API for representing and handling a stream of data in JavaScript.
+			This W3C spec is intended to extend the WHATWG spec to meet requirements specific to the browser environment.
 		</p>
 	</section>
 
@@ -125,7 +125,7 @@ var respecConfig = {
 
 		<p>
 			Web applications should have the ability to acquire, manipulate, and pass data in a wide variety of forms, including as a sequence of data made available over time.
-			This <a href="https://github.com/whatwg/streams">WHATWG Streams API</a> specification defines the basic representation for streams of data, and programmatic ways to read and write streams of data and errors raised on those operations.
+			The <a href="https://github.com/whatwg/streams">WHATWG Streams API</a> specification defines the basic representation for streams of data, and programmatic ways to read and write streams of data and errors raised on those operations.
                         This W3C spec had been defining a Streams API, but has been merged into the effort at WHATWG.
                         Feedback made for the W3C spec has been incorporated into the WHATWG Streams API specification.
                         Currently, the goal of this spec is for discussing and defining extensions to meet requirements specific to the browser environment.
@@ -140,6 +140,10 @@ var respecConfig = {
 			The ReadableStream interface defines a general protocol for <a href="#producers">data producing APIs</a> to communicate with data consuming code.
 			This interface represents the potential for an infinite amount of data which are obtained over time and read once.
 		</p>
+
+                <p>
+                  The WritableByteStream interface is extended version of WritableStream which has functionality for high performance binary data handling.
+                </p>
 
                 <p>
                   The ReadableByteStream interface is extended version of ReadableStream which has functionality for high performance binary data handling.
