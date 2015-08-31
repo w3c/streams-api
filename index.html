@@ -112,6 +112,45 @@ var respecConfig = {
 	<!-- 	table.error td, table th { border-left:solid; border-right:solid; border-bottom:solid thin; vertical-align:top; padding:0.2em } -->
 	<!-- </style> -->
 
+<style>
+.stability {
+  position: fixed;
+  bottom: 0;
+  left: 0; right: 0;
+  margin: 0 auto 0 auto;
+  width: 52%;
+  background: maroon; color: yellow;
+  -webkit-border-radius: 1em 1em 0 0;
+  -moz-border-radius: 1em 1em 0 0;
+  border-radius: 1em 1em 0 0;
+  -moz-box-shadow: 0 0 1em #500;
+  -webkit-box-shadow: 0 0 1em #500;
+  box-shadow: 0 0 1em red;
+  padding: 0.5em 1em;
+  text-align: center;
+}
+.stability strong {
+  display: block;
+}
+.stability input {
+  -moz-appearance: none; -webkit-appearance: none; margin: 0; 
+  border: 0; padding: 0.25em 0.5em; background: transparent; color: black;
+  position: absolute; top: -0.5em; right: 0; font: 1.25em sans-serif; text-align: center;
+}
+.stability input:hover {
+  color: white;
+  text-shadow: 0 0 2px black;
+}
+.stability input:active {
+  padding: 0.3em 0.45em 0.2em 0.55em;
+}
+.stability :link, .stability :visited,
+.stability :link:hover, .stability :visited:hover {
+  background: transparent;
+  color: white;
+}
+</style>
+
 </head>
 <body>
 
@@ -283,6 +322,12 @@ client.send();</pre>
 			for their contributions to this specification.
 		</p>
 	</section>
-
+<p class="stability" id="wip">
+<b>Warning:</b><br>
+ This is an older spec snapshot. Implementors and
+ reviewers should instead read the
+ <a href="https://streams.spec.whatwg.org/">latest specification</a>,
+ which is up to date with the latest changes and bug fixes.
+</p>
 </body>
 </html>
